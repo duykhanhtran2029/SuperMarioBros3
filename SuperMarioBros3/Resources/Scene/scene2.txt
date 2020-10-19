@@ -1,8 +1,10 @@
 # id	file_path	transparent_color_r	g	b
 [TEXTURES]
-0	textures\mario.png	255	255	255
-20	textures\misc.png	176	224	248
-10	textures\enemies.png	3	26	110
+0	Resources\Textures\mario.png	255	255	255
+20	Resources\Textures\misc.png	176	224	248
+#50	Resources\Textures\enemies.png	3	26	110
+30	Resources\Textures\enemies-2.png	0	128	128
+
 
 # id	left	top	right	bottom	texture_id
 [SPRITES]
@@ -43,7 +45,18 @@
 40002	318	117	334	133	20
 40003	336	117	352	133	20
 40004	355	117	370	133	20
-						
+
+#KOOPAS
+#walk left
+50001	205	191	221	217	30
+50002	222	191	238	217	30
+#walk right
+50011	187	191	202	217	30
+50012	170	191	185	217	30
+#die
+50031	152	202	168	217	20
+
+
 # ani_id	sprite1_id	time1	sprite2_id	time2	...
 [ANIMATIONS]
 
@@ -81,7 +94,13 @@
 # die
 702	30003	100
 
-
+# ==== KOOPAS  =========
+#walk left
+801	50001	100	50002	100
+#walk right
+802	50011	100	50012	100'
+#die
+803	50031	100
 
 #
 # id	ani1	ani2	ani3
@@ -95,23 +114,24 @@
 22	602
 # GOOMBA
 3	701	702
+#KOOPAS
+4	801	802	803
 
 [OBJECTS]
 # type	x	y	ani_set_id	extra_settings per object type
-# type: 0 = Mario , 1 = Brick, 2 = Goomba
+# type: 0 = Mario , 1 = Brick, 2 = Goomba, 3 = Koopas
 # MARIO
-0	50.0	0	1
+0	10	0	1
 
-# GOOMBA
-2	200	135	3
-2	260	135	3
-2	320	135	3
-2	480	135	3
-2	500	135	3
+# KOOPAS
+3	20	124	4
 
 # BRICK 
 # --- platform (hint: I created the list using Excel!) ----
 1	0	150	2
+1	0	135	2
+1	0	120	2
+1	0	104	2
 1	16	150	2
 1	32	150	2
 1	48	150	2
@@ -140,23 +160,11 @@
 1	416	150	2
 1	432	150	2
 1	448	150	2
+#
+1	150	134	22
 
-# ---- brick group 1 ----
-1	100	74	2
-1	100	90	22
-1	84	90	22
-
-# ---- brick group 2 ----
-1	160	74	2
-1	160	90	22
-1	144	90	22
-
-# ---- brick group 3 ----
-1	220	74	2
-1	220	90	22
-1	204	90	22
 
 # --- SCENE PORTAL ----
 # type	l	t	ani_set_id	r	b	scene_id
-50	300	98	0	316	150	2
+50	300	98	0	380	150	1
 
