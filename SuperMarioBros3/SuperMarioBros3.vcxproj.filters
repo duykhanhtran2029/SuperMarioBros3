@@ -41,6 +41,9 @@
     <ClCompile Include="Mario.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Map.cpp">
+      <Filter>Map</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Animations.h">
@@ -85,6 +88,9 @@
     <ClInclude Include="Utils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Map.h">
+      <Filter>Map</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header Files">
@@ -92,6 +98,9 @@
     </Filter>
     <Filter Include="Source Files">
       <UniqueIdentifier>{33d16ce7-c9c8-4e2a-ba57-84a5f9e6c1c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Map">
+      <UniqueIdentifier>{46ba81ee-8e6a-4cff-8ba5-9156f6b03eb3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

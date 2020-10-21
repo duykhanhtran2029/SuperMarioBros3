@@ -3,7 +3,9 @@
 0	Resources\Textures\mario.png	255	255	255
 20	Resources\Textures\misc.png	176	224	248
 10	Resources\Textures\enemies.png	3	26	110
-
+30	Resources\Tilemap\world1-1_bank.png	0	0	0
+[TILEMAP DATA]
+Resources\Tilemap\world1-1.txt
 # id	left	top	right	bottom	texture_id
 [SPRITES]
 # BIG MARIO 
@@ -37,16 +39,13 @@
 30002	25	14	41	29	10
 #die
 30003	45	21	61	29	10
-
 #brick with question mark animation
 40001	300	117	316	133	20
 40002	318	117	334	133	20
 40003	336	117	352	133	20
-40004	355	117	370	133	20
-						
+40004	355	117	370	133	20		
 # ani_id	sprite1_id	time1	sprite2_id	time2	...
 [ANIMATIONS]
-
 # ==== MARIO =========
 #idle BIG right
 400	10001	100
@@ -66,23 +65,15 @@
 503	10031	100	10032	100	10033	100
 #die
 599	10099	100
-
-
 # ==== BRICK =========
 601	20001	100
-
 # ==== QUESTION MARK BRICK =========
 602	40001	1000	40001	100	40002	100	40003	100	40004	100
-
-
 # ==== GOOMBA  =========
 # walk
 701	30001	100	30002	100
 # die
 702	30003	100
-
-
-
 #
 # id	ani1	ani2	ani3
 #
@@ -95,7 +86,6 @@
 22	602
 # GOOMBA
 3	701	702
-
 [OBJECTS]
 # type	x	y	ani_set_id	extra_settings per object type
 # type: 0 = Mario , 1 = Brick, 2 = Goomba
@@ -108,7 +98,6 @@
 2	320	135	3
 2	480	135	3
 2	500	135	3
-
 # BRICK 
 # --- platform (hint: I created the list using Excel!) ----
 1	0	150	2
@@ -140,12 +129,10 @@
 1	416	150	2
 1	432	150	2
 1	448	150	2
-
 # ---- brick group 1 ----
 1	100	74	2
 1	100	90	22
 1	84	90	22
-
 # ---- brick group 2 ----
 1	160	74	2
 1	160	90	22
@@ -155,8 +142,6 @@
 1	220	74	2
 1	220	90	22
 1	204	90	22
-
 # --- SCENE PORTAL ----
 # type	l	t	ani_set_id	r	b	scene_id
 50	300	98	0	316	150	2
-

@@ -6,6 +6,7 @@
 #include "Textures.h"
 #include "Sprites.h"
 #include "Portal.h"
+#include "Map.h"
 
 using namespace std;
 
@@ -26,6 +27,7 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath):
 #define SCENE_SECTION_ANIMATIONS 4
 #define SCENE_SECTION_ANIMATION_SETS	5
 #define SCENE_SECTION_OBJECTS	6
+#define SCENE_SECTION_TILEMAP_DATA	7
 
 #define OBJECT_TYPE_MARIO	0
 #define OBJECT_TYPE_BRICK	1
@@ -36,7 +38,8 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath):
 
 #define MAX_SCENE_LINE 1024
 
-
+Map* TileMap;
+bool IsScene1 = false;
 void CPlayScene::_ParseSection_TEXTURES(string line)
 {
 	vector<string> tokens = split(line);
@@ -177,7 +180,31 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	obj->SetAnimationSet(ani_set);
 	objects.push_back(obj);
 }
+void CPlayScene::_ParseSection_TILEMAP_DATA(string line)
+{
+	int ID, rowMap, columnMap, columnTile, rowTile, totalTiles;
+	LPCWSTR path = ToLPCWSTR(line);
+	ifstream f;
 
+	f.open(path);
+	f >> ID >> rowMap >> columnMap >> rowTile >> columnTile >> totalTiles;
+	//Init Map Matrix
+
+	int** TileMapData = new int* [rowMap];
+	for (int i = 0; i < rowMap; i++)
+	{
+		TileMapData[i] = new int[columnMap];
+		for (int j = 0; j < columnMap; j++)
+			f >> TileMapData[i][j];
+	}
+	f.close();
+
+	TileMap = new Map(ID, rowMap, columnMap, rowTile, columnTile, totalTiles);
+	TileMap->ExtractTileFromTileSet();
+	TileMap->SetTileMapData(TileMapData);
+	DebugOut(L"[DETAILS] rowmap: %d	%d	%d	%d	%d\n", rowMap, columnMap, columnTile, rowTile, totalTiles);
+	IsScene1 = true;
+}
 void CPlayScene::Load()
 {
 	DebugOut(L"[INFO] Start loading scene resources from : %s \n", sceneFilePath);
@@ -198,6 +225,8 @@ void CPlayScene::Load()
 		if (line == "[TEXTURES]") { section = SCENE_SECTION_TEXTURES; continue; }
 		if (line == "[SPRITES]") { 
 			section = SCENE_SECTION_SPRITES; continue; }
+		if (line == "[TILEMAP DATA]") {
+			section = SCENE_SECTION_TILEMAP_DATA; continue; }
 		if (line == "[ANIMATIONS]") { 
 			section = SCENE_SECTION_ANIMATIONS; continue; }
 		if (line == "[ANIMATION_SETS]") { 
@@ -205,7 +234,6 @@ void CPlayScene::Load()
 		if (line == "[OBJECTS]") { 
 			section = SCENE_SECTION_OBJECTS; continue; }
 		if (line[0] == '[') { section = SCENE_SECTION_UNKNOWN; continue; }	
-
 		//
 		// data section
 		//
@@ -216,6 +244,7 @@ void CPlayScene::Load()
 			case SCENE_SECTION_ANIMATIONS: _ParseSection_ANIMATIONS(line); break;
 			case SCENE_SECTION_ANIMATION_SETS: _ParseSection_ANIMATION_SETS(line); break;
 			case SCENE_SECTION_OBJECTS: _ParseSection_OBJECTS(line); break;
+			case SCENE_SECTION_TILEMAP_DATA: _ParseSection_TILEMAP_DATA(line); break;
 		}
 	}
 
@@ -253,11 +282,14 @@ void CPlayScene::Update(DWORD dt)
 	cx -= game->GetScreenWidth() / 2;
 	cy -= game->GetScreenHeight() / 2;
 
-	CGame::GetInstance()->SetCamPos(cx, 0.0f /*cy*/);
+	CGame::GetInstance()->SetCamPos(cx, cy);
 }
 
 void CPlayScene::Render()
 {
+	if (IsScene1)
+		TileMap->Render();
+
 	for (int i = 0; i < objects.size(); i++)
 		objects[i]->Render();
 }

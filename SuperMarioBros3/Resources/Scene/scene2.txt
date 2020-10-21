@@ -4,8 +4,6 @@
 20	Resources\Textures\misc.png	176	224	248
 #50	Resources\Textures\enemies.png	3	26	110
 30	Resources\Textures\enemies-2.png	0	128	128
-
-
 # id	left	top	right	bottom	texture_id
 [SPRITES]
 # BIG MARIO 
