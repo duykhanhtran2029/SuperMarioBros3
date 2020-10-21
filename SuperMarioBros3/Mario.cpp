@@ -28,6 +28,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 	// Simple fall down
 	vy += MARIO_GRAVITY*dt;
 
+	CGame* game = CGame::GetInstance();
 	vector<LPCOLLISIONEVENT> coEvents;
 	vector<LPCOLLISIONEVENT> coEventsResult;
 
@@ -47,7 +48,12 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 	// No collision occured, proceed normally
 	if (coEvents.size()==0)
 	{
-		x += dx; 
+		if (x + dx >= game->GetCamX() + game->GetScreenWidth() - 16)//ria phai
+			x = game->GetCamX() + game->GetScreenWidth() - 16;
+		else if (x + dx <= 0)//ria trai
+			x = 0;
+		else
+			x += dx;
 		y += dy;
 	}
 	else

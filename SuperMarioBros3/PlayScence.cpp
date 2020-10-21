@@ -40,6 +40,7 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath):
 
 Map* TileMap;
 bool IsScene1 = false;
+int countc = 0;
 void CPlayScene::_ParseSection_TEXTURES(string line)
 {
 	vector<string> tokens = split(line);
@@ -159,14 +160,14 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	case OBJECT_TYPE_GOOMBA: obj = new CGoomba(); break;
 	case OBJECT_TYPE_BRICK: obj = new CBrick(); break;
 	case OBJECT_TYPE_KOOPAS: obj = new CKoopas(); break;
-	case OBJECT_TYPE_PORTAL:
-		{	
-			float r = atof(tokens[4].c_str());
-			float b = atof(tokens[5].c_str());
-			int scene_id = atoi(tokens[6].c_str());
-			obj = new CPortal(x, y, r, b, scene_id);
-		}
-		break;
+	//case OBJECT_TYPE_PORTAL:
+	//	{	
+	//		float r = atof(tokens[4].c_str());
+	//		float b = atof(tokens[5].c_str());
+	//		int scene_id = atoi(tokens[6].c_str());
+	//		obj = new CPortal(x, y, r, b, scene_id);
+	//	}
+	//	break;
 	default:
 		DebugOut(L"[ERR] Invalid object type: %d\n", object_type);
 		return;
@@ -274,22 +275,36 @@ void CPlayScene::Update(DWORD dt)
 	// skip the rest if scene was already unloaded (Mario::Update might trigger PlayScene::Unload)
 	if (player == NULL) return; 
 
-	// Update camera to follow mario
-	float cx, cy;
+
+	//get map and screen information
+	float cx, cy, sw, sh, mw, mh, mx, my;
 	player->GetPosition(cx, cy);
-
 	CGame *game = CGame::GetInstance();
-	cx -= game->GetScreenWidth() / 2;
-	cy -= game->GetScreenHeight() / 2;
+	sw = game->GetScreenWidth();
+	sh = game->GetScreenHeight();
+	mw = TileMap->GetMapWidth();
+	mh = TileMap->GetMapHeight();
 
-	CGame::GetInstance()->SetCamPos(cx, cy);
+	// Update camera to follow mario
+	if (cx >= sw / 2 //Left Edge
+	 && cx + sw / 2 <= mw) //Right Edge
+		cx -= sw / 2;
+	else if (cx < sw / 2)
+		cx = 0;
+	else if (cx + sw / 2 > mw)
+		cx = mw - sw + 1;
+	if (cy - sh / 2 <= 0)//Top Edge
+		cy = 0;
+	else if (cy + sh / 2 >= mh)//Bottom Edge
+		cy = mh - sh;
+	else cy -= sh / 2;
+	CGame::GetInstance()->SetCamPos((int)cx, (int)cy);
+	TileMap->SetCamPos((int)cx, (int)cy);
 }
 
 void CPlayScene::Render()
 {
-	if (IsScene1)
-		TileMap->Render();
-
+	TileMap->Render();
 	for (int i = 0; i < objects.size(); i++)
 		objects[i]->Render();
 }

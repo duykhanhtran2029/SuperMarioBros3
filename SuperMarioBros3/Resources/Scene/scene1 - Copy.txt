@@ -3,7 +3,7 @@
 0	Resources\Textures\mario.png	255	255	255
 20	Resources\Textures\misc.png	176	224	248
 10	Resources\Textures\enemies.png	3	26	110
-30	Resources\Tilemap\world1-1_bank.png	255	0	255
+30	Resources\Tilemap\world1-1_bank.png	0	0	0
 [TILEMAP DATA]
 Resources\Tilemap\world1-1.txt
 # id	left	top	right	bottom	texture_id
