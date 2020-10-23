@@ -21,17 +21,11 @@ void Map::Render()
 	int LastColumn = ceil( (CamX + CGame::GetInstance()->GetScreenWidth()) / TILE_WIDTH);
 	if (LastColumn >= TotalColumnsOfMap)
 		LastColumn = TotalColumnsOfMap - 1;
-	DebugOut(L"FirstColumn = %d, LastColumn = %d\n", FirstColumn, LastColumn);
-	int counttiles = 0;
 	for (int CurrentRow = 0; CurrentRow < TotalRowsOfMap; CurrentRow++)
 		for (int CurrentColumn = FirstColumn; CurrentColumn <= LastColumn; CurrentColumn++)
 		{
-			Tiles.at(TileMap[CurrentRow][CurrentColumn] - 1)->Draw(CurrentColumn * TILE_WIDTH, CurrentRow * TILE_HEIGHT);
-			counttiles++;
-			DebugOut(L"Current Row = %d, Current Column = %d\n", CurrentRow, CurrentColumn);
+			Tiles.at(TileMap[CurrentRow][CurrentColumn] - 1)->Draw(CurrentColumn * TILE_WIDTH, CurrentRow * TILE_HEIGHT, 128);
 		}
-	DebugOut(L"Rendered Tiles = %d\n", counttiles);
-			// Tiles.at(6)->Draw(CurrentColumn * TILE_WIDTH, CurrentRow * TILE_HEIGHT);
 }
 
 void Map::SetTileMapData(int** TileMapData)

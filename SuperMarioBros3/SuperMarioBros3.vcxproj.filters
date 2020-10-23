@@ -103,4 +103,7 @@
       <UniqueIdentifier>{46ba81ee-8e6a-4cff-8ba5-9156f6b03eb3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="Resources\Scene\scene1.txt" />
+  </ItemGroup>
 </Project>
