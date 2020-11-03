@@ -12,7 +12,7 @@ Resources\Tilemap\world1-1.txt
 # idle right
 10001	246	154	260	181	0
 # walk
-10002	275	154	290	181	0		
+10002	275	154	290	181	0
 10003	304	154	321	181	0
 # idle left
 10011	186	154	200	181	0
@@ -24,14 +24,28 @@ Resources\Tilemap\world1-1.txt
 #  ==== Small Mario ==== 
 # idle small right
 10021	247	0	259	15	0
-# walk
+# walk to the right
 10022	275	0	291	15	0
 10023	306	0	320	15	0
+10024	335	0	351	16	0
+10025	367	0	379	15	0
+10026	397	0	410	16	0
+#brake face to right
+10027	426	0	440	16	0
+#jump small right
+10028	395	80	411	96	0
 # idle small left
 10031	187	0	198	15	0
-# walk
+# walk to the left
 10032	155	0	170	15	0
 10033	125	0	139	15	0
+10034	95	0	111	16	0
+10035	67	0	81	15	0
+10036	36	0	50	16	0
+#brake face to left
+10037	6	0	20	16	0
+#jump small left
+10038	35	80	51	96	0
 # ==== Brick ==== 
 20001	408	225	424	241	20
 #cloud brick
@@ -77,22 +91,34 @@ Resources\Tilemap\world1-1.txt
 # ani_id	sprite1_id	time1	sprite2_id	time2	...
 [ANIMATIONS]
 # ==== Mario =========
-#idle BIG right
+# ==== BIG =====
+#idle big right
 400	10001	100
-#idle BIG left
+#idle big left
 401	10011	100
-#idle small right
-402	10021	100
-#idle small left
-403	10031	100
 #walk right big
 500	10001	100	10002	100	10003	100
 #walk left big
 501	10011	100	10012	100	10013	100
+#jump big left
+#jump big right
+# ==== SMALL =====
+#idle small right
+402	10021	100
+#idle small left
+403	10031	100
 #walk right small
-502	10021	100	10022	100	10023	100
+502	10021	100	10022	100	10023	100	10024	100
 #walk left small
-503	10031	100	10032	100	10033	100
+503	10031	100	10032	100	10033	100	10034	100
+#jump small left
+513	10038	100
+#jump small right
+512	10028	100
+#brake face to right
+522	10027	100
+#brake face to left
+523	10037	100
 #die
 599	10099	100
 # ==== Brick =========
@@ -114,9 +140,9 @@ Resources\Tilemap\world1-1.txt
 702	30003	100
 #  ==== Block  ====
 # pink
-623 40003	100
 621	40001	100
 622	40002	100
+623	40003	100
 # cyan
 624	40004	100
 625	40005	100
@@ -134,7 +160,7 @@ Resources\Tilemap\world1-1.txt
 #
 [ANIMATION_SETS]
 # Mario
-1	400	401	402	403	500	501	502	503	599
+1	400	401	402	403	500	501	502	503	512	513	522	533	599
 # Brick
 46	601
 # Cloud Brick 

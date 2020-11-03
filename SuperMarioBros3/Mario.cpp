@@ -10,14 +10,20 @@
 
 CMario::CMario(float x, float y) : CGameObject()
 {
-	level = MARIO_LEVEL_BIG;
+	level = MARIO_LEVEL_SMALL;
 	untouchable = 0;
+	WalkingStacks = 0;
 	SetState(MARIO_STATE_IDLE);
 
 	start_x = x; 
 	start_y = y; 
 	this->x = x; 
 	this->y = y; 
+
+	JumpingStacks = 0;
+	isReadyToJump = true;
+	isTouchingGround = false;
+	isFalling = false;
 }
 
 void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
@@ -47,10 +53,10 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 
 	// No collision occured, proceed normally
 	if (coEvents.size()==0)
-	{
-		if (x + dx >= game->GetCamX() + game->GetScreenWidth() - 16)//ria phai
+	{	
+		if (x + dx >= game->GetCamX() + game->GetScreenWidth() - 16)//Right edge
 			x = game->GetCamX() + game->GetScreenWidth() - 16;
-		else if (x + dx <= 0)//ria trai
+		else if (x + dx <= 0)//Left edge
 			x = 0;
 		else
 			x += dx;
@@ -68,7 +74,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 		// how to push back Mario if collides with a moving objects, what if Mario is pushed this way into another object?
 		//if (rdx != 0 && rdx!=dx)
 		//	x += nx*abs(rdx); 
-		
+
 		// block every object first!
 		x += min_tx*dx + nx*0.4f;
 		y += min_ty*dy + ny*0.4f;
@@ -76,7 +82,10 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 		if (nx!=0) vx = 0;
 		if (ny!=0) vy = 0;
 
-
+		//reset jump
+		isTouchingGround = true;
+		isReadyToJump = true;
+		JumpingStacks = 0;
 		//
 		// Collision logic with other objects
 		//
@@ -128,6 +137,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 
 void CMario::Render()
 {
+	//DebugOut(L"Is touching ground: %d\t Walking stacks: %d\n", isTouchingGround,WalkingStacks);
 	int ani = -1;
 	if (state == MARIO_STATE_DIE)
 		ani = MARIO_ANI_DIE;
@@ -145,14 +155,31 @@ void CMario::Render()
 	}
 	else if (level == MARIO_LEVEL_SMALL)
 	{
-		if (vx == 0)
+		if (isTouchingGround == false)
 		{
-			if (nx>0) ani = MARIO_ANI_SMALL_IDLE_RIGHT;
-			else ani = MARIO_ANI_SMALL_IDLE_LEFT;
+			if (nx > 0)
+				ani = MARIO_ANI_SMALL_JUMPING_RIGHT;
+			else ani = MARIO_ANI_SMALL_JUMPING_LEFT;
 		}
-		else if (vx > 0)
-			ani = MARIO_ANI_SMALL_WALKING_RIGHT;
-		else ani = MARIO_ANI_SMALL_WALKING_LEFT;
+		else
+		{
+			if (vx == 0)
+			{
+				//if (WalkingStacks > 3)
+				//{
+				//	if (nx > 0) ani = MARIO_ANI_SMALL_BRAKING_LEFT;
+				//	else ani = MARIO_ANI_SMALL_BRAKING_RIGHT;
+				//}
+				//else
+				//{
+					if (nx > 0) ani = MARIO_ANI_SMALL_IDLE_RIGHT;
+					else ani = MARIO_ANI_SMALL_IDLE_LEFT;
+				//}
+			}
+			else if (vx > 0)
+				ani = MARIO_ANI_SMALL_WALKING_RIGHT;
+			else ani = MARIO_ANI_SMALL_WALKING_LEFT;
+		}
 	}
 
 	int alpha = 255;
@@ -162,31 +189,104 @@ void CMario::Render()
 
 	RenderBoundingBox();
 }
-
-void CMario::SetState(int state)
+void CMario::SetState(int istate)
 {
-	CGameObject::SetState(state);
-
-	switch (state)
+	//DebugOut(L"Current State: %d\n", state);
+	CGameObject::SetState(istate);
+	switch (istate)
 	{
 	case MARIO_STATE_WALKING_RIGHT:
-		vx = MARIO_WALKING_SPEED;
+		if (nx == -1)
+		{
+			if (isTouchingGround)
+			{
+				WalkingStacks = 0;
+				vx = MARIO_WALKING_SPEED;
+			}
+			else
+			{
+				isFalling = true;
+				vx = 0;
+			}
+		}
+		else
+		{
+			if (!(isFalling && vx == 0))
+			{
+				WalkingStacks++;
+				if (WalkingStacks > MARIO_SPEED_MAX_STACKS)
+					WalkingStacks = MARIO_SPEED_MAX_STACKS;
+
+				if (WalkingStacks == MARIO_SPEED_MAX_STACKS)
+					vx = MARIO_WALKING_SPEED + MARIO_ACCELERATION * MARIO_SPEED_MAX_STACKS;
+				else
+					vx = MARIO_WALKING_SPEED;
+			}
+		}
 		nx = 1;
 		break;
 	case MARIO_STATE_WALKING_LEFT: 
-		vx = -MARIO_WALKING_SPEED;
+		if (nx == 1)
+		{
+			if (isTouchingGround)
+			{
+				WalkingStacks = 0;
+				vx -= MARIO_WALKING_SPEED;
+			}
+			else
+			{
+				isFalling = true;
+				vx = 0;
+			}
+			//DebugOut(L"Right to Left\n");
+		}
+		else
+		{
+			if (!(isFalling && vx == 0))
+			{
+				WalkingStacks++;
+				if (WalkingStacks > MARIO_SPEED_MAX_STACKS)
+					WalkingStacks = MARIO_SPEED_MAX_STACKS;
+				if (WalkingStacks == MARIO_SPEED_MAX_STACKS)
+					vx = -(MARIO_WALKING_SPEED + MARIO_ACCELERATION * MARIO_SPEED_MAX_STACKS);
+				else
+					vx = -MARIO_WALKING_SPEED;
+			}
+
+		}
 		nx = -1;
 		break;
 	case MARIO_STATE_JUMP:
-		// TODO: need to check if Mario is *current* on a platform before allowing to jump again
-		vy = -MARIO_JUMP_SPEED_Y;
+		if (isTouchingGround)
+		{
+			JumpingStacks++;
+			vy = -MARIO_JUMP_SPEED_Y;
+			isTouchingGround = false;
+		}
+		else
+		{
+			if (JumpingStacks <= MARIO_JUMP_MAX_STACKS && JumpingStacks > 0 && !isFalling)
+			{
+				vy = -MARIO_JUMP_SPEED_Y;
+				JumpingStacks++;
+			}
+		}
+		if (JumpingStacks == MARIO_JUMP_MAX_STACKS)
+		{
+			isReadyToJump = false;
+			isFalling = true;
+		}
 		break; 
 	case MARIO_STATE_IDLE: 
 		vx = 0;
+		WalkingStacks = 0;
 		break;
 	case MARIO_STATE_DIE:
 		vy = -MARIO_DIE_DEFLECT_SPEED;
 		break;
+	//case MARIO_STATE_BRAKE:
+	//	vx = 0;
+	//	break;
 	}
 }
 

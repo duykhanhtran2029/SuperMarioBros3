@@ -7,6 +7,8 @@
 #include "Sprites.h"
 #include "Portal.h"
 #include "Map.h"
+#include "Block.h"
+#include "Define.h"
 
 using namespace std;
 
@@ -33,14 +35,13 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath):
 #define OBJECT_TYPE_BRICK	1
 #define OBJECT_TYPE_GOOMBA	2
 #define OBJECT_TYPE_KOOPAS	3
+#define OBJECT_TYPE_BLOCK	4
 
 #define OBJECT_TYPE_PORTAL	50
 
 #define MAX_SCENE_LINE 1024
 
 Map* TileMap;
-bool IsScene1 = false;
-int countc = 0;
 void CPlayScene::_ParseSection_TEXTURES(string line)
 {
 	vector<string> tokens = split(line);
@@ -160,6 +161,7 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	case OBJECT_TYPE_GOOMBA: obj = new CGoomba(); break;
 	case OBJECT_TYPE_BRICK: obj = new CBrick(); break;
 	case OBJECT_TYPE_KOOPAS: obj = new CKoopas(); break;
+	case OBJECT_TYPE_BLOCK: obj = new CBlock(); break;
 	//case OBJECT_TYPE_PORTAL:
 	//	{	
 	//		float r = atof(tokens[4].c_str());
@@ -204,7 +206,6 @@ void CPlayScene::_ParseSection_TILEMAP_DATA(string line)
 	TileMap->ExtractTileFromTileSet();
 	TileMap->SetTileMapData(TileMapData);
 	DebugOut(L"[DETAILS] rowmap: %d	%d	%d	%d	%d\n", rowMap, columnMap, columnTile, rowTile, totalTiles);
-	IsScene1 = true;
 }
 void CPlayScene::Load()
 {
@@ -322,7 +323,7 @@ void CPlayScene::Unload()
 
 	DebugOut(L"[INFO] Scene %s unloaded! \n", sceneFilePath);
 }
-
+int cc = 0;
 void CPlayScenceKeyHandler::OnKeyDown(int KeyCode)
 {
 	//DebugOut(L"[INFO] KeyDown: %d\n", KeyCode);
@@ -330,15 +331,25 @@ void CPlayScenceKeyHandler::OnKeyDown(int KeyCode)
 	CMario *mario = ((CPlayScene*)scence)->GetPlayer();
 	switch (KeyCode)
 	{
-	case DIK_SPACE:
-		mario->SetState(MARIO_STATE_JUMP);
-		break;
 	case DIK_A: 
 		mario->Reset();
 		break;
 	}
 }
-
+void CPlayScenceKeyHandler::OnKeyUp(int KeyCode)
+{
+	CMario* mario = ((CPlayScene*)scence)->GetPlayer();
+	switch (KeyCode)
+	{
+		case DIK_SPACE:
+			if (mario->isTouchingGround)
+				mario->SetisReadyToJump(true);
+			else
+				mario->SetisReadyToJump(false);
+			mario->SetisFalling(false);
+			break;
+	}
+}
 void CPlayScenceKeyHandler::KeyState(BYTE *states)
 {
 	CGame *game = CGame::GetInstance();
@@ -346,6 +357,10 @@ void CPlayScenceKeyHandler::KeyState(BYTE *states)
 
 	// disable control key when Mario die 
 	if (mario->GetState() == MARIO_STATE_DIE) return;
+	if (game->IsKeyDown(DIK_SPACE) && mario->isReadyToJump && mario->isFalling == false)
+	{
+		mario->SetState(MARIO_STATE_JUMP);
+	}
 	if (game->IsKeyDown(DIK_RIGHT))
 		mario->SetState(MARIO_STATE_WALKING_RIGHT);
 	else if (game->IsKeyDown(DIK_LEFT))
