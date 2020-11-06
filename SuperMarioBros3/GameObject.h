@@ -56,6 +56,9 @@ public:
 
 	float ax, ay; //acceleration
 
+	int DebugAlpha = 0;
+	int DebugTag = 0;
+
 	int nx;	 
 
 	int state;
@@ -71,9 +74,12 @@ public:
 	void GetSpeed(float &vx, float &vy) { vx = this->vx; vy = this->vy; }
 
 	int GetState() { return this->state; }
+	
+	void SetDebugAlpha(int Da) { DebugAlpha = Da; }
+	void SetDebugTag(int tag) { DebugTag = tag; }
 
-	void RenderBoundingBox(int alpha = 0);
-
+	void RenderBoundingBox();
+	bool isColliding(float friend_left, float friend_top, float friend_right, float friend_bottom);
 	void SetAnimationSet(LPANIMATION_SET ani_set) { animation_set = ani_set; }
 
 	LPCOLLISIONEVENT SweptAABBEx(LPGAMEOBJECT coO);

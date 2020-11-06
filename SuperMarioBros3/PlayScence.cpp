@@ -135,12 +135,14 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	//DebugOut(L"--> %s\n",ToWSTR(line).c_str());
 
 	if (tokens.size() < 3) return; // skip invalid lines - an object set must have at least id, x, y
-
+	int tag = 0;
 	int object_type = atoi(tokens[0].c_str());
 	float x = atof(tokens[1].c_str());
 	float y = atof(tokens[2].c_str());
 
 	int ani_set_id = atoi(tokens[3].c_str());
+	if(tokens.size() == 5)
+		tag = atof(tokens[4].c_str());
 
 	CAnimationSets * animation_sets = CAnimationSets::GetInstance();
 
@@ -159,8 +161,8 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 
 		DebugOut(L"[INFO] Player object created!\n");
 		break;
-	case OBJECT_TYPE_GOOMBA: obj = new CGoomba(); break;
-	case OBJECT_TYPE_BRICK: obj = new CBrick(); break;
+	case OBJECT_TYPE_GOOMBA: obj = new CGoomba(tag); break;
+	case OBJECT_TYPE_BRICK: obj = new CBrick(tag); break;
 	case OBJECT_TYPE_KOOPAS: obj = new CKoopas(); break;
 	case OBJECT_TYPE_BLOCK: obj = new CBlock(); break;
 	//case OBJECT_TYPE_PORTAL:
@@ -262,7 +264,19 @@ void CPlayScene::Update(DWORD dt)
 {
 	// We know that Mario is the first object in the list hence we won't add him into the colliable object list
 	// TO-DO: This is a "dirty" way, need a more organized way 
-
+	//for (auto i = objects.begin() + 1; i != objects.end(); ++i)
+	//{
+	//	if (dynamic_cast<CGoomba*>(*i))
+	//	{
+	//		CGoomba* goomba = dynamic_cast<CGoomba*>(*i);
+	//		if (goomba->GetState() == GOOMBA_STATE_DIE)
+	//		{
+	//			objects.erase(i);
+	//			i--;
+	//			delete goomba;
+	//		}
+	//	}
+	//}
 	vector<LPGAMEOBJECT> coObjects;
 	for (size_t i = 1; i < objects.size(); i++)
 	{
@@ -301,7 +315,8 @@ void CPlayScene::Update(DWORD dt)
 		cy = mh - sh;
 	else cy -= sh / 2;
 	CGame::GetInstance()->SetCamPos((int)cx, (int)cy);
-	TileMap->SetCamPos((int)cx, (int)cy);
+	//TileMap->SetCamPos((int)cx, (int)cy);
+	TileMap->SetCamPos(cx, cy);
 }
 
 void CPlayScene::Render()
