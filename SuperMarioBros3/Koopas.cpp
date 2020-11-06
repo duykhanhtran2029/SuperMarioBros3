@@ -5,7 +5,7 @@ CKoopas::CKoopas()
 	SetState(KOOPAS_STATE_WALKING);
 }
 
-void CKoopas::GetBoundingBox(float &left, float &top, float &right, float &bottom)
+void CKoopas::GetBoundingBox(float& left, float& top, float& right, float& bottom)
 {
 	left = x;
 	top = y;
@@ -17,7 +17,7 @@ void CKoopas::GetBoundingBox(float &left, float &top, float &right, float &botto
 		bottom = y + KOOPAS_BBOX_HEIGHT;
 }
 
-void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
+void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
 	CGameObject::Update(dt, coObjects);
 
@@ -64,5 +64,5 @@ void CKoopas::SetState(int state)
 	case KOOPAS_STATE_WALKING:
 		vx = KOOPAS_WALKING_SPEED;
 	}
-
 }
+

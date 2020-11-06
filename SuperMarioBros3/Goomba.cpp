@@ -24,7 +24,7 @@ void CGoomba::CalcPotentialCollisions(vector<LPGAMEOBJECT>* coObjects, vector<LP
 void CGoomba::GetBoundingBox(float& left, float& top, float& right, float& bottom)
 {
 
-	if (state == GOOMBA_STATE_DIE_BY_KICK || state == GOOMBA_STATE_DIE)
+	if (state == GOOMBA_STATE_DIE_BY_KICK || state == GOOMBA_STATE_DISAPPEAR)
 	{
 		left = top = right = bottom = 0;
 		return;
@@ -54,15 +54,6 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	vector<LPCOLLISIONEVENT> coEventsResult;
 
 	coEvents.clear();
-
-
-	if (GetTickCount() - jumpingStart >= GOOMBA_TIME_JUMPING && type == GOOMBA_RED_FLY) // GOOMBA RED FLY JUMP
-	{
-
-		vy = -GOOMBA_JUMP_SPEED;
-		jumpingStart = GetTickCount();
-
-	}
 
 	// turn off collision when goomba kicked 
 	if (state != GOOMBA_STATE_DIE_BY_KICK && state != GOOMBA_STATE_DIE)
@@ -110,15 +101,6 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 
 				}
 			}
-
-			//else // Collisions with other things  
-			//{
-			//	if (e->nx != 0 && ny == 0 && !dynamic_cast<CFireBullet*>(e->obj))
-			//	{
-			//		vx = -vx;
-			//	}
-
-			//}
 		}
 	}
 
@@ -168,9 +150,6 @@ void CGoomba::SetState(int state)
 	case GOOMBA_STATE_DIE_BY_KICK:
 		vy = -GOOMBA_DIE_DEFLECT_SPEED;
 		vx = -vx;
-		break;
-	case GOOMBA_STATE_RED_LOSE_WINGS:
-		vy = 0;
 		break;
 	case GOOMBA_STATE_WALKING:
 		vx = -GOOMBA_WALKING_SPEED;

@@ -10,7 +10,7 @@
 #define MARIO_ACCELERATION_JUMP		0.0005f
 #define MARIO_JUMP_SPEED_MAX		0.28f
 #define MARIO_JUMP_SPEED_MIN		0.18f
-#define MARIO_JUMP_DEFLECT_SPEED	0.2f
+#define MARIO_JUMP_DEFLECT_SPEED	0.28f
 #define MARIO_GRAVITY				0.002f
 #define MARIO_DIE_DEFLECT_SPEED		0.5f
 
@@ -22,9 +22,9 @@
 
 #define MARIO_STATE_IDLE			0
 #define MARIO_STATE_WALKING_RIGHT	100
-#define MARIO_STATE_WALKING_LEFT	200
-#define MARIO_STATE_JUMP			300
-#define MARIO_STATE_SIT				330
+#define MARIO_STATE_WALKING_LEFT	101
+#define MARIO_STATE_JUMP			200
+#define MARIO_STATE_SIT				201
 #define MARIO_STATE_INERTIA			400
 #define MARIO_STATE_DIE				900
 
@@ -125,13 +125,13 @@
 
 class CMario : public CGameObject
 {
-	int level;
-	int untouchable;
 	DWORD untouchable_start;
 
 	float start_x;			// initial position of Mario at scene
 	float start_y;
 public: 
+	int level;
+	int untouchable;
 	//state
 	bool isOnGround = false;
 
@@ -154,6 +154,9 @@ public:
 	//hold
 	bool isHolding = false;
 	bool isReadyToHold = false;
+	//kick
+	bool isKicking = false;
+	bool isReadyToKick = true;
 
 	//run
 	bool isReadyToRun = false;
@@ -166,14 +169,22 @@ public:
 	//set
 	void SetIsOnGround(bool On) { this->isReadyToHold = On; }
 	void SetIsReadyToHold(bool hold) { this->isReadyToHold = hold; }
-	void setIsReadyToJump(bool jump) { isReadyToJump = jump; }
-	void setIsJumping(bool jump) { this->isJumping = jump; }
-	void setIsFalling(bool fall) { this->isFalling = fall; }
-	void setIsReadyToSit(bool sit) { this->isReadyToSit = sit; }
-	void setIsReadyToRun(bool run) { this->isReadyToRun = run; }
-	void setIsRunning(bool run) { this->isRunning = run; }
-	void setIsSitting(bool sit) { this->isSitting= sit; }
+	void SetIsHolding(bool m) { this->isHolding = m; }
+
+	void SetIsReadyToJump(bool jump) { isReadyToJump = jump; }
+	void SetIsJumping(bool jump) { this->isJumping = jump; }
+	void SetIsFalling(bool fall) { this->isFalling = fall; }
+
+	void SetIsReadyToRun(bool run) { this->isReadyToRun = run; }
+	void SetIsRunning(bool run) { this->isRunning = run; }
+
+	void SetIsReadyToSit(bool sit) { this->isReadyToSit = sit; }
+	void SetIsSitting(bool sit) { this->isSitting= sit; }
+
 	void SetIsShootingFireBall(bool shoot) { this->isShootingFireBall = shoot; }
+
+	void SetIsReadyToKick(bool m) { this->isReadyToKick = m; }
+	void SetIsKicking(bool m) { this->isKicking = m; }
 
 	//render for all
 	void BasicRenderLogicsForAllLevel(int& ani,
