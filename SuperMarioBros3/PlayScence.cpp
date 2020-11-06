@@ -108,9 +108,11 @@ void CPlayScene::_ParseSection_ANIMATION_SETS(string line)
 	if (tokens.size() < 2) return; // skip invalid lines - an animation set must at least id and one animation id
 
 	int ani_set_id = atoi(tokens[0].c_str());
-
-	LPANIMATION_SET s = new CAnimationSet();
-
+	LPANIMATION_SET s;
+	if (CAnimationSets::GetInstance()->animation_sets[ani_set_id] != NULL)
+		s = CAnimationSets::GetInstance()->animation_sets[ani_set_id];
+	else
+		s = new CAnimationSet();
 	CAnimations *animations = CAnimations::GetInstance();
 
 	for (int i = 1; i < tokens.size(); i++)
@@ -120,7 +122,6 @@ void CPlayScene::_ParseSection_ANIMATION_SETS(string line)
 		LPANIMATION ani = animations->Get(ani_id);
 		s->push_back(ani);
 	}
-
 	CAnimationSets::GetInstance()->Add(ani_set_id, s);
 }
 
@@ -331,6 +332,18 @@ void CPlayScenceKeyHandler::OnKeyDown(int KeyCode)
 	CMario *mario = ((CPlayScene*)scence)->GetPlayer();
 	switch (KeyCode)
 	{
+	case DIK_1:
+		mario->SetLevel(MARIO_LEVEL_SMALL);
+		break;
+	case DIK_2:
+		mario->SetLevel(MARIO_LEVEL_BIG);
+		break;
+	case DIK_3:
+		mario->SetLevel(MARIO_LEVEL_TAIL);
+		break;
+	case DIK_4:
+		mario->SetLevel(MARIO_LEVEL_FIRE);
+		break;
 	case DIK_A: 
 		mario->Reset();
 		break;
@@ -342,12 +355,19 @@ void CPlayScenceKeyHandler::OnKeyUp(int KeyCode)
 	switch (KeyCode)
 	{
 		case DIK_SPACE:
-			if (mario->isTouchingGround)
-				mario->SetisReadyToJump(true);
+			if (mario->isOnGround)
+				mario->setIsReadyToJump(true);
 			else
-				mario->SetisReadyToJump(false);
-			mario->SetisFalling(false);
+				mario->setIsReadyToJump(false);
 			break;
+		/*case DIK_DOWN:
+			mario->SetPosition(mario->x, mario->y - 9);*/
+		//case DIK_RIGHT:
+		//	mario->SetState(MARIO_STATE_INERTIA);
+		//	break;
+		//case DIK_LEFT:
+		//	mario->SetState(MARIO_STATE_INERTIA);
+		//	break;
 	}
 }
 void CPlayScenceKeyHandler::KeyState(BYTE *states)
@@ -357,14 +377,18 @@ void CPlayScenceKeyHandler::KeyState(BYTE *states)
 
 	// disable control key when Mario die 
 	if (mario->GetState() == MARIO_STATE_DIE) return;
-	if (game->IsKeyDown(DIK_SPACE) && mario->isReadyToJump && mario->isFalling == false)
+	if (game->IsKeyDown(DIK_SPACE) && mario->isReadyToJump)
 	{
 		mario->SetState(MARIO_STATE_JUMP);
+		mario->setIsJumping(true);
+		mario->setIsReadyToSit(false);
 	}
 	if (game->IsKeyDown(DIK_RIGHT))
 		mario->SetState(MARIO_STATE_WALKING_RIGHT);
 	else if (game->IsKeyDown(DIK_LEFT))
 		mario->SetState(MARIO_STATE_WALKING_LEFT);
+	else if (game->IsKeyDown(DIK_DOWN) && mario->isReadyToSit)
+		mario->SetState(MARIO_STATE_SIT);
 	else
 		mario->SetState(MARIO_STATE_IDLE);
 }

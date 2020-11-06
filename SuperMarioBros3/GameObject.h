@@ -54,6 +54,8 @@ public:
 	float vx;
 	float vy;
 
+	float ax, ay; //acceleration
+
 	int nx;	 
 
 	int state;
@@ -70,7 +72,7 @@ public:
 
 	int GetState() { return this->state; }
 
-	void RenderBoundingBox();
+	void RenderBoundingBox(int alpha = 0);
 
 	void SetAnimationSet(LPANIMATION_SET ani_set) { animation_set = ani_set; }
 
@@ -89,6 +91,7 @@ public:
 	CGameObject();
 
 	virtual void GetBoundingBox(float &left, float &top, float &right, float &bottom) = 0;
+	bool CheckBoundingBox(float left, float top, float right, float bottom);
 	virtual void Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects = NULL);
 	virtual void Render() = 0;
 	virtual void SetState(int state) { this->state = state; }

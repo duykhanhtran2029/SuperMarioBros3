@@ -8,44 +8,158 @@
 Resources\Tilemap\world1-1.txt
 # id	left	top	right	bottom	texture_id
 [SPRITES]
-#  ==== Big Mario  ==== 
-# idle right
-10001	246	154	260	181	0
-# walk
-10002	275	154	290	181	0
-10003	304	154	321	181	0
-# idle left
-10011	186	154	200	181	0
-#walk
-10012	155	154	170	181	0
-10013	125	154	140	181	0
+# Type	Level	State	Direction	Serial
+# Type: 1 = Mario
+# Level: 0 = Small; 1 = Big; 2 = Tail; 3 = Fire
+# State: 0 = Walk; 1 = Run; 2 = Jump; 3 = Brake; 4 = Sitdown; 5 = Hold; 6 = Optional 
+# Direction: 0 = Right; 1 = Left, null = Idle
+# Serial: Optional
 # die 
-10099	215	120	231	135	0
+10909	215	120	231	135	0
 #  ==== Small Mario ==== 
-# idle small right
-10021	247	0	259	15	0
-# walk to the right
-10022	275	0	291	15	0
-10023	306	0	320	15	0
-10024	335	0	351	16	0
-10025	367	0	379	15	0
-10026	397	0	410	16	0
-#brake face to right
-10027	426	0	440	16	0
-#jump small right
-10028	395	80	411	96	0
-# idle small left
-10031	187	0	198	15	0
-# walk to the left
-10032	155	0	170	15	0
-10033	125	0	139	15	0
-10034	95	0	111	16	0
-10035	67	0	81	15	0
-10036	36	0	50	16	0
-#brake face to left
-10037	6	0	20	16	0
-#jump small left
-10038	35	80	51	96	0
+# --Right--
+# idle right
+10001	247	0	259	15	0
+#walk right
+10002	275	0	291	15	0
+10003	306	0	320	15	0
+#run right
+10104	335	0	351	16	0
+10105	367	0	379	15	0
+10106	397	0	410	16	0
+#jump up right
+10201	395	80	411	96	0
+#jump down right
+10202	395	80	411	96	0
+#brake right
+10307	6	0	20	16	0
+# --Left--
+# idle left
+10011	187	0	198	15	0
+#walk left
+10012	155	0	170	15	0
+10013	125	0	139	15	0
+#run left
+10114	95	0	111	16	0
+10115	67	0	81	15	0
+10116	36	0	50	16	0
+#jump up left
+10211	35	80	51	96	0
+#jump down left
+10212	35	80	51	96	0
+#brake left
+10317	426	0	440	16	0
+#  ==== Big Mario  ==== 
+# --Right--
+# idle right
+11001	246	154	260	181	0
+#walk right
+11002	275	154	291	181	0
+11003	305	155	321	181	0
+#run right
+11104	334	154	353	181	0
+11105	362	154	381	181	0
+11106	392	155	411	181	0
+#jump up right
+11201	395	275	411	301	0
+#jump down right
+11202	305	155	321	181	0
+#brake right
+11307	5	154	21	182	0
+#sit right
+11408	426	239	440	257	0
+# --Left--
+# idle left
+11011	186	154	200	181	0
+#walk left
+11012	155	154	170	181	0
+11013	125	154	140	181	0
+#run left
+11114	93	154	112	181	0
+11115	65	154	84	181	0
+11116	35	155	54	181	0
+#jump up left
+11211	35	275	51	301	0
+#jump down left
+11212	125	155	141	181	0
+#brake left
+11317	425	154	441	182	0
+#sit left
+11418	6	239	20	257	0
+#  ==== Tail Mario ==== 
+# --Right--
+# idle right
+12001	243	634	264	662	0
+#walk right
+12002	272	634	294	662	0
+12003	303	634	324	661	0
+#run right
+12104	331	634	355	662	0
+12105	362	634	385	662	0
+12106	393	634	414	661	0
+#jump up right
+12201	392	754	415	781	0
+#jump down right
+12202	303	634	324	661	0
+#brake right
+12307	5 	633	21	663	0
+#sit right
+12408	422	719	444	737	0
+# --Left--
+# idle left
+12011	182	634	203	662	0
+#walk left
+12012	152	634	174	662	0
+12013	122	634	143	661	0
+#run left
+12114	91	634	115	662	0
+12115	61	634	84	662	0
+12116	32	634	53	661	0
+#jump up left
+12211	31	754	54	781	0
+#jump down left
+12212	122	634	143	661	0
+#brake left
+12317	425	633	441	663	0
+#sit left
+12418	2	719	24	737	0
+#  ==== Fire Mario ==== 
+# --Right--
+# idle right
+13001	246	394	260	421	0
+#walk right
+13002	275	394	291	421	0
+13003	305	395	321	421	0
+#run right
+13104	334	394	353	421	0
+13105	362	394	381	421	0
+13106	392	395	411	421	0
+#jump up right
+13201	395	515	411	541	0
+#jump down right
+13202	305	395	321	421	0
+#brake right
+13307	5	394	21	422	0
+#sit right
+13408	426	479	440	497	0
+# --Left--
+# idle left
+13011	186	394	200	421	0
+#walk left
+13012	155	394	171	421	0
+13013	125	395	141	421	0
+#run left
+13114	93	394	112	421	0
+13115	65	394	84	421	0
+13116	35	395	54	421	0
+#jump up left
+13211	35	515	51	541	0
+#jump down left
+13212	125	395	141	421	0
+#brake left
+13317	425	394	441	422	0
+#sit left
+13418	6	479	20	497	0
 # ==== Brick ==== 
 20001	408	225	424	241	20
 #cloud brick
@@ -91,36 +205,146 @@ Resources\Tilemap\world1-1.txt
 # ani_id	sprite1_id	time1	sprite2_id	time2	...
 [ANIMATIONS]
 # ==== Mario =========
-# ==== BIG =====
-#idle big right
-400	10001	100
-#idle big left
-401	10011	100
-#walk right big
-500	10001	100	10002	100	10003	100
-#walk left big
-501	10011	100	10012	100	10013	100
-#jump big left
-#jump big right
+#Type Level State Direction
+# Type: 1 = Mario
+# Level: 0 = Small; 1 = Big; 2 = Tail; 3 = Fire
+# State: 0 = Walk; 1 = Run; 2 = Jump; 3 = Brake; 4 = Sitdown; 5 = Hold; 6 = Fast 
+# Direction: 0 = Right; 1 = Left, null = Idle; 3 = RightDown; 4 = LeftDown
 # ==== SMALL =====
 #idle small right
-402	10021	100
+100	10001	100
+#walk small right
+1000	10001	100	10002	100	10003	100
+#walk fast small right
+1060	10001	50	10002	50	10003	50
+#run small right
+1010	10104	100	10105	100	10106	100
+#jump up small right
+1020	10201	100
+#jump down small right
+1023	10202	100
+#brake small right 
+1030	10307	100
+
 #idle small left
-403	10031	100
-#walk right small
-502	10021	100	10022	100	10023	100	10024	100
-#walk left small
-503	10031	100	10032	100	10033	100	10034	100
-#jump small left
-513	10038	100
-#jump small right
-512	10028	100
-#brake face to right
-522	10027	100
-#brake face to left
-523	10037	100
+101	10011	100
+#walk small left
+1001	10011	100	10012	100	10013	100
+#walk fast small left
+1061	10011	50	10012	50	10013	50
+#run small left
+1011	10114	100	10115	100	10116	100
+#jump up small left
+1021	10211	100
+#jump down small left
+1024	10212	100
+#brake small left 
+1031	10317	100
+# ==== BIG =====
+#idle big right
+110	11001	100
+#walk big right
+1100	11001	100	11002	100	11003	100
+#walk fast big right
+1160	11001	50	11002	50	11003	50
+#run big right
+1110	11104	100	11105	100	11106	100
+#jump up big right
+1120	11201	100
+#jump down big right
+1123	11202	100
+#brake big right 
+1130	11307	100
+#sit big right
+1140	11408	100
+
+#idle big left
+111	11011	100
+#walk big left
+1101	11011	100	11012	100	11013	100
+#walk fast big left
+1161	11011	50	11012	50	11013	50
+#run big left
+1111	11114	100	11115	100	11116	100
+#jump up big left
+1121	11211	100
+#jump down big left
+1124	11212	100
+#brake big left 
+1131	11317	100
+#sit big left
+1141	11418	100
+# ==== TAIL =====
+#idle tail right
+120	12001	100
+#walk tail right
+1200	12001	100	12002	100	12003	100
+#walk fast tail right
+1260	12001	50	12002	50	12003	50
+#run tail right
+1210	12104	100	12105	100	12106	100
+#jump up tail right
+1220	12201	100
+#jump down tail right
+1223	12202	100
+#brake tail right 
+1230	12307	100
+#sit tail right
+1240	12408	100
+
+#idle tail left
+121	12011	100
+#walk tail left
+1201	12011	100	12012	100	12013	100
+#walk fast tail left
+1261	12011	50	12012	50	12013	50
+#run tail left
+1211	12114	100	12115	100	12116	100
+#jump up tail left
+1221	12211	100
+#jump down tail left
+1224	12212	100
+#brake tail left 
+1231	12317	100
+#sit tail left
+1241	12418	100
+# ==== FIRE =====
+#idle fire right
+130	13001	100
+#walk fire right
+1300	13001	100	13002	100	13003	100
+#walk fast fire right
+1360	13001	50	13002	50	13003	50
+#run fire right
+1310	13104	100	13105	100	13106	100
+#jump up fire right
+1320	13201	100
+#jump down fire right
+1323	13202	100
+#brake fire right 
+1330	13307	100
+#sit fire right
+1340	13408	100
+
+#idle fire left
+131	13011	100
+#walk fire left
+1301	13011	100	13012	100	13013	100
+#walk fire left
+1361	13011	50	13012	50	13013	50
+#run fire left
+1311	13114	100	13115	100	13116	100
+#jump up fire left
+1321	13211	100
+#jump down fire left
+1324	13212	100
+#brake fire left 
+1331	13317	100
+#sit fire left
+1341	13418	100
+
 #die
-599	10099	100
+1099	10909	100
 # ==== Brick =========
 601	20001	100
 # ==== Brick With Question Mark =========
@@ -160,7 +384,10 @@ Resources\Tilemap\world1-1.txt
 #
 [ANIMATION_SETS]
 # Mario
-1	400	401	402	403	500	501	502	503	512	513	522	533	599
+1	100	1000	1010	1060	1020	1023	1030	101	1001	1011	1061	1021	1024	1031
+1	110	1100	1110	1160	1120	1123	1130	1140	111	1101	1111	1161	1121	1124	1131	1141
+1	120	1200	1210	1260	1220	1223	1230	1240	121	1201	1211	1261	1221	1224	1231	1241
+1	130	1300	1310	1360	1320	1323	1330	1340	131	1301	1311	1361	1321	1324	1331	1341	1099
 # Brick
 46	601
 # Cloud Brick 

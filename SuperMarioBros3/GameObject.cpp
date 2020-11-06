@@ -14,6 +14,7 @@ CGameObject::CGameObject()
 	x = y = 0;
 	vx = vy = 0;
 	nx = 1;	
+	ax = ay = 0;
 }
 
 void CGameObject::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
@@ -115,7 +116,7 @@ void CGameObject::FilterCollision(
 }
 
 
-void CGameObject::RenderBoundingBox()
+void CGameObject::RenderBoundingBox(int alpha)
 {
 	D3DXVECTOR3 p(x, y, 0);
 	RECT rect;
@@ -130,9 +131,25 @@ void CGameObject::RenderBoundingBox()
 	rect.right = (int)r - (int)l;
 	rect.bottom = (int)b - (int)t;
 
-	CGame::GetInstance()->Draw(x, y, bbox, rect.left, rect.top, rect.right, rect.bottom, 0);
+	CGame::GetInstance()->Draw(x, y, bbox, rect.left, rect.top, rect.right, rect.bottom, alpha);
 }
+bool CGameObject::CheckBoundingBox(float friend_left, float friend_top, float friend_right, float friend_bottom)
+{
+	float this_left, this_top, this_right, this_bottom;
 
+	GetBoundingBox(
+		this_left,
+		this_top,
+		this_right,
+		this_bottom);
+
+	bool on1 = friend_left < this_right;
+	bool on2 = friend_top < this_bottom;
+	bool down1 = friend_right > this_left;
+	bool down2 = friend_bottom > this_top;
+
+	return on1 && on2 && down1 && down2;
+}
 
 CGameObject::~CGameObject()
 {

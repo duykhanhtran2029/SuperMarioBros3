@@ -41,14 +41,14 @@
     <ClCompile Include="Koopas.cpp">
       <Filter>Map Objects</Filter>
     </ClCompile>
-    <ClCompile Include="Mario.cpp">
-      <Filter>Map Objects</Filter>
-    </ClCompile>
     <ClCompile Include="Portal.cpp">
       <Filter>Map Objects</Filter>
     </ClCompile>
     <ClCompile Include="Goomba.cpp">
       <Filter>Map Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="Mario.cpp">
+      <Filter>Mario</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -95,14 +95,14 @@
     <ClInclude Include="Koopas.h">
       <Filter>Map Objects</Filter>
     </ClInclude>
-    <ClInclude Include="Mario.h">
-      <Filter>Map Objects</Filter>
-    </ClInclude>
     <ClInclude Include="Portal.h">
       <Filter>Map Objects</Filter>
     </ClInclude>
     <ClInclude Include="Goomba.h">
       <Filter>Map Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Mario.h">
+      <Filter>Mario</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -120,6 +120,9 @@
     </Filter>
     <Filter Include="HUD">
       <UniqueIdentifier>{76be1072-b439-4dad-b832-af46e48d1e99}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Mario">
+      <UniqueIdentifier>{b21e6db8-be01-40d2-8def-ec37276fddee}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
