@@ -68,6 +68,9 @@ public:
 	LPANIMATION_SET animation_set;
 
 public: 
+	bool isDestroyed = false;
+	void SetIsDestroyed(bool isDestroyed) { this->isDestroyed = isDestroyed; }
+
 	void SetPosition(float x, float y) { this->x = x, this->y = y; }
 	void SetSpeed(float vx, float vy) { this->vx = vx, this->vy = vy; }
 	void GetPosition(float &x, float &y) { x = this->x; y = this->y; }

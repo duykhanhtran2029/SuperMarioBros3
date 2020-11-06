@@ -1,5 +1,5 @@
 #include "Goomba.h"
-
+#include "Brick.h"
 CGoomba::CGoomba(int ctype)
 {
 	type = ctype;
@@ -24,7 +24,7 @@ void CGoomba::CalcPotentialCollisions(vector<LPGAMEOBJECT>* coObjects, vector<LP
 void CGoomba::GetBoundingBox(float& left, float& top, float& right, float& bottom)
 {
 
-	if (state == GOOMBA_STATE_DIE_BY_KICK || state == GOOMBA_STATE_DIE)
+	if (state == GOOMBA_STATE_DIE_BY_KICK || state == GOOMBA_STATE_DISAPPEAR)
 	{
 		left = top = right = bottom = 0;
 		return;
@@ -54,16 +54,6 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	vector<LPCOLLISIONEVENT> coEventsResult;
 
 	coEvents.clear();
-
-
-	if (GetTickCount() - jumpingStart >= GOOMBA_TIME_JUMPING && type == GOOMBA_RED_FLY) // GOOMBA RED FLY JUMP
-	{
-
-		vy = -GOOMBA_JUMP_SPEED;
-		jumpingStart = GetTickCount();
-
-	}
-
 	// turn off collision when goomba kicked 
 	if (state != GOOMBA_STATE_DIE_BY_KICK && state != GOOMBA_STATE_DIE)
 		CalcPotentialCollisions(coObjects, coEvents);
@@ -92,11 +82,14 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 
 		if (ny != 0) vy = 0;
 
-		// Collision logic with the others Goombas
 		for (UINT i = 0; i < coEventsResult.size(); i++)
 		{
 			LPCOLLISIONEVENT e = coEventsResult[i];
-
+			float oLeft, oTop, oRight, oBottom;
+			float mLeft, mTop, mRight, mBottom;
+			if (e->obj->isDestroyed == true)
+				continue;
+			GetBoundingBox(mLeft, mTop, mRight, mBottom);
 			if (dynamic_cast<CGoomba*>(e->obj)) // if e->obj is Goomba 
 			{
 				CGoomba* goomba = dynamic_cast<CGoomba*>(e->obj);
@@ -110,18 +103,26 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 
 				}
 			}
+			else if (dynamic_cast<CBrick*>(e->obj))
+			{
+				CBrick* object = dynamic_cast<CBrick*>(e->obj);
+				object->GetBoundingBox(oLeft, oTop, oRight, oBottom);
 
-			//else // Collisions with other things  
-			//{
-			//	if (e->nx != 0 && ny == 0 && !dynamic_cast<CFireBullet*>(e->obj))
-			//	{
-			//		vx = -vx;
-			//	}
+				if (e->ny != 0) vy = 0;
+				if (e->nx != 0)
+				{
+					if (ceil(mBottom) != oTop)
+						vx = - vx;
+					if (ceil(mRight) == oLeft && e->nx < 0)
+						x = mLeft - 1;
+					if (ceil(mLeft) == oRight && e->nx > 0)
+						x = mLeft + 1;
+					//DebugOut(L"[RESULT]	e->nx: %f\t mBottom: %f\toTop: %f\t\n",e->nx, mBottom, oTop);
+				}
+			}
 
-			//}
 		}
 	}
-
 	if (vx < 0 && x < 0) {
 		x = 0;
 		vx = -vx;
@@ -141,7 +142,10 @@ void CGoomba::Render()
 	case GOOMBA_NORMAL:
 		ani = GOOMBA_NORMAL_ANI_WALKING;
 		if (state == GOOMBA_STATE_DISAPPEAR)
+		{
+			SetIsDestroyed(true);
 			return;
+		}
 		else if (state == GOOMBA_STATE_DIE) {
 			ani = GOOMBA_NORMAL_ANI_DIE;
 			state = GOOMBA_STATE_DISAPPEAR;

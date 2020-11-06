@@ -371,9 +371,9 @@ void CPlayScenceKeyHandler::OnKeyUp(int KeyCode)
 	{
 		case DIK_SPACE:
 			if (mario->isOnGround)
-				mario->setIsReadyToJump(true);
+				mario->SetIsReadyToJump(true);
 			else
-				mario->setIsReadyToJump(false);
+				mario->SetIsReadyToJump(false);
 			break;
 		/*case DIK_DOWN:
 			mario->SetPosition(mario->x, mario->y - 9);*/
@@ -395,8 +395,8 @@ void CPlayScenceKeyHandler::KeyState(BYTE *states)
 	if (game->IsKeyDown(DIK_SPACE) && mario->isReadyToJump)
 	{
 		mario->SetState(MARIO_STATE_JUMP);
-		mario->setIsJumping(true);
-		mario->setIsReadyToSit(false);
+		mario->SetIsJumping(true);
+		mario->SetIsReadyToSit(false);
 	}
 	if (game->IsKeyDown(DIK_RIGHT))
 		mario->SetState(MARIO_STATE_WALKING_RIGHT);

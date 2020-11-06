@@ -122,54 +122,41 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 		for (UINT i = 0; i < coEventsResult.size(); i++)
 		{
 			LPCOLLISIONEVENT e = coEventsResult[i];
+			if (e->obj->isDestroyed == true)
+				continue;
 			GetBoundingBox(mLeft, mTop, mRight, mBottom);
 			//DebugOut(L"[RESULT] mLeft: %f\tmTop: %f\tmRight: %f\tmBottom: %f\t\n", mLeft, mTop, mRight, mBottom);
 			if (dynamic_cast<CGoomba*>(e->obj)) // if e->obj is Goomba 
 			{
 				CGoomba* goomba = dynamic_cast<CGoomba*>(e->obj);
-
-				// jump on top >> kill Goomba and deflect a bit 
-				if (e->ny < 0)
-				{
-					if (goomba->GetState() != GOOMBA_STATE_DIE)
-					{
-						if (goomba->GetType() != GOOMBA_RED_FLY)
-						{
-							goomba->SetState(GOOMBA_STATE_DIE);
-							vy = -MARIO_JUMP_DEFLECT_SPEED;
-						}
-						else
-						{
-							if (goomba->GetState() != GOOMBA_STATE_RED_LOSE_WINGS)
-							{
-								goomba->SetState(GOOMBA_STATE_RED_LOSE_WINGS);
-								vy = -MARIO_JUMP_DEFLECT_SPEED;
-							}
-							else
-							{
-								goomba->SetState(GOOMBA_STATE_DIE);
-								vy = -MARIO_JUMP_DEFLECT_SPEED;
-							}
-
-						}
-					}
-				}
-				else if (e->nx != 0)
-				{
-					if (untouchable == 0)
+					// jump on top >> kill Goomba and deflect a bit 
+					if (e->ny < 0)
 					{
 						if (goomba->GetState() != GOOMBA_STATE_DIE)
 						{
-							if (level > MARIO_LEVEL_SMALL)
+							if (goomba->GetType() != GOOMBA_RED_FLY)
 							{
-								level = MARIO_LEVEL_SMALL;
-								StartUntouchable();
+								goomba->SetState(GOOMBA_STATE_DIE);
+									vy = -MARIO_JUMP_DEFLECT_SPEED;
 							}
-							else
-								SetState(MARIO_STATE_DIE);
 						}
 					}
-				}
+					else if (e->nx != 0)
+					{
+						if (untouchable == 0)
+						{
+							if (goomba->GetState() != GOOMBA_STATE_DIE)
+							{
+								if (level > MARIO_LEVEL_SMALL)
+								{
+									level = MARIO_LEVEL_SMALL;
+									StartUntouchable();
+								}
+								else
+									SetState(MARIO_STATE_DIE);
+							}
+						}
+					}
 			}
 			else if (dynamic_cast<CBrick*>(e->obj)) 
 			{
@@ -197,6 +184,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 				else
 				{
 					object->GetBoundingBox(oLeft, oTop, oRight, oBottom);
+					x += min_tx * dx + nx * 0.4f;
 					y += min_ty * dy + ny * 0.4f;
 					//DebugOut(L"[POS] x: %f\t y: %f\t\n", x, y);
 					if (e->ny != 0) vy = 0;
