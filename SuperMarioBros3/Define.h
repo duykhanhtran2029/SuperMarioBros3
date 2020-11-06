@@ -11,3 +11,5 @@
 #define SCREEN_HEIGHT 240
 
 #define MAX_FRAME_RATE 144
+
+#define PLATFORM 1

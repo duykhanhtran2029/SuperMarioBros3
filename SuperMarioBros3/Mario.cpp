@@ -9,6 +9,7 @@
 #include "Brick.h"
 #include "Block.h"
 #include "Portal.h"
+#include "Define.h"
 bool isChangeDirection = false;
 int preState = -1;
 CMario::CMario(float x, float y) : CGameObject()
@@ -66,19 +67,6 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 	{
 		vx = 0;
 	}
-	for (int i = 0; i < coObjects->size(); i++)
-	{
-		LPGAMEOBJECT obj = coObjects->at(i);
-		float pLeft, pTop, pRight, pBottom;
-		obj->GetBoundingBox(pLeft, pTop, pRight, pBottom);
-		if (dynamic_cast<CBrick*>(obj))
-		{
-			if (CheckBoundingBox(pLeft, pTop, pRight, pBottom))
-			{
-				y -= y + MARIO_BIG_BBOX_HEIGHT - pTop + 1.0f;
-			}
-		}
-	}
 	CGame* game = CGame::GetInstance();
 	vector<LPCOLLISIONEVENT> coEvents;
 	vector<LPCOLLISIONEVENT> coEventsResult;
@@ -112,7 +100,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 		float min_tx, min_ty, nx = 0, ny;
 		float rdx = 0; 
 		float rdy = 0;
-
+		
 		// TODO: This is a very ugly designed function!!!!
 		FilterCollision(coEvents, coEventsResult, min_tx, min_ty, nx, ny, rdx, rdy);
 
@@ -129,35 +117,55 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 		//
 		// Collision logic with other objects
 		//
+		float oLeft, oTop, oRight, oBottom;
+		float mLeft, mTop, mRight, mBottom;
 		for (UINT i = 0; i < coEventsResult.size(); i++)
 		{
 			LPCOLLISIONEVENT e = coEventsResult[i];
-
-			if (dynamic_cast<CGoomba *>(e->obj)) // if e->obj is Goomba 
+			GetBoundingBox(mLeft, mTop, mRight, mBottom);
+			//DebugOut(L"[RESULT] mLeft: %f\tmTop: %f\tmRight: %f\tmBottom: %f\t\n", mLeft, mTop, mRight, mBottom);
+			if (dynamic_cast<CGoomba*>(e->obj)) // if e->obj is Goomba 
 			{
-				CGoomba *goomba = dynamic_cast<CGoomba *>(e->obj);
+				CGoomba* goomba = dynamic_cast<CGoomba*>(e->obj);
 
 				// jump on top >> kill Goomba and deflect a bit 
 				if (e->ny < 0)
 				{
-					if (goomba->GetState()!= GOOMBA_STATE_DIE)
+					if (goomba->GetState() != GOOMBA_STATE_DIE)
 					{
-						goomba->SetState(GOOMBA_STATE_DIE);
-						vy = -MARIO_JUMP_DEFLECT_SPEED;
+						if (goomba->GetType() != GOOMBA_RED_FLY)
+						{
+							goomba->SetState(GOOMBA_STATE_DIE);
+							vy = -MARIO_JUMP_DEFLECT_SPEED;
+						}
+						else
+						{
+							if (goomba->GetState() != GOOMBA_STATE_RED_LOSE_WINGS)
+							{
+								goomba->SetState(GOOMBA_STATE_RED_LOSE_WINGS);
+								vy = -MARIO_JUMP_DEFLECT_SPEED;
+							}
+							else
+							{
+								goomba->SetState(GOOMBA_STATE_DIE);
+								vy = -MARIO_JUMP_DEFLECT_SPEED;
+							}
+
+						}
 					}
 				}
 				else if (e->nx != 0)
 				{
-					if (untouchable==0)
+					if (untouchable == 0)
 					{
-						if (goomba->GetState()!=GOOMBA_STATE_DIE)
+						if (goomba->GetState() != GOOMBA_STATE_DIE)
 						{
 							if (level > MARIO_LEVEL_SMALL)
 							{
 								level = MARIO_LEVEL_SMALL;
 								StartUntouchable();
 							}
-							else 
+							else
 								SetState(MARIO_STATE_DIE);
 						}
 					}
@@ -165,11 +173,44 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 			}
 			else if (dynamic_cast<CBrick*>(e->obj)) 
 			{
-				x += min_tx * dx + nx * 0.8f;
-				y += min_ty * dy + ny * 0.4f;
-				if (e->ny != 0) vy = 0;
-				//if (e->nx != 0) vx = 0;
-			//	DebugOut(L"e->nx: %f\n", e->nx);
+				CBrick* object = dynamic_cast<CBrick*>(e->obj);
+				object->SetDebugAlpha(255);
+				if (object->getTag() == PLATFORM)
+				{
+					object->GetBoundingBox(oLeft, oTop, oRight, oBottom);
+					x += min_tx * dx + nx * 0.4f;
+					y += min_ty * dy + ny * 0.4f;
+
+					if (e->ny != 0) vy = 0;
+					if (e->nx != 0)
+					{
+						if (ceil(mBottom) != oTop)
+							vx = 0;
+						if (ceil(mRight) == oLeft && e->nx < 0)
+							x = mLeft - 1;
+						if (ceil(mLeft) == oRight && e->nx > 0)
+							x = mLeft + 1;
+						DebugOut(L"[RESULT]	e->nx: %f\t mLeft: %f\t oRight: %f\t\n", e->nx, mLeft, oRight);
+						//DebugOut(L"[RESULT]	e->nx: %f\t mBottom: %f\toTop: %f\t\n",e->nx, mBottom, oTop);
+					}
+				}
+				else
+				{
+					object->GetBoundingBox(oLeft, oTop, oRight, oBottom);
+					y += min_ty * dy + ny * 0.4f;
+					//DebugOut(L"[POS] x: %f\t y: %f\t\n", x, y);
+					if (e->ny != 0) vy = 0;
+					if (e->nx != 0)
+					{
+						if (ceil(mBottom) != oTop)
+							vx = 0;
+						if (ceil(mRight) == oLeft && e->nx < 0)
+							x = mLeft - 1;
+						if (ceil(mLeft) == oRight && e->nx > 0)
+							x = mLeft + 1;
+						//DebugOut(L"[RESULT]	e->nx: %f\t mRight: %f\t oLeft: %f\t\n",e->nx, mRight, oLeft);
+					}
+				}					
 			}
 			else if (dynamic_cast<CBlock*>(e->obj))
 			{
@@ -190,12 +231,16 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 				CPortal *p = dynamic_cast<CPortal *>(e->obj);
 				CGame::GetInstance()->SwitchScene(p->GetSceneId());
 			}
+			e->obj->SetDebugAlpha(e->obj->DebugAlpha - 50);
 		}
 	}
 
 	// clean up collision events
-	for (UINT i = 0; i < coEvents.size(); i++) delete coEvents[i];
-	//DebugOut(L"x:	%f, y		%f:\n", x, y);
+	for (UINT i = 0; i < coEvents.size(); i++)
+	{
+		delete coEvents[i];
+	}
+	DebugOut(L"[POS]x:	%f, y		%f:\n", x, y);
 }
 void CMario::BasicRenderLogicsForAllLevel(int& ani, int ani_jump_down_right, int ani_jump_down_left,
 	int ani_idle_right, int ani_idle_left,
@@ -355,7 +400,7 @@ void CMario::Render()
 
 	animation_set->at(ani)->Render(x, y, alpha);
 
-	RenderBoundingBox(128);
+	RenderBoundingBox();
 }
 void CMario::SetState(int state)
 {
