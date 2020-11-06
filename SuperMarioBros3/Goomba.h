@@ -37,6 +37,7 @@ class CGoomba : public CGameObject
 	virtual void Render();
 	void CalcPotentialCollisions(vector<LPGAMEOBJECT>* coObjects, vector<LPCOLLISIONEVENT>& coEvents);
 	int type;
+	DWORD  jumpingStart = 0;
 public:
 	CGoomba(int ctype);
 	int GetType()

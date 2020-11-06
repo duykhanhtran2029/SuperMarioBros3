@@ -108,6 +108,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 		//if (rdx != 0 && rdx!=dx)
 		//	x += nx*abs(rdx); 
 
+
 		//reset jump
 		isOnGround = true;
 		isJumping = false;
@@ -132,8 +133,25 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 				{
 					if (goomba->GetState() != GOOMBA_STATE_DIE)
 					{
-						goomba->SetState(GOOMBA_STATE_DIE);
-						vy = -MARIO_JUMP_DEFLECT_SPEED;
+						if (goomba->GetType() != GOOMBA_RED_FLY)
+						{
+							goomba->SetState(GOOMBA_STATE_DIE);
+							vy = -MARIO_JUMP_DEFLECT_SPEED;
+						}
+						else
+						{
+							if (goomba->GetState() != GOOMBA_STATE_RED_LOSE_WINGS)
+							{
+								goomba->SetState(GOOMBA_STATE_RED_LOSE_WINGS);
+								vy = -MARIO_JUMP_DEFLECT_SPEED;
+							}
+							else
+							{
+								goomba->SetState(GOOMBA_STATE_DIE);
+								vy = -MARIO_JUMP_DEFLECT_SPEED;
+							}
+
+						}
 					}
 				}
 				else if (e->nx != 0)
@@ -213,7 +231,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 				CPortal *p = dynamic_cast<CPortal *>(e->obj);
 				CGame::GetInstance()->SwitchScene(p->GetSceneId());
 			}
-			//e->obj->SetDebugAlpha(e->obj->DebugAlpha - 50);
+			e->obj->SetDebugAlpha(e->obj->DebugAlpha - 50);
 		}
 	}
 

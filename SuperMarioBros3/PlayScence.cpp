@@ -163,7 +163,7 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 		break;
 	case OBJECT_TYPE_GOOMBA: obj = new CGoomba(tag); break;
 	case OBJECT_TYPE_BRICK: obj = new CBrick(tag); break;
-	//case OBJECT_TYPE_KOOPAS: obj = new CKoopas(0); break;
+	case OBJECT_TYPE_KOOPAS: obj = new CKoopas(); break;
 	case OBJECT_TYPE_BLOCK: obj = new CBlock(); break;
 	//case OBJECT_TYPE_PORTAL:
 	//	{	
@@ -269,11 +269,11 @@ void CPlayScene::Update(DWORD dt)
 	//	if (dynamic_cast<CGoomba*>(*i))
 	//	{
 	//		CGoomba* goomba = dynamic_cast<CGoomba*>(*i);
-	//		if (goomba->GetState() == GOOMBA_STATE_DISAPPEAR)
+	//		if (goomba->GetState() == GOOMBA_STATE_DIE)
 	//		{
-	//			DebugOut(L"goomba->GetState(): %d\n", goomba->GetState());
 	//			objects.erase(i);
 	//			i--;
+	//			delete goomba;
 	//		}
 	//	}
 	//}
@@ -371,9 +371,9 @@ void CPlayScenceKeyHandler::OnKeyUp(int KeyCode)
 	{
 		case DIK_SPACE:
 			if (mario->isOnGround)
-				mario->SetIsReadyToJump(true);
+				mario->setIsReadyToJump(true);
 			else
-				mario->SetIsReadyToJump(false);
+				mario->setIsReadyToJump(false);
 			break;
 		/*case DIK_DOWN:
 			mario->SetPosition(mario->x, mario->y - 9);*/
@@ -392,15 +392,11 @@ void CPlayScenceKeyHandler::KeyState(BYTE *states)
 
 	// disable control key when Mario die 
 	if (mario->GetState() == MARIO_STATE_DIE) return;
-	if (game->IsKeyDown(DIK_Q))    //Holding the koopas shell
-	{
-		mario->SetIsHolding(true);
-	}
 	if (game->IsKeyDown(DIK_SPACE) && mario->isReadyToJump)
 	{
 		mario->SetState(MARIO_STATE_JUMP);
-		mario->SetIsJumping(true);
-		mario->SetIsReadyToSit(false);
+		mario->setIsJumping(true);
+		mario->setIsReadyToSit(false);
 	}
 	if (game->IsKeyDown(DIK_RIGHT))
 		mario->SetState(MARIO_STATE_WALKING_RIGHT);

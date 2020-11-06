@@ -63,7 +63,6 @@ public:
 
 	int state;
 
-	bool isDestroyed = false;
 	DWORD dt; 
 
 	LPANIMATION_SET animation_set;
@@ -78,8 +77,6 @@ public:
 	
 	void SetDebugAlpha(int Da) { DebugAlpha = Da; }
 	void SetDebugTag(int tag) { DebugTag = tag; }
-
-	void SetIsDestroyed(bool isDestroyed) { this->isDestroyed = isDestroyed; }
 
 	void RenderBoundingBox();
 	bool isColliding(float friend_left, float friend_top, float friend_right, float friend_bottom);
