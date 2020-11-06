@@ -23,9 +23,10 @@
 #define MARIO_STATE_IDLE			0
 #define MARIO_STATE_WALKING_RIGHT	100
 #define MARIO_STATE_WALKING_LEFT	101
-#define MARIO_STATE_JUMP			200
-#define MARIO_STATE_SIT				201
-#define MARIO_STATE_INERTIA			400
+#define MARIO_STATE_JUMPING			200
+#define MARIO_STATE_SITTING			201
+#define MARIO_STATE_HOLDING			444
+#define MARIO_STATE_KICK			401
 #define MARIO_STATE_DIE				900
 
 // SMALL
@@ -104,6 +105,82 @@
 
 
 #define MARIO_ANI_DIE	62
+//SMALL
+#define MARIO_ANI_SMALL_HOLD_IDLE_RIGHT			63
+#define MARIO_ANI_SMALL_HOLD_WALKING_RIGHT		64
+#define MARIO_ANI_SMALL_HOLD_WALKING_FAST_RIGHT	64
+#define MARIO_ANI_SMALL_HOLD_RUNNING_RIGHT		64
+#define MARIO_ANI_SMALL_HOLD_JUMPINGUP_RIGHT	65
+#define MARIO_ANI_SMALL_HOLD_JUMPINGDOWN_RIGHT	65
+#define MARIO_ANI_SMALL_HOLD_BRAKING_RIGHT		64
+#define MARIO_ANI_SMALL_KICKING_RIGHT			66
+
+#define MARIO_ANI_SMALL_HOLD_IDLE_LEFT			67
+#define MARIO_ANI_SMALL_HOLD_WALKING_LEFT		68
+#define MARIO_ANI_SMALL_HOLD_WALKING_FAST_LEFT	68
+#define MARIO_ANI_SMALL_HOLD_RUNNING_LEFT		68
+#define MARIO_ANI_SMALL_HOLD_JUMPINGUP_LEFT		69
+#define MARIO_ANI_SMALL_HOLD_JUMPINGDOWN_LEFT	69
+#define MARIO_ANI_SMALL_HOLD_BRAKING_LEFT		68
+#define MARIO_ANI_SMALL_KICKING_LEFT			70
+
+//BIG
+#define MARIO_ANI_BIG_HOLD_IDLE_RIGHT			71
+#define MARIO_ANI_BIG_HOLD_WALKING_RIGHT		72
+#define MARIO_ANI_BIG_HOLD_WALKING_FAST_RIGHT	72
+#define MARIO_ANI_BIG_HOLD_RUNNING_RIGHT		72
+#define MARIO_ANI_BIG_HOLD_JUMPINGUP_RIGHT		73
+#define MARIO_ANI_BIG_HOLD_JUMPINGDOWN_RIGHT	73
+#define MARIO_ANI_BIG_HOLD_BRAKING_RIGHT		72
+#define MARIO_ANI_BIG_KICKING_RIGHT				74
+
+#define MARIO_ANI_BIG_HOLD_IDLE_LEFT			75
+#define MARIO_ANI_BIG_HOLD_WALKING_LEFT			76
+#define MARIO_ANI_BIG_HOLD_WALKING_FAST_LEFT	76
+#define MARIO_ANI_BIG_HOLD_RUNNING_LEFT			76
+#define MARIO_ANI_BIG_HOLD_JUMPINGUP_LEFT		77
+#define MARIO_ANI_BIG_HOLD_JUMPINGDOWN_LEFT		77
+#define MARIO_ANI_BIG_HOLD_BRAKING_LEFT			76
+#define MARIO_ANI_BIG_KICKING_LEFT				78
+
+//TAIL
+#define MARIO_ANI_TAIL_HOLD_IDLE_RIGHT			79
+#define MARIO_ANI_TAIL_HOLD_WALKING_RIGHT		80
+#define MARIO_ANI_TAIL_HOLD_WALKING_FAST_RIGHT	80
+#define MARIO_ANI_TAIL_HOLD_RUNNING_RIGHT		80
+#define MARIO_ANI_TAIL_HOLD_JUMPINGUP_RIGHT		81
+#define MARIO_ANI_TAIL_HOLD_JUMPINGDOWN_RIGHT	81
+#define MARIO_ANI_TAIL_HOLD_BRAKING_RIGHT		80
+#define MARIO_ANI_TAIL_KICKING_RIGHT			82
+
+#define MARIO_ANI_TAIL_HOLD_IDLE_LEFT			83
+#define MARIO_ANI_TAIL_HOLD_WALKING_LEFT		84
+#define MARIO_ANI_TAIL_HOLD_WALKING_FAST_LEFT	84
+#define MARIO_ANI_TAIL_HOLD_RUNNING_LEFT		84
+#define MARIO_ANI_TAIL_HOLD_JUMPINGUP_LEFT		85
+#define MARIO_ANI_TAIL_HOLD_JUMPINGDOWN_LEFT	85
+#define MARIO_ANI_TAIL_HOLD_BRAKING_LEFT		84
+#define MARIO_ANI_TAIL_KICKING_LEFT				86
+
+//FIRE
+#define MARIO_ANI_FIRE_HOLD_IDLE_RIGHT			87
+#define MARIO_ANI_FIRE_HOLD_WALKING_RIGHT		88
+#define MARIO_ANI_FIRE_HOLD_WALKING_FAST_RIGHT	88
+#define MARIO_ANI_FIRE_HOLD_RUNNING_RIGHT		88
+#define MARIO_ANI_FIRE_HOLD_JUMPINGUP_RIGHT		89
+#define MARIO_ANI_FIRE_HOLD_JUMPINGDOWN_RIGHT	89
+#define MARIO_ANI_FIRE_HOLD_BRAKING_RIGHT		88
+#define MARIO_ANI_FIRE_KICKING_RIGHT			90
+
+#define MARIO_ANI_FIRE_HOLD_IDLE_LEFT			91
+#define MARIO_ANI_FIRE_HOLD_WALKING_LEFT		92
+#define MARIO_ANI_FIRE_HOLD_WALKING_FAST_LEFT	92
+#define MARIO_ANI_FIRE_HOLD_RUNNING_LEFT		92
+#define MARIO_ANI_FIRE_HOLD_JUMPINGUP_LEFT		93
+#define MARIO_ANI_FIRE_HOLD_JUMPINGDOWN_LEFT	93
+#define MARIO_ANI_FIRE_HOLD_BRAKING_LEFT		92
+#define MARIO_ANI_FIRE_KICKING_LEFT				94
+
 
 #define	MARIO_LEVEL_SMALL	1
 #define	MARIO_LEVEL_BIG		2
@@ -121,11 +198,12 @@
 #define MARIO_FIRE_BBOX_WIDTH  14
 
 #define MARIO_UNTOUCHABLE_TIME 5000
-
+#define MARIO_KICKING_TIME		 200	
 
 class CMario : public CGameObject
 {
 	DWORD untouchable_start;
+	DWORD kicking_start;
 
 	float start_x;			// initial position of Mario at scene
 	float start_y;
@@ -189,7 +267,7 @@ public:
 	//render for all
 	void BasicRenderLogicsForAllLevel(int& ani,
 		int ani_idle_right, int ani_idle_left, int ani_jump_down_right, int ani_jump_down_left,
-		int ani_baking_right, int ani_baking_left, int ani_walking_right, int ani_walking_left);
+		int ani_baking_right, int ani_baking_left, int ani_walking_right, int ani_walking_left, int ani_kicking_right, int ani_kicking_left);
 	void RenderSitting(int& ani, int ani_sit_right, int ani_sit_left);
 
 	void RenderJumping(int& ani, int ani_jump_up_right, int ani_jump_up_left, int ani_jump_down_right, int ani_jump_down_left);
@@ -199,6 +277,6 @@ public:
 	void SetLevel(int l);
 	void StartUntouchable() { untouchable = 1; untouchable_start = GetTickCount(); }
 	void Reset();
-
+	void StartKicking() { kicking_start = GetTickCount(); }
 	virtual void GetBoundingBox(float &left, float &top, float &right, float &bottom);
 };

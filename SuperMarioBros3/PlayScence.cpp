@@ -375,6 +375,10 @@ void CPlayScenceKeyHandler::OnKeyUp(int KeyCode)
 			else
 				mario->SetIsReadyToJump(false);
 			break;
+		case DIK_B:
+			mario->SetIsHolding(false);
+			mario->SetIsReadyToHold(false);
+			break;
 		/*case DIK_DOWN:
 			mario->SetPosition(mario->x, mario->y - 9);*/
 		//case DIK_RIGHT:
@@ -394,7 +398,7 @@ void CPlayScenceKeyHandler::KeyState(BYTE *states)
 	if (mario->GetState() == MARIO_STATE_DIE) return;
 	if (game->IsKeyDown(DIK_SPACE) && mario->isReadyToJump)
 	{
-		mario->SetState(MARIO_STATE_JUMP);
+		mario->SetState(MARIO_STATE_JUMPING);
 		mario->SetIsJumping(true);
 		mario->SetIsReadyToSit(false);
 	}
@@ -403,7 +407,9 @@ void CPlayScenceKeyHandler::KeyState(BYTE *states)
 	else if (game->IsKeyDown(DIK_LEFT))
 		mario->SetState(MARIO_STATE_WALKING_LEFT);
 	else if (game->IsKeyDown(DIK_DOWN) && mario->isReadyToSit)
-		mario->SetState(MARIO_STATE_SIT);
-	else
+		mario->SetState(MARIO_STATE_SITTING);
+	else 
 		mario->SetState(MARIO_STATE_IDLE);
+	if (game->IsKeyDown(DIK_B))
+		mario->SetIsReadyToHold(true);
 }

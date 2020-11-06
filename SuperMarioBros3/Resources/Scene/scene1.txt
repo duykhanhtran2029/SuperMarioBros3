@@ -4,6 +4,7 @@
 20	Resources\Textures\misc.png	176	224	248
 10	Resources\Textures\enemies.png	3	26	110
 30	Resources\Tilemap\world1-1_bank.png	0	0	0
+40	Resources\Textures\enemies1.1.png	0	255	255
 50	Resources\Textures\enemies-2.png	0	128	128
 [TILEMAP DATA]
 Resources\Tilemap\world1-1.txt
@@ -12,7 +13,7 @@ Resources\Tilemap\world1-1.txt
 # Type	Level	State	Direction	Serial
 # Type: 1 = Mario
 # Level: 0 = Small; 1 = Big; 2 = Tail; 3 = Fire
-# State: 0 = Walk; 1 = Run; 2 = Jump; 3 = Brake; 4 = Sitdown; 5 = Hold; 6 = Optional 
+# State: 0 = Walk; 1 = Run; 2 = Jump; 3 = Brake; 4 = Sitdown; 5 = Hold; 6 = Kick, 7 = Optional 
 # Direction: 0 = Right; 1 = Left, null = Idle
 # Serial: Optional
 # die 
@@ -34,6 +35,15 @@ Resources\Tilemap\world1-1.txt
 10202	395	80	411	96	0
 #brake right
 10307	6	0	20	16	0
+#hold idle right
+10500	246	120	260	136	0
+#hold walk right
+10501	276	120	291	136	0
+10502	246	120	260	136	0
+#hold jump right
+10503	276	120	291	136	0
+#kick right
+10700	425	80	441	96	0
 # --Left--
 # idle left
 10011	187	0	198	15	0
@@ -50,6 +60,15 @@ Resources\Tilemap\world1-1.txt
 10212	35	80	51	96	0
 #brake left
 10317	426	0	440	16	0
+#hold idle left
+10510	186	120	200	136	0
+#hold walk left
+10511	155	120	170	136	0
+10512	186	120	200	136	0
+#hold jump left
+10513	155	120	170	136	0
+#kick left
+10710	5	80	21	96	0
 #  ==== Big Mario  ==== 
 # --Right--
 # idle right
@@ -69,6 +88,15 @@ Resources\Tilemap\world1-1.txt
 11307	5	154	21	182	0
 #sit right
 11408	426	239	440	257	0
+#hold idle right
+11500	336	234	350	261	0
+#hold walk right
+11501	336	234	350	261	0
+11502	276	314	291	341	0
+#hold jump right
+11503	305	315	321	341	0
+#kick right
+11700	423	274	444	301	0
 # --Left--
 # idle left
 11011	186	154	200	181	0
@@ -87,6 +115,15 @@ Resources\Tilemap\world1-1.txt
 11317	425	154	441	182	0
 #sit left
 11418	6	239	20	257	0
+#hold idle left
+11510	96	234	110	261	0
+#hold walk left
+11511	96	234	110	261	0
+11512	155	314	170	341	0
+#hold jump left
+11513	125	315	141	341	0
+#kick left
+11710	2	274	23	301	0
 #  ==== Tail Mario ==== 
 # --Right--
 # idle right
@@ -106,6 +143,15 @@ Resources\Tilemap\world1-1.txt
 12307	5 	633	21	663	0
 #sit right
 12408	422	719	444	737	0
+#hold idle right
+12500	242	794	264	822	0
+#hold walk right
+12501	242	794	264	822	0
+12502	272	794	294	822	0
+#hold jump right
+12503	303	794	324	821	0
+#kick right
+12700	422	754	444	782	0
 # --Left--
 # idle left
 12011	182	634	203	662	0
@@ -124,6 +170,15 @@ Resources\Tilemap\world1-1.txt
 12317	425	633	441	663	0
 #sit left
 12418	2	719	24	737	0
+#hold idle left
+12510	182	794	204	822	0
+#hold walk left
+12511	182	794	204	822	0
+12512	152	794	174	822	0
+#hold jump left
+12513	122	794	143	821	0
+#kick left
+12710	2	754	24	782	0
 #  ==== Fire Mario ==== 
 # --Right--
 # idle right
@@ -143,6 +198,15 @@ Resources\Tilemap\world1-1.txt
 13307	5	394	21	422	0
 #sit right
 13408	426	479	440	497	0
+#hold idle right
+13500	336	474	350	501	0
+#hold walk right
+13501	336	474	350	501	0
+13502	276	554	291	581	0
+#hold jump right
+13503	305	555	321	581	0
+#kick right
+13700	423	514	444	541	0
 # --Left--
 # idle left
 13011	186	394	200	421	0
@@ -161,6 +225,15 @@ Resources\Tilemap\world1-1.txt
 13317	425	394	441	422	0
 #sit left
 13418	6	479	20	497	0
+#hold idle left
+13510	96	474	110	501	0
+#hold walk left
+13511	96	474	110	501	0
+13512	155	554	170	581	0
+#hold jump left
+13513	125	555	141	581	0
+#kick right
+13710	2	514	23	541	0
 # ==== Brick ==== 
 20001	408	225	424	241	20
 #cloud brick
@@ -198,20 +271,43 @@ Resources\Tilemap\world1-1.txt
 60092	187	108	203	124	50
 #die 
 60090	204	115	220	124	50
-
+# ==== Red Koopas ====
+# -- Right --
+#walk right
+40000	585	66	601	93	40
+40001	604	67	620	93	40
+#spin right
+40200	603	97	619	113	40
+40201	582	96	598	112	40
+40202	561	96	577	112	40
+# -- Left --
+#walk left
+40010	47	66	63	93	40
+40011	28	67	44	93	40
+#spin left
+40210	29	97	45	113	40
+40211	50	96	66	112	40
+40212	71	96	87	112	40
+#shell
+40710	29	97	45	113	40
+#shake
+40830	29	97	45	113	40
+40831	71	75	89	91	40
+#die
+40930	152	202	168	218	30
 # ==== Block  ====
 # pink 
-40001	64	16	80	32	30
-40002	80	16	96	32	30
-40003	96	16	112	32	30
+90001	64	16	80	32	30
+90002	80	16	96	32	30
+90003	96	16	112	32	30
 # cyan
-40004	128	64	144	80	30
-40005	144	64	160	80	30
-40006	160	64	176	80	30
+90004	128	64	144	80	30
+90005	144	64	160	80	30
+90006	160	64	176	80	30
 # green
-40007	0	48	16	64	30
-40008	16	48	32	64	30
-40009	32	48	48	64	30
+90007	0	48	16	64	30
+90008	16	48	32	64	30
+90009	32	48	48	64	30
 # ==== Pipe ==== 
 50021	160	0	176	16	30
 50022	0	16	16	32	30
@@ -240,7 +336,14 @@ Resources\Tilemap\world1-1.txt
 1023	10202	100
 #brake small right 
 1030	10307	100
-
+#hold idle small right
+10500	10500	100
+#hold walk small right
+10510	10501	100	10502	100
+#hold jump small right
+10530	10503	100
+#hold kick small right
+10570	10700	200
 #idle small left
 101	10011	100
 #walk small left
@@ -255,6 +358,14 @@ Resources\Tilemap\world1-1.txt
 1024	10212	100
 #brake small left 
 1031	10317	100
+#hold idle small left
+10501	10500	100
+#hold walk small left
+10511	10501	100	10502	100
+#hold jump small left
+10531	10503	100
+#hold kick small left
+10571	10700	200
 # ==== BIG =====
 #idle big right
 110	11001	100
@@ -272,6 +383,14 @@ Resources\Tilemap\world1-1.txt
 1130	11307	100
 #sit big right
 1140	11408	100
+#hold idle big right
+11500	11500	100
+#hold walk big right
+11510	11501	100	11502	100
+#hold jump big right
+11530	11503	100
+#hold kick big right
+11570	11700	200
 
 #idle big left
 111	11011	100
@@ -289,6 +408,14 @@ Resources\Tilemap\world1-1.txt
 1131	11317	100
 #sit big left
 1141	11418	100
+#hold idle big left
+11501	11510	100
+#hold walk big left
+11511	11511	100	11512	100
+#hold jump big left
+11531	11513	100
+#hold kick big left
+11571	11710	200
 # ==== TAIL =====
 #idle tail right
 120	12001	100
@@ -306,6 +433,14 @@ Resources\Tilemap\world1-1.txt
 1230	12307	100
 #sit tail right
 1240	12408	100
+#hold idle tail right
+12500	12500	100
+#hold walk tail right
+12510	12501	100	10502	100
+#hold jump tail right
+12530	12503	100
+#hold kick tail right
+12570	12700	200
 
 #idle tail left
 121	12011	100
@@ -323,6 +458,14 @@ Resources\Tilemap\world1-1.txt
 1231	12317	100
 #sit tail left
 1241	12418	100
+#hold idle tail left
+12501	12510	100
+#hold walk tail left
+12511	12511	100	10512	100
+#hold jump tail left
+12531	12513	100
+#hold kick tail left
+12571	12710	200
 # ==== FIRE =====
 #idle fire right
 130	13001	100
@@ -340,6 +483,14 @@ Resources\Tilemap\world1-1.txt
 1330	13307	100
 #sit fire right
 1340	13408	100
+#hold idle fire right
+13500	13500	100
+#hold walk fire right
+13510	13501	100	13502	100
+#hold jump fire right
+13530	13503	100
+#hold kick fire right
+13570	13700	200
 
 #idle fire left
 131	13011	100
@@ -357,7 +508,14 @@ Resources\Tilemap\world1-1.txt
 1331	13317	100
 #sit fire left
 1341	13418	100
-
+#hold idle fire left
+13501	13510	100
+#hold walk fire left
+13511	13511	100	13512	100
+#hold jump fire left
+13531	13513	100
+#hold kick fire left
+13571	13710	200
 #die
 1099	10909	100
 # ==== Brick =========
@@ -385,19 +543,36 @@ Resources\Tilemap\world1-1.txt
 1675	60091	100	60092	100
 #die
 1672	60090	100
+#  ==== Koopas ====
+# --- Right ---
+# walk right
+4000	40000	200	40001	200
+# spin right
+4020	40200	50	40201	50	40202	50
+# --- Left ---
+# walk left
+4001	40010	200	40011	200
+# spin left
+4021	40210	50	40211	50	40212	50
+# shell
+4070	40710	100
+# shake
+4083	40830	50	40831	50
+#die
+4093	40930	100
 #  ==== Block  ====
 # pink
-621	40001	100
-622	40002	100
-623	40003	100
+621	90001	100
+622	90002	100
+623	90003	100
 # cyan
-624	40004	100
-625	40005	100
-626	40006	100
+624	90004	100
+625	90005	100
+626	90006	100
 # green
-627	40007	100
-628	40008	100
-629	40009	100
+627	90007	100
+628	90008	100
+629	90009	100
 #  ==== Pipe ==== 
 611	50021	100
 612	50022	100
@@ -411,6 +586,10 @@ Resources\Tilemap\world1-1.txt
 1	110	1100	1110	1160	1120	1123	1130	1140	111	1101	1111	1161	1121	1124	1131	1141
 1	120	1200	1210	1260	1220	1223	1230	1240	121	1201	1211	1261	1221	1224	1231	1241
 1	130	1300	1310	1360	1320	1323	1330	1340	131	1301	1311	1361	1321	1324	1331	1341	1099
+1	10500	10510	10530	10570	10501	10511	10531	10571
+1	11500	11510	11530	11570	11501	11511	11531	11571
+1	12500	12510	12530	12570	12501	12511	12531	12571
+1	13500	13510	13530	13570	13501	13511	13531	13571
 # Brick
 46	601
 # cloud Brick 
@@ -442,7 +621,10 @@ Resources\Tilemap\world1-1.txt
 13	613
 14	614
 # Goomba
-3	2013	2014
+2	2013	2014
+# Koopas
+3	4000	4020	4001	4021	4070	4083	4093
+# 
 [OBJECTS]
 # type	x	y	ani_set_id	extra_settings per object type
 # type: 0 = Mario , 1 = Brick, 2 = Goomba, 3 = Koopas, 4 = Block
@@ -726,14 +908,16 @@ Resources\Tilemap\world1-1.txt
 1	2336	400	14
 # === Goomba === 
 # --- Yellow ---
-2	224	134	3	0
-2	200	102	3	0
-2	528	134	3	0
-2	832	115	3	0
-2	880	115	3	0
+#2	224	134	2	0
+#2	200	102	2	0
+#2	528	134	2	0
+#2	832	115	2	0
+#2	880	115	2	0
 
 # --- Red ---
-#2	944	115	33	1
+# === Koopas === 
+3	300	134	3	0
+
 # === Block Line === 
 4	1312	144	15
 4	464	336	15
