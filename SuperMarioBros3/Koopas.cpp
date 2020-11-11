@@ -1,5 +1,6 @@
 #include "Koopas.h"
 #include "Utils.h"
+#include "Block.h"
 CKoopas::CKoopas()
 {
 	//SetState(KOOPAS_STATE_WALKING);
@@ -59,38 +60,48 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	CMario* mario = ((CPlayScene*)CGame::GetInstance()->GetCurrentScene())->GetPlayer();
 	if (!mario->isHolding)
 	{
+		float mLeft, mTop, mRight, mBottom;
+		mario->GetBoundingBox(mLeft, mTop, mRight, mBottom);
 		isBeingHeld = false;
+		if (isColliding(mLeft, mTop, mRight, mBottom))
+		{
+			if (state == KOOPAS_STATE_IN_SHELL)
+			{
+				this->nx = mario->nx;
+				this->SetState(KOOPAS_STATE_SPINNING);
+			}
+		}
 	}
 	if (isBeingHeld)
 	{
 		y = mario->y + 8;
-		
 		float tmp = mario -> vx;
 		if (tmp < 0)
 			tmp = -1;
-		else
+		if (tmp > 0)
 			tmp = 1;
-		DebugOut(L"vx %f\t\n", mario->vx);
+		if (tmp == 0)
+			tmp = mario->nx;
 		if (mario->level == MARIO_LEVEL_BIG)
 		{
-			x = mario->x + tmp * MARIO_BIG_BBOX_WIDTH;
+			x = mario->x + tmp * (MARIO_BIG_BBOX_WIDTH - 1);
 		}
 		else if (mario->level == MARIO_LEVEL_SMALL)
 		{
-			x = mario->x + tmp * MARIO_SMALL_BBOX_WIDTH;
+			x = mario->x + tmp * (MARIO_SMALL_BBOX_WIDTH - 1);
 			y = y - 10;
 		}
 		else if (mario->level == MARIO_LEVEL_TAIL)
 		{
-			x = mario->x + tmp * MARIO_TAIL_BBOX_WIDTH;
+			x = mario->x + tmp * (MARIO_TAIL_BBOX_WIDTH - 1);
 		}
 		else
 		{
-			x = mario->x + tmp * MARIO_FIRE_BBOX_WIDTH;
+			x = mario->x + tmp * (MARIO_FIRE_BBOX_WIDTH - 1);
 		}
 	}
 	// No collision occured, proceed normally
-	if (coEvents.size() == 0)
+	if (coEvents.size() == 0||isBeingHeld)
 	{
 		x += dx;
 		y += dy;
@@ -106,16 +117,24 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		FilterCollision(coEvents, coEventsResult, min_tx, min_ty, nx, ny, rdx, rdy);
 
 		// block 
+		x += min_tx * dx + nx * 0.4f;
+		y += min_ty * dy + ny * 0.4f;
 
 		if (ny != 0) vy = 0;
+		//if (nx != 0) vx = 0;
 
 
 
 		// Collision logic with the others Koopas
+		float oLeft, oTop, oRight, oBottom;
+		float mLeft, mTop, mRight, mBottom;
 		for (UINT i = 0; i < coEventsResult.size(); i++)
 		{
 			LPCOLLISIONEVENT e = coEventsResult[i];
-
+			if (e->obj != NULL)
+				if (e->obj->isDestroyed == true)
+					continue;
+			GetBoundingBox(mLeft, mTop, mRight, mBottom);
 			if (dynamic_cast<CKoopas*>(e->obj)) // if e->obj is Koopas 
 			{
 				CKoopas* koopas = dynamic_cast<CKoopas*>(e->obj);
@@ -133,22 +152,37 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				}
 
 			}
-			else
-			{
-				if (nx != 0 && ny == 0)
+			else if (dynamic_cast<CGoomba*>(e->obj))
 				{
-					if (dynamic_cast<CGoomba*>(e->obj))
+					CGoomba* goomba = dynamic_cast<CGoomba*>(e->obj);
+					if (goomba->GetState() != GOOMBA_STATE_DIE && (this->GetState() == KOOPAS_STATE_SPINNING || isBeingHeld))
 					{
-						CGoomba* goomba = dynamic_cast<CGoomba*>(e->obj);
-						if (goomba->GetState() != GOOMBA_STATE_DIE && (this->GetState() == KOOPAS_STATE_SPINNING || isBeingHeld))
-						{
-							goomba->SetState(GOOMBA_STATE_DIE_BY_KICK);
-						}
+						goomba->SetState(GOOMBA_STATE_DIE_BY_KICK);
 					}
-					else if (!dynamic_cast<CBrick*>(e->obj))
-						vx = -vx;
 				}
-			}
+				else if (dynamic_cast<CBrick*>(e->obj))
+				{
+					CBrick* object = dynamic_cast<CBrick*>(e->obj);
+					//object->SetDebugAlpha(255);
+					object->GetBoundingBox(oLeft, oTop, oRight, oBottom);
+
+
+					if (e->ny != 0) vy = 0;
+					if (e->nx != 0)
+					{
+						if (ceil(mBottom) != oTop)
+							vx = - vx;
+					}
+				}
+				else if (dynamic_cast<CBlock*>(e->obj))
+				{
+					CBlock* block = dynamic_cast<CBlock*>(e->obj);
+					x += dx;
+					if (ny < 0)
+						vy = 0;
+					else
+						y += dy;
+				}
 		}
 	}
 

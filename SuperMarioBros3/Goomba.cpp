@@ -1,5 +1,7 @@
 #include "Goomba.h"
 #include "Brick.h"
+#include "Utils.h"
+#include "Block.h"
 CGoomba::CGoomba(int ctype)
 {
 	type = ctype;
@@ -87,8 +89,9 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			LPCOLLISIONEVENT e = coEventsResult[i];
 			float oLeft, oTop, oRight, oBottom;
 			float mLeft, mTop, mRight, mBottom;
-			if (e->obj->isDestroyed == true)
-				continue;
+			if(e->obj != NULL)
+				if (e->obj->isDestroyed == true)
+					continue;
 			GetBoundingBox(mLeft, mTop, mRight, mBottom);
 			if (dynamic_cast<CGoomba*>(e->obj)) // if e->obj is Goomba 
 			{
@@ -113,12 +116,14 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				{
 					if (ceil(mBottom) != oTop)
 						vx = - vx;
-					if (ceil(mRight) == oLeft && e->nx < 0)
-						x = mLeft - 1;
-					if (ceil(mLeft) == oRight && e->nx > 0)
-						x = mLeft + 1;
 					//DebugOut(L"[RESULT]	e->nx: %f\t mBottom: %f\toTop: %f\t\n",e->nx, mBottom, oTop);
 				}
+			}
+			else if (dynamic_cast<CBlock*>(e->obj))
+			{
+				CBlock* block = dynamic_cast<CBlock*>(e->obj);
+				x += dx;
+				y += dy;
 			}
 
 		}
@@ -127,11 +132,9 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		x = 0;
 		vx = -vx;
 	}
-
-
 	// clean up collision events
 	for (UINT i = 0; i < coEvents.size(); i++) delete coEvents[i];
-
+	//DebugOut(L"final: %f %f\n", y, vy);
 }
 
 void CGoomba::Render()

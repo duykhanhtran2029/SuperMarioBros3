@@ -50,6 +50,9 @@
     <ClCompile Include="Mario.cpp">
       <Filter>Mario</Filter>
     </ClCompile>
+    <ClCompile Include="FireBullet.cpp">
+      <Filter>Mario</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Map.h">
@@ -85,7 +88,6 @@
     <ClInclude Include="StatusBoard.h">
       <Filter>HUD</Filter>
     </ClInclude>
-    <ClInclude Include="Define.h" />
     <ClInclude Include="Block.h">
       <Filter>Map Objects</Filter>
     </ClInclude>
@@ -102,6 +104,12 @@
       <Filter>Map Objects</Filter>
     </ClInclude>
     <ClInclude Include="Mario.h">
+      <Filter>Mario</Filter>
+    </ClInclude>
+    <ClInclude Include="Define.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FireBullet.h">
       <Filter>Mario</Filter>
     </ClInclude>
   </ItemGroup>

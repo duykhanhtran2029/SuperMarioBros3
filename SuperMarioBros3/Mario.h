@@ -1,5 +1,6 @@
 #pragma once
 #include "GameObject.h"
+#include "FireBullet.h"
 
 #define MARIO_WALKING_SPEED_START	0.001f 
 #define MARIO_WALKING_SPEED_MAX		0.15f
@@ -16,17 +17,22 @@
 
 #define MARIO_RUN_SPEED_MAX			0.3f
 
+#define MARIO_BULLET_MAX			20
+
 #define MARIO_UNTOUCHABLE_TIME		5000
-#define MARIO_USING_TAIL_TIME		300
-#define MARIO_SHOOTING_TIME			200
+#define MARIO_TURNING_TAIL_TIME		200
+#define MARIO_SHOOTING_TIME			500
+#define MARIO_KICKING_TIME			200	
 
 #define MARIO_STATE_IDLE			0
 #define MARIO_STATE_WALKING_RIGHT	100
-#define MARIO_STATE_WALKING_LEFT	101
+#define MARIO_STATE_WALKING_LEFT	111
 #define MARIO_STATE_JUMPING			200
 #define MARIO_STATE_SITTING			201
 #define MARIO_STATE_HOLDING			444
-#define MARIO_STATE_KICK			401
+#define MARIO_STATE_KICK			411
+#define MARIO_STATE_SHOOTING		422
+#define MARIO_STATE_TURNING			433
 #define MARIO_STATE_DIE				900
 
 // SMALL
@@ -181,6 +187,14 @@
 #define MARIO_ANI_FIRE_HOLD_BRAKING_LEFT		92
 #define MARIO_ANI_FIRE_KICKING_LEFT				94
 
+//TAIL
+#define MARIO_ANI_TAIL_TURNING_RIGHT			95
+#define MARIO_ANI_TAIL_TURNING_LEFT				96
+#define MARIO_ANI_TAIL_FLAPPING_RIGHT			97
+#define MARIO_ANI_TAIL_FLAPPING_LEFT			98
+//FIRE
+#define MARIO_ANI_SHOOTING_RIGHT				99
+#define MARIO_ANI_SHOOTING_LEFT					100
 
 #define	MARIO_LEVEL_SMALL	1
 #define	MARIO_LEVEL_BIG		2
@@ -197,17 +211,18 @@
 
 #define MARIO_FIRE_BBOX_WIDTH  14
 
-#define MARIO_UNTOUCHABLE_TIME 5000
-#define MARIO_KICKING_TIME		 200	
 
 class CMario : public CGameObject
 {
 	DWORD untouchable_start;
 	DWORD kicking_start;
+	DWORD shooting_start;
+	DWORD turning_start;
 
 	float start_x;			// initial position of Mario at scene
 	float start_y;
 public: 
+	vector <CFireBullet*> Bullets;
 	int level;
 	int untouchable;
 	//state
@@ -219,15 +234,13 @@ public:
 
 	//hight-jump
 	bool isReadyToJump = true;
-	bool isFalling = false;
 	bool isJumping = false;
 
 	//using tail
-	bool isUsingTail = false;
+	bool isTurningTail = false;
 
 	//shoot
-	bool isShootingFireBall = false;
-	bool isForFireBallAppear = true;
+	bool isShooting = false;
 
 	//hold
 	bool isHolding = false;
@@ -251,7 +264,6 @@ public:
 
 	void SetIsReadyToJump(bool jump) { isReadyToJump = jump; }
 	void SetIsJumping(bool jump) { this->isJumping = jump; }
-	void SetIsFalling(bool fall) { this->isFalling = fall; }
 
 	void SetIsReadyToRun(bool run) { this->isReadyToRun = run; }
 	void SetIsRunning(bool run) { this->isRunning = run; }
@@ -259,8 +271,8 @@ public:
 	void SetIsReadyToSit(bool sit) { this->isReadyToSit = sit; }
 	void SetIsSitting(bool sit) { this->isSitting= sit; }
 
-	void SetIsShootingFireBall(bool shoot) { this->isShootingFireBall = shoot; }
-
+	void SetIsShooting(bool shoot) { this->isShooting = shoot; }
+	void AddBullets(CFireBullet* c) { Bullets.push_back(c); }
 	void SetIsReadyToKick(bool m) { this->isReadyToKick = m; }
 	void SetIsKicking(bool m) { this->isKicking = m; }
 
@@ -277,6 +289,8 @@ public:
 	void SetLevel(int l);
 	void StartUntouchable() { untouchable = 1; untouchable_start = GetTickCount(); }
 	void Reset();
-	void StartKicking() { kicking_start = GetTickCount(); }
+	void StartKicking() { kicking_start = GetTickCount(); isKicking = true; }
+	void StartShooting() { shooting_start = GetTickCount(); isShooting = true; }
+	void StartTurning() { turning_start = GetTickCount(); isTurningTail = true; }
 	virtual void GetBoundingBox(float &left, float &top, float &right, float &bottom);
 };
