@@ -422,12 +422,13 @@ void CPlayScenceKeyHandler::OnKeyUp(int KeyCode)
 	case DIK_DOWN:
 		mario->SetIsSitting(false);
 	case DIK_B:
+		mario->SetIsHolding(false);
+		mario->SetIsReadyToHold(false);
 		if (mario->isHolding)
 		{
-			mario->SetIsHolding(false);
-			mario->SetIsReadyToHold(false);
 			mario->StartKicking();
 		}
+		//mario->SetIs
 		break;
 		/*case DIK_DOWN:
 			mario->SetPosition(mario->x, mario->y - 9);*/

@@ -81,7 +81,7 @@ public:
 	void SetIsDestroyed(bool isDestroyed) { this->isDestroyed = isDestroyed; }
 	void SetPosition(float x, float y) { this->x = x, this->y = y; }
 	void SetSpeed(float vx, float vy) { this->vx = vx, this->vy = vy; }
-	void SetDirection(float nx) { this->nx = nx; }
+	void SetDirection(int nx) { this->nx = nx; }
 	void SetTag(float tag) { this->tag = tag; }
 	void SetDelta(float mx, float my) { deltaX = mx; deltaY = my; }
 	

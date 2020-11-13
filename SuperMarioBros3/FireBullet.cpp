@@ -36,9 +36,6 @@ void CFireBullet::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 
 		// TODO: This is a very ugly designed function!!!!
 		FilterCollision(coEvents, coEventsResult, min_tx, min_ty, nx, ny, rdx, rdy);
-
-		y += min_ty * dy + ny * 0.4f;
-		x += min_tx * dx + nx * 0.4f;
 		for (UINT i = 0; i < coEventsResult.size(); i++)
 		{
 			LPCOLLISIONEVENT e = coEventsResult[i];
@@ -47,6 +44,8 @@ void CFireBullet::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					continue;
 			if (dynamic_cast<CBrick*>(e->obj))
 			{
+				y += min_ty * dy + ny * 0.4f;
+				x += min_tx * dx + nx * 0.4f;
 				CBrick* obj = dynamic_cast<CBrick*>(e->obj);
 				if (nx != 0 && ny == 0)
 				{
@@ -62,14 +61,7 @@ void CFireBullet::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			}
 			else
 			{
-				int temp = x;
 				x += dx;
-				if (x == temp)
-				{
-					isBeingUsed = false;
-					x = 1;
-					y = -1;
-				}
 				y += dy;
 			}
 		}

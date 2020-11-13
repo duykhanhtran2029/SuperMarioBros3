@@ -204,9 +204,9 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 					DebugOut(L"is Turning Tail: %d\n", isTurningTail);
 					if (isTurningTail)
 					{
-						koopas->SetState(KOOPAS_STATE_DIE);
+						koopas->SetState(KOOPAS_STATE_SHELL_UP);
 					}
-					else if (koopas->GetState() == KOOPAS_STATE_IN_SHELL)
+					else if (koopas->GetState() == KOOPAS_STATE_IN_SHELL || koopas->GetState() == KOOPAS_STATE_SHELL_UP)
 					{
 						if (isReadyToHold)
 						{
@@ -215,7 +215,6 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 						}
 						else
 						{
-							DebugOut(L"is Kicking: %d\n", isTurningTail);
 							StartKicking();
 							koopas->nx = this->nx;
 							koopas->SetState(KOOPAS_STATE_SPINNING);
@@ -223,7 +222,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 					}
 					else if (untouchable == 0 && isKicking == false)
 					{
-						if (koopas->GetState() != KOOPAS_STATE_IN_SHELL)
+						if (koopas->GetState() != KOOPAS_STATE_IN_SHELL || koopas->GetState() != KOOPAS_STATE_SHELL_UP)
 						{
 							if (level != MARIO_LEVEL_SMALL)
 							{
@@ -559,7 +558,7 @@ void CMario::Render()
 	if (untouchable) alpha = 128;
 	animation_set->at(ani)->Render(x, y, alpha);
 
-	DebugAlpha = 0;
+	//DebugAlpha = 128;
 	RenderBoundingBox();
 }
 void CMario::SetState(int state)
@@ -639,6 +638,11 @@ void CMario::GetBoundingBox(float &left, float &top, float &right, float &bottom
 		{
 			right = left + MARIO_TAIL_BBOX_WIDTH;
 			bottom = top + MARIO_BIG_BBOX_HEIGHT;
+			//if (isTurningTail)
+			//{
+			//		right += 6;
+			//		deltaX -= 6;
+			//}
 			//right += 7;
 			//if (nx < 0)
 			//	deltaX = -7;

@@ -124,6 +124,10 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				x += dx;
 				y += dy;
 			}
+			else if (dynamic_cast<CFireBullet*>(e->obj))
+			{
+				SetState(GOOMBA_STATE_DIE);
+			}
 
 		}
 	}
