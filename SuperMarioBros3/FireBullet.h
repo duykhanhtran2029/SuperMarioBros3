@@ -8,7 +8,8 @@ class CFireBullet : public CGameObject
 {
 public:
 	bool isBeingUsed = false;
-
+	int tempHeight = -1;
+	void SetTemHeight(float ty) { this->tempHeight = ty; };
 	virtual void Render();
 	virtual void Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects);
 	virtual void GetBoundingBox(float& l, float& t, float& r, float& b);

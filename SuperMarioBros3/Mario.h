@@ -1,11 +1,12 @@
 #pragma once
 #include "GameObject.h"
 #include "FireBullet.h"
+#include "Utils.h"
 
 #define MARIO_WALKING_SPEED_START	0.001f 
 #define MARIO_WALKING_SPEED_MAX		0.15f
 #define MARIO_ACCELERATION			0.0003f
-#define MARIO_WALKING_SPEED_MIN		0.01f
+#define MARIO_WALKING_SPEED_MIN		0.05f
 
 
 #define MARIO_ACCELERATION_JUMP		0.0005f
@@ -21,7 +22,7 @@
 
 #define MARIO_UNTOUCHABLE_TIME		5000
 #define MARIO_TURNING_TAIL_TIME		200
-#define MARIO_SHOOTING_TIME			200
+#define MARIO_SHOOTING_TIME			150
 #define MARIO_KICKING_TIME			200	
 #define MARIO_FLAPPING_TIME			200	
 
@@ -196,6 +197,8 @@
 //FIRE
 #define MARIO_ANI_SHOOTING_RIGHT				99
 #define MARIO_ANI_SHOOTING_LEFT					100
+#define MARIO_ANI_SHOOTING_JUMP_RIGHT			101
+#define MARIO_ANI_SHOOTING_JUMP_LEFT			102
 
 #define	MARIO_LEVEL_SMALL	1
 #define	MARIO_LEVEL_BIG		2
@@ -210,13 +213,14 @@
 
 #define MARIO_TAIL_BBOX_WIDTH  21
 
-#define MARIO_FIRE_BBOX_WIDTH  14
+#define MARIO_FIRE_BBOX_WIDTH  15
 
 class CMario : public CGameObject
 {
 	DWORD untouchable_start;
 	DWORD kicking_start;
 	DWORD shooting_start;
+	DWORD delay_start;
 	DWORD turning_start;
 	DWORD flapping_start;
 
@@ -244,6 +248,7 @@ public:
 
 	//shoot
 	bool isShooting = false;
+	int LoadBullets = 2;
 
 	//hold
 	bool isHolding = false;
@@ -289,17 +294,20 @@ public:
 	void RenderJumping(int& ani, int ani_jump_up_right, int ani_jump_up_left, int ani_jump_down_right, int ani_jump_down_left);
 	
 	//timer
+	void DelayShooting() { delay_start = GetTickCount(); isKicking = true; }
 	void StartKicking() { kicking_start = GetTickCount(); isKicking = true; }
-	void StartShooting()
+	void StartShooting(float bx, float by)
 	{ 
 		shooting_start = GetTickCount(); 
-		isShooting = true; 
-		iBullet++;
+		isShooting = true;
 		if (iBullet >= MARIO_BULLET_MAX)
 			iBullet = 0;
-		Bullets[iBullet]->SetPosition(x + nx * FIRE_BULLET_BBOX_WIDTH, y + (float)2 / 3 * (MARIO_LEVEL_SMALL ? MARIO_SMALL_BBOX_HEIGHT : MARIO_BIG_BBOX_HEIGHT));
+		Bullets[iBullet]->SetPosition(bx + nx * FIRE_BULLET_BBOX_WIDTH, by + (float)2 / 3 * (MARIO_LEVEL_SMALL ? MARIO_SMALL_BBOX_HEIGHT : MARIO_BIG_BBOX_HEIGHT));
 		Bullets[iBullet]->SetIsBeingUsed(true);
 		Bullets[iBullet]->SetSpeed(nx * FIRE_BULLET_SPEED_X, FIRE_BULLET_SPEED_Y);
+		Bullets[iBullet]->SetTemHeight(0);
+		iBullet++;
+		DebugOut(L"%f %f\n", Bullets[iBullet]->x, Bullets[iBullet]->y);
 	}
 	void StartTurning() { turning_start = GetTickCount(); isTurningTail = true; }
 	void StartFlapping() 

@@ -36,6 +36,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 	// Simple fall down
 	vy += ay * dt;
 	//limited the speed of mario 
+	//DebugOut(L"State:	%d\n", state);
 	if (abs(vx) >= MARIO_WALKING_SPEED_MAX)
 	{
 		vx = nx * MARIO_WALKING_SPEED_MAX;
@@ -46,14 +47,14 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 		ay = MARIO_GRAVITY;
 		isReadyToJump = false;
 	}
-	if (state == MARIO_STATE_IDLE)//slow down
-	{
-		ax = -nx * MARIO_ACCELERATION;
-		ay = MARIO_GRAVITY;
-		if (abs(vx) <= MARIO_WALKING_SPEED_MIN)
-			vx = 0;
-		//DebugOut(L"ax:	%f, vx:	%f\n", ax, vx);
-	}
+	//if (state == MARIO_STATE_IDLE)//slow down
+	//{
+	//	ax = -nx * MARIO_ACCELERATION;
+	//	ay = MARIO_GRAVITY;
+	//	if (abs(vx) <= MARIO_WALKING_SPEED_MIN)
+	//		vx = 0;
+	//	DebugOut(L"ax:	%f, vx:	%f\n", ax, vx);
+	//}
 	if (GetTickCount() - kicking_start > MARIO_KICKING_TIME)
 	{
 		isKicking = false;
@@ -165,7 +166,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 							goomba->SetDirection(nx);
 							goomba->SetState(GOOMBA_STATE_DIE_BY_KICK);
 						}
-						if (untouchable == 0)
+						else if (untouchable == 0)
 						{
 							if (goomba->GetState() != GOOMBA_STATE_DIE)
 							{
@@ -286,6 +287,11 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 					y += dy;
 				}
 			}
+			else if (dynamic_cast<CFireBullet*>(e->obj))
+			{
+				x += dx;
+				y += dy;
+			}
 			else if (dynamic_cast<CPortal *>(e->obj))
 			{
 				CPortal *p = dynamic_cast<CPortal *>(e->obj);
@@ -315,7 +321,7 @@ void CMario::BasicRenderLogicsForAllLevel(int& ani, int ani_jump_down_right, int
 		if (isOnGround && vy >= 0)
 		{
 			if (nx > 0) ani = ani_idle_right;
-			else ani = ani_idle_left;
+				else ani = ani_idle_left;
 			if (isKicking)
 				if (nx > 0) ani = ani_kicking_right;
 				else ani = ani_kicking_left;
@@ -345,10 +351,15 @@ void CMario::BasicRenderLogicsForAllLevel(int& ani, int ani_jump_down_right, int
 				ani = ani_kicking_right;
 			else if (vx < 0)
 				ani = ani_kicking_left;
-		}
-			
+		}	
 	}
-
+	if (isShooting)
+	{
+		if (nx > 0)
+			ani = MARIO_ANI_SHOOTING_RIGHT;
+		else if (nx < 0)
+			ani = MARIO_ANI_SHOOTING_LEFT;
+	}
 }
 
 void CMario::RenderSitting(int& ani, int ani_sit_right, int ani_sit_left)
@@ -368,6 +379,13 @@ void CMario::RenderJumping(int& ani, int ani_jump_up_right, int ani_jump_up_left
 		ani = ani_jump_down_right;
 	else if (nx < 0 && vy > 0)
 		ani = ani_jump_down_left;
+	if (isShooting)
+	{
+		if (nx > 0)
+			ani = MARIO_ANI_SHOOTING_JUMP_RIGHT;
+		else
+			ani = MARIO_ANI_SHOOTING_JUMP_LEFT;
+	}
 }
 void CMario::Render()
 {
@@ -536,19 +554,12 @@ void CMario::Render()
 					MARIO_ANI_FIRE_HOLD_BRAKING_RIGHT, MARIO_ANI_FIRE_HOLD_BRAKING_LEFT,
 					MARIO_ANI_FIRE_HOLD_WALKING_RIGHT, MARIO_ANI_FIRE_HOLD_WALKING_LEFT, MARIO_ANI_FIRE_KICKING_RIGHT, MARIO_ANI_FIRE_KICKING_LEFT);
 		}
-		if (isShooting )
-		{
-			if (nx > 0)
-				ani = MARIO_ANI_SHOOTING_RIGHT;
-			else if (nx < 0)
-				ani = MARIO_ANI_SHOOTING_LEFT;
-		}
 	}
 
 	if (untouchable) alpha = 128;
 	animation_set->at(ani)->Render(x, y, alpha);
 
-	DebugAlpha = 128;
+	DebugAlpha = 0;
 	RenderBoundingBox();
 }
 void CMario::SetState(int state)
@@ -577,6 +588,17 @@ void CMario::SetState(int state)
 		ay = -MARIO_ACCELERATION_JUMP;
 		break;
 	case MARIO_STATE_IDLE:
+		if(vx > 0)
+			ax = -MARIO_ACCELERATION;
+		if (vx < 0)
+			ax = MARIO_ACCELERATION;
+		ay = MARIO_GRAVITY;
+		if (abs(vx) <= MARIO_WALKING_SPEED_MIN)
+		{
+			vx = 0;
+			ax = 0;
+		}
+		//DebugOut(L"ax:	%f, vx:	%f\n", ax, vx);
 		break;
 	case MARIO_STATE_SITTING:
 		if (level != MARIO_LEVEL_SMALL)
@@ -612,20 +634,20 @@ void CMario::GetBoundingBox(float &left, float &top, float &right, float &bottom
 		{
 			right = left + MARIO_BIG_BBOX_WIDTH;
 			bottom = top + MARIO_BIG_BBOX_HEIGHT;
-
 		}
 		else if (level == MARIO_LEVEL_TAIL)
 		{
-			right = left + MARIO_BIG_BBOX_WIDTH;
+			right = left + MARIO_TAIL_BBOX_WIDTH;
 			bottom = top + MARIO_BIG_BBOX_HEIGHT;
-			if (this->nx > 0)
-				deltaX = 6;
-			DebugOut(L"%f\n", this->nx);
+			//right += 7;
+			//if (nx < 0)
+			//	deltaX = -7;
+			//DebugOut(L"%d\n", nx);
 			//left += 9;
 		}	
 		else if (level == MARIO_LEVEL_FIRE)
 		{
-			right = left + MARIO_BIG_BBOX_WIDTH;
+			right = left + MARIO_FIRE_BBOX_WIDTH;
 			bottom = top + MARIO_BIG_BBOX_HEIGHT;
 		}
 		if (state == MARIO_STATE_SITTING)

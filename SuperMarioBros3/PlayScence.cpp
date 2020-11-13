@@ -158,7 +158,6 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 		}
 		obj = new CMario(x, y);
 		player = (CMario*)obj;
-
 		DebugOut(L"[INFO] Player object created!\n");
 		break;
 	case OBJECT_TYPE_GOOMBA:
@@ -384,7 +383,10 @@ void CPlayScenceKeyHandler::OnKeyDown(int KeyCode)
 		break;
 	case DIK_B:
 		if (mario->level == MARIO_LEVEL_FIRE && !mario->isShooting && !mario->isSitting)
-			mario->StartShooting();
+		{
+			mario->StartShooting(mario->x, mario->y);
+			//DebugOut(L"%f %f\n", mario->x, mario->y);
+		}
 		if (mario->level == MARIO_LEVEL_TAIL && !mario->isTurningTail && !mario->isSitting)
 			mario->StartTurning();
 		break;
@@ -444,23 +446,19 @@ void CPlayScenceKeyHandler::KeyState(BYTE* states)
 
 	// disable control key when Mario die 
 	if (mario->GetState() == MARIO_STATE_DIE) return;
+	if (game->IsKeyDown(DIK_B))
+		mario->SetIsReadyToHold(true);
 	if (game->IsKeyDown(DIK_SPACE) && mario->isReadyToJump)
 	{
 		mario->SetState(MARIO_STATE_JUMPING);
 		mario->SetIsJumping(true);
 		mario->SetIsReadyToSit(false);
 	}
-	if (game->IsKeyDown(DIK_RIGHT))
+	else if (game->IsKeyDown(DIK_RIGHT))
 		mario->SetState(MARIO_STATE_WALKING_RIGHT);
 	else if (game->IsKeyDown(DIK_LEFT))
 		mario->SetState(MARIO_STATE_WALKING_LEFT);
 	else if (game->IsKeyDown(DIK_DOWN) && mario->isReadyToSit)
 		mario->SetState(MARIO_STATE_SITTING);
-	else
-		mario->SetState(MARIO_STATE_IDLE);
-	if (game->IsKeyDown(DIK_B))
-	{
-		mario->SetIsReadyToHold(true);
-		//DebugOut(L"isReadyToHold: %d\n", mario->isReadyToHold);
-	}
+	else mario->SetState(MARIO_STATE_IDLE);
 }

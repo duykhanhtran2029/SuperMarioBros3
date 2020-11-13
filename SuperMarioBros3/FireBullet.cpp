@@ -7,7 +7,6 @@ CFireBullet::CFireBullet(float x, float y) : CGameObject()
 	this->x = x;
 	this->y = y;
 }
-int tempHeight = -1;
 
 void CFireBullet::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
@@ -63,7 +62,14 @@ void CFireBullet::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			}
 			else
 			{
+				int temp = x;
 				x += dx;
+				if (x == temp)
+				{
+					isBeingUsed = false;
+					x = 1;
+					y = -1;
+				}
 				y += dy;
 			}
 		}
