@@ -3,7 +3,7 @@
 
 CFireBullet::CFireBullet(float x, float y) : CGameObject()
 {
-	vx = vy = FIRE_BULLET_FLYING_SPEED;
+	vx = vy = 0;
 	this->x = x;
 	this->y = y;
 }
@@ -28,8 +28,6 @@ void CFireBullet::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	{
 		x += dx;
 		y += dy;
-		if (y <= tempHeight - FIRE_BULLET_LIMITED_HEIGHT)
-			vy = -vy;
 	}
 	else
 	{
@@ -39,6 +37,9 @@ void CFireBullet::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 
 		// TODO: This is a very ugly designed function!!!!
 		FilterCollision(coEvents, coEventsResult, min_tx, min_ty, nx, ny, rdx, rdy);
+
+		y += min_ty * dy + ny * 0.4f;
+		x += min_tx * dx + nx * 0.4f;
 		for (UINT i = 0; i < coEventsResult.size(); i++)
 		{
 			LPCOLLISIONEVENT e = coEventsResult[i];
@@ -48,17 +49,17 @@ void CFireBullet::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			if (dynamic_cast<CBrick*>(e->obj))
 			{
 				CBrick* obj = dynamic_cast<CBrick*>(e->obj);
-				y += min_ty * dy + ny * 0.4f;
-				x += min_tx * dx + nx * 0.4f;
-				if (nx != 0)
+				if (nx != 0 && ny == 0)
 				{
 					isBeingUsed = false;
 					x = 1;
 					y = -1;
 				}
 				if (ny != 0)
+				{
+					tempHeight = y;
 					vy = -vy;
-				tempHeight = y;
+				}	
 			}
 			else
 			{
@@ -68,7 +69,11 @@ void CFireBullet::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		}
 		//DebugOut(L"%f %f\n", tempHeight - FIRE_BULLET_LIMITED_HEIGHT, y);
 	}
-
+	if (y <= tempHeight - FIRE_BULLET_LIMITED_HEIGHT)
+	{
+		y = tempHeight - FIRE_BULLET_LIMITED_HEIGHT;
+		vy = FIRE_BULLET_SPEED_Y;
+	}
 	// clean up collision events
 	for (UINT i = 0; i < coEvents.size(); i++) delete coEvents[i];
 }

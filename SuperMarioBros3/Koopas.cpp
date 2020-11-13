@@ -97,7 +97,7 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		}
 		else
 		{
-			x = mario->x + tmp * (MARIO_FIRE_BBOX_WIDTH - 1);
+			x = mario->x + tmp * (MARIO_BIG_BBOX_WIDTH - 1);
 		}
 	}
 	// No collision occured, proceed normally
@@ -177,11 +177,34 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				else if (dynamic_cast<CBlock*>(e->obj))
 				{
 					CBlock* block = dynamic_cast<CBlock*>(e->obj);
-					x += dx;
 					if (ny < 0)
 						vy = 0;
 					else
 						y += dy;
+					if(this->state == KOOPAS_STATE_WALKING)
+						switch (block->tag)
+						{
+						case 0:
+							x += dx;
+							break;
+						case IS_LEFT_EDGE_BLOCK:
+							if (this->nx < 0)
+								if (x <= block->x)
+								{
+									vx = KOOPAS_WALKING_SPEED;
+									this->nx = 1;
+								}
+
+							break;
+						case IS_RIGHT_EDGE_BLOCK:
+							if (this->nx > 0)
+								if (x >= block->x)
+								{
+									vx = -KOOPAS_WALKING_SPEED;
+									this->nx = -1;
+								}
+							break;
+						}
 				}
 		}
 	}

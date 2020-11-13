@@ -2,9 +2,8 @@
 #include "Brick.h"
 #include "Utils.h"
 #include "Block.h"
-CGoomba::CGoomba(int ctype)
+CGoomba::CGoomba()
 {
-	type = ctype;
 	SetState(GOOMBA_STATE_WALKING);
 }
 void CGoomba::CalcPotentialCollisions(vector<LPGAMEOBJECT>* coObjects, vector<LPCOLLISIONEVENT>& coEvents)
@@ -140,7 +139,7 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 void CGoomba::Render()
 {
 	int ani = 0;
-	switch (type)
+	switch (tag)
 	{
 	case GOOMBA_NORMAL:
 		ani = GOOMBA_NORMAL_ANI_WALKING;

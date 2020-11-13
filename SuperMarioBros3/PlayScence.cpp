@@ -148,7 +148,6 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	CAnimationSets* animation_sets = CAnimationSets::GetInstance();
 
 	CGameObject* obj = NULL;
-
 	switch (object_type)
 	{
 	case OBJECT_TYPE_MARIO:
@@ -162,10 +161,22 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 
 		DebugOut(L"[INFO] Player object created!\n");
 		break;
-	case OBJECT_TYPE_GOOMBA: obj = new CGoomba(tag); break;
-	case OBJECT_TYPE_BRICK: obj = new CBrick(tag); break;
-	case OBJECT_TYPE_KOOPAS: obj = new CKoopas(); break;
-	case OBJECT_TYPE_BLOCK: obj = new CBlock(); break;
+	case OBJECT_TYPE_GOOMBA:
+		obj = new CGoomba();
+		obj->SetTag(tag);
+		break;
+	case OBJECT_TYPE_BRICK: 
+		obj = new CBrick();
+		obj->SetTag(tag);
+		break;
+	case OBJECT_TYPE_KOOPAS:
+		obj = new CKoopas();
+		obj->SetTag(tag);
+		break;
+	case OBJECT_TYPE_BLOCK:
+		obj = new CBlock();
+		obj->SetTag(tag);
+		break;
 	case OBJECT_TYPE_FIRE_BULLET: obj = new CFireBullet(); break;
 		//case OBJECT_TYPE_PORTAL:
 		//	{	
@@ -372,10 +383,10 @@ void CPlayScenceKeyHandler::OnKeyDown(int KeyCode)
 		mario->SetLevel(MARIO_LEVEL_FIRE);
 		break;
 	case DIK_B:
-		if(mario->level == MARIO_LEVEL_FIRE && !mario->isShooting && !mario->isSitting)
-		mario->SetState(MARIO_STATE_SHOOTING);
+		if (mario->level == MARIO_LEVEL_FIRE && !mario->isShooting && !mario->isSitting)
+			mario->StartShooting();
 		if (mario->level == MARIO_LEVEL_TAIL && !mario->isTurningTail && !mario->isSitting)
-			mario->SetState(MARIO_STATE_TURNING);
+			mario->StartTurning();
 		break;
 	case DIK_A:
 		mario->Reset();
@@ -386,6 +397,10 @@ void CPlayScenceKeyHandler::OnKeyDown(int KeyCode)
 			mario->SetIsReadyToJump(true);
 			//mario->
 		}
+		else if (mario->level == MARIO_LEVEL_TAIL && !mario->isFlapping && mario->vy >0)
+		{
+			mario->StartFlapping();
+		}
 		break;
 	}
 }
@@ -395,19 +410,22 @@ void CPlayScenceKeyHandler::OnKeyUp(int KeyCode)
 	switch (KeyCode)
 	{
 	case DIK_SPACE:
-	if (!mario->isOnGround)
-		mario->SetIsReadyToJump(false);
+		if (!mario->isOnGround)
+		{
+			mario->SetIsReadyToJump(false);
+			mario->SetIsFlapping(false);
+		}
 		//DebugOut(L"[INFO] Is not on ground \n");
 		break;
 	case DIK_DOWN:
 		mario->SetIsSitting(false);
 	case DIK_B:
-		//if (mario->isHolding)
-		//{
-		//	mario->SetIsHolding(false);
-		//	mario->SetIsReadyToHold(false);
-		//	mario->StartKicking();
-		//}
+		if (mario->isHolding)
+		{
+			mario->SetIsHolding(false);
+			mario->SetIsReadyToHold(false);
+			mario->StartKicking();
+		}
 		break;
 		/*case DIK_DOWN:
 			mario->SetPosition(mario->x, mario->y - 9);*/

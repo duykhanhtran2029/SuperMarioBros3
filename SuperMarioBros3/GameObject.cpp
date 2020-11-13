@@ -126,12 +126,12 @@ void CGameObject::RenderBoundingBox()
 	float l,t,r,b; 
 
 	this->GetBoundingBox(l, t, r, b);
-	rect.left = 0;
+	rect.left =0;
 	rect.top = 0;
 	rect.right = (int)r - (int)l;
 	rect.bottom = (int)b - (int)t;
 
-	CGame::GetInstance()->Draw(x, y, bbox, rect.left, rect.top, rect.right, rect.bottom, DebugAlpha);
+	CGame::GetInstance()->Draw(x + deltaX, y + deltaY, bbox, rect.left, rect.top, rect.right, rect.bottom, DebugAlpha);
 }
 bool CGameObject::isColliding(float friend_left, float friend_top, float friend_right, float friend_bottom)
 {

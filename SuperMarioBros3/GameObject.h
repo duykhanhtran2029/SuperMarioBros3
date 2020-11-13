@@ -56,6 +56,9 @@ public:
 
 	float ax, ay; //acceleration
 
+	float deltaX = 0;
+	float deltaY = 0;
+
 	int DebugAlpha = 0;
 	int DebugTag = 0;
 
@@ -68,15 +71,19 @@ public:
 	LPANIMATION_SET animation_set;
 
 public: 
+	int tag = 0;
 	bool isDestroyed = false;
-	void SetIsDestroyed(bool isDestroyed) { this->isDestroyed = isDestroyed; }
 
-	void SetPosition(float x, float y) { this->x = x, this->y = y; }
-	void SetSpeed(float vx, float vy) { this->vx = vx, this->vy = vy; }
 	void GetPosition(float &x, float &y) { x = this->x; y = this->y; }
 	void GetSpeed(float &vx, float &vy) { vx = this->vx; vy = this->vy; }
-
 	int GetState() { return this->state; }
+
+	void SetIsDestroyed(bool isDestroyed) { this->isDestroyed = isDestroyed; }
+	void SetPosition(float x, float y) { this->x = x, this->y = y; }
+	void SetSpeed(float vx, float vy) { this->vx = vx, this->vy = vy; }
+	void SetDirection(float nx) { this->nx = nx; }
+	void SetTag(float tag) { this->tag = tag; }
+	void SetDelta(float mx, float my) { deltaX = mx; deltaY = my; }
 	
 	void SetDebugAlpha(int Da) { DebugAlpha = Da; }
 	void SetDebugTag(int tag) { DebugTag = tag; }

@@ -36,12 +36,7 @@ class CGoomba : public CGameObject
 	virtual void Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects);
 	virtual void Render();
 	void CalcPotentialCollisions(vector<LPGAMEOBJECT>* coObjects, vector<LPCOLLISIONEVENT>& coEvents);
-	int type;
 public:
-	CGoomba(int ctype);
-	int GetType()
-	{
-		return type;
-	}
+	CGoomba();
 	virtual void SetState(int state);
 };
