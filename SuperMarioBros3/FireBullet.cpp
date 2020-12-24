@@ -8,6 +8,43 @@ CFireBullet::CFireBullet(float x, float y) : CGameObject()
 	this->y = y;
 }
 
+void CFireBullet::FilterCollision(
+	vector<LPCOLLISIONEVENT>& coEvents,
+	vector<LPCOLLISIONEVENT>& coEventsResult,
+	float& min_tx, float& min_ty,
+	int& nx, int& ny, float& rdx, float& rdy)
+{
+	min_tx = 1.0f;
+	min_ty = 1.0f;
+	int min_ix = -1;
+	int min_iy = -1;
+
+	nx = 0;
+	ny = 0;
+
+	coEventsResult.clear();
+
+	for (UINT i = 0; i < coEvents.size(); i++)
+	{
+		LPCOLLISIONEVENT c = coEvents[i];
+
+		if (c->t < min_tx && c->nx != 0) {
+			min_tx = c->t; min_ix = i; rdx = c->dx;
+			if(ny == 0)
+				nx = c->nx;
+		}
+
+		if (c->t < min_ty && c->ny != 0) {
+			min_ty = c->t; min_iy = i; rdy = c->dy;
+			if(nx == 0)
+				ny = c->ny;
+		}
+	}
+
+	if (min_ix >= 0) coEventsResult.push_back(coEvents[min_ix]);
+	if (min_iy >= 0) coEventsResult.push_back(coEvents[min_iy]);
+}
+
 void CFireBullet::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
 
@@ -30,12 +67,15 @@ void CFireBullet::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	}
 	else
 	{
-		float min_tx, min_ty, nx = 0, ny;
+		float min_tx, min_ty;
+		int nx = 0, ny = 0;
 		float rdx = 0;
 		float rdy = 0;
+		float x0, y0;
 
 		// TODO: This is a very ugly designed function!!!!
 		FilterCollision(coEvents, coEventsResult, min_tx, min_ty, nx, ny, rdx, rdy);
+
 		for (UINT i = 0; i < coEventsResult.size(); i++)
 		{
 			LPCOLLISIONEVENT e = coEventsResult[i];
@@ -44,20 +84,24 @@ void CFireBullet::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					continue;
 			if (dynamic_cast<CBrick*>(e->obj))
 			{
-				y += min_ty * dy + ny * 0.4f;
-				x += min_tx * dx + nx * 0.4f;
+				x0 = x;
+				y0 = y;
+				x += min_ty * dy + ny * 0.4f;
+				y += min_tx * dx + nx * 0.4f;
 				CBrick* obj = dynamic_cast<CBrick*>(e->obj);
-				if (nx != 0 && ny == 0)
-				{
-					isBeingUsed = false;
-					x = 1;
-					y = -1;
-				}
+
 				if (ny != 0)
 				{
 					tempHeight = y;
-					vy = -vy;
-				}	
+					vy = -FIRE_BULLET_SPEED_Y;
+					y = y0;
+				}
+
+				if (nx != 0)
+				{
+					isBeingUsed = false;
+					x = y = -1;
+				}
 			}
 			else
 			{

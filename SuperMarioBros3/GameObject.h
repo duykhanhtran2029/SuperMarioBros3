@@ -20,11 +20,12 @@ typedef CCollisionEvent * LPCOLLISIONEVENT;
 struct CCollisionEvent
 {
 	LPGAMEOBJECT obj;
-	float t, nx, ny;
+	float t;
+	int nx, ny;
 	
 	float dx, dy;		// *RELATIVE* movement distance between this object and obj
 
-	CCollisionEvent(float t, float nx, float ny, float dx = 0, float dy = 0, LPGAMEOBJECT obj = NULL) 
+	CCollisionEvent(float t, int nx, int ny, float dx = 0, float dy = 0, LPGAMEOBJECT obj = NULL) 
 	{ 
 		this->t = t; 
 		this->nx = nx; 
@@ -99,8 +100,8 @@ public:
 		vector<LPCOLLISIONEVENT> &coEventsResult, 
 		float &min_tx, 
 		float &min_ty, 
-		float &nx, 
-		float &ny, 
+		int &nx, 
+		int &ny, 
 		float &rdx, 
 		float &rdy);
 

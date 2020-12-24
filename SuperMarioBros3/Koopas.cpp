@@ -111,7 +111,8 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	else
 	{
 
-		float min_tx, min_ty, nx = 0, ny;
+		float min_tx, min_ty;
+		int nx = 0, ny = 0;
 		float rdx = 0;
 		float rdy = 0;
 
@@ -264,9 +265,9 @@ void CKoopas::SetState(int state)
 		break;
 	case KOOPAS_STATE_SPINNING:
 		if (nx > 0)
-			vx = KOOPAS_WALKING_SPEED * 15;
+			vx = KOOPAS_WALKING_SPEED * 5;
 		else
-			vx = -KOOPAS_WALKING_SPEED * 15;
+			vx = -KOOPAS_WALKING_SPEED * 5;
 		break;
 	case KOOPAS_STATE_IN_SHELL:
 		vx = 0;

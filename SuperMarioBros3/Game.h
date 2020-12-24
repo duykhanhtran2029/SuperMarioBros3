@@ -75,8 +75,8 @@ public:
 		float sr, 
 		float sb,
 		float &t, 
-		float &nx, 
-		float &ny);
+		int &nx, 
+		int &ny);
 
 	LPDIRECT3DDEVICE9 GetDirect3DDevice() { return this->d3ddv; }
 	LPDIRECT3DSURFACE9 GetBackBuffer() { return backBuffer; }

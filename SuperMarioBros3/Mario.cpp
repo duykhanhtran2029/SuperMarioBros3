@@ -11,8 +11,6 @@
 #include "Portal.h"
 #include "Define.h"
 #include "FireBullet.h"
-bool isChangeDirection = false;
-int preState = -1;
 int debugCount = 0;
 CMario::CMario(float x, float y) : CGameObject()
 {
@@ -37,7 +35,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 	vy += ay * dt;
 	//limited the speed of mario 
 	//DebugOut(L"State:	%d\n", state);
-	if (abs(vx) >= MARIO_WALKING_SPEED_MAX)
+	if (abs(vx) >= MARIO_WALKING_SPEED_MAX && !isRunning)
 	{
 		vx = nx * MARIO_WALKING_SPEED_MAX;
 	}
@@ -55,32 +53,37 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 	//		vx = 0;
 	//	DebugOut(L"ax:	%f, vx:	%f\n", ax, vx);
 	//}
-	if (GetTickCount() - kicking_start > MARIO_KICKING_TIME)
+	if (GetTickCount64() - running_start > MARIO_RUNNING_STACK_TIME && isRunning)
 	{
-		isKicking = false;
+		RunningStacks++;
+		if (RunningStacks > 6)
+			RunningStacks = 6;
 	}
-	if (GetTickCount() - shooting_start > MARIO_SHOOTING_TIME)
+
+	if (GetTickCount64() - kicking_start > MARIO_KICKING_TIME && isKicking)
+		isKicking = false;
+
+	if (GetTickCount64() - shooting_start > MARIO_SHOOTING_TIME && isShooting)
 	{
 		isShooting = false;
+		lastshoot = GetTickCount64();
 	}
-	if (GetTickCount() - turning_start > MARIO_TURNING_TAIL_TIME)
-	{
+
+	if (GetTickCount64() - turning_start > MARIO_TURNING_TAIL_TIME && isTurningTail)
 		isTurningTail = false;
-	}
-	if (GetTickCount() - flapping_start > MARIO_FLAPPING_TIME)
-	{
+
+	if (GetTickCount64() - flapping_start > MARIO_FLAPPING_TIME && isFlapping)
 		isFlapping = false;
-	}
-	else
+	if (GetTickCount64() - flapping_start <= MARIO_FLAPPING_TIME && !isFlapping)
 		vy -= vy / 3;
 	if (state == MARIO_STATE_SITTING) {
 		if (vy < 0)
 			vy -= MARIO_ACCELERATION_JUMP * dt;
 	}
+	
 	if (isJumping&&isChangeDirection)
-	{
 		vx = 0;
-	}
+
 	CGame* game = CGame::GetInstance();
 	vector<LPCOLLISIONEVENT> coEvents;
 	vector<LPCOLLISIONEVENT> coEventsResult;
@@ -92,7 +95,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 		CalcPotentialCollisions(coObjects, coEvents);
 
 	// reset untouchable timer if untouchable time has passed
-	if ( GetTickCount() - untouchable_start > MARIO_UNTOUCHABLE_TIME) 
+	if ( GetTickCount64() - untouchable_start > MARIO_UNTOUCHABLE_TIME) 
 	{
 		untouchable_start = 0;
 		untouchable = 0;
@@ -111,7 +114,8 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 	}
 	else
 	{
-		float min_tx, min_ty, nx = 0, ny;
+		float min_tx, min_ty;
+		int nx = 0, ny = 0;
 		float rdx = 0; 
 		float rdy = 0;
 		

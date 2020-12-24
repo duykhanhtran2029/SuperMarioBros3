@@ -31,7 +31,8 @@ LPCOLLISIONEVENT CGameObject::SweptAABBEx(LPGAMEOBJECT coO)
 {
 	float sl, st, sr, sb;		// static object bbox
 	float ml, mt, mr, mb;		// moving object bbox
-	float t, nx, ny;
+	float t;
+	int nx, ny;
 
 	coO->GetBoundingBox(sl, st, sr, sb);
 
@@ -84,15 +85,15 @@ void CGameObject::FilterCollision(
 	vector<LPCOLLISIONEVENT> &coEvents,
 	vector<LPCOLLISIONEVENT> &coEventsResult,
 	float &min_tx, float &min_ty, 
-	float &nx, float &ny, float &rdx, float &rdy)
+	int &nx, int &ny, float &rdx, float &rdy)
 {
 	min_tx = 1.0f;
 	min_ty = 1.0f;
 	int min_ix = -1;
 	int min_iy = -1;
 
-	nx = 0.0f;
-	ny = 0.0f;
+	nx = 0;
+	ny = 0;
 
 	coEventsResult.clear();
 

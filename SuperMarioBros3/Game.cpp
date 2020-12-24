@@ -212,7 +212,7 @@ void CGame::SweptAABB(
 	float ml, float mt,	float mr, float mb,			
 	float dx, float dy,			
 	float sl, float st, float sr, float sb,
-	float &t, float &nx, float &ny)
+	float &t, int &nx, int &ny)
 {
 
 	float dx_entry, dx_exit, tx_entry, tx_exit;
@@ -295,15 +295,14 @@ void CGame::SweptAABB(
 
 	if (tx_entry > ty_entry)
 	{
-		ny = 0.0f;
-		dx > 0 ? nx = -1.0f : nx = 1.0f;
+		ny = 0;
+		dx > 0 ? nx = -1 : nx = 1;
 	}
 	else 
 	{
-		nx = 0.0f;
-		dy > 0?ny = -1.0f:ny = 1.0f;
+		nx = 0;
+		dy > 0?ny = -1:ny = 1;
 	}
-
 }
 
 CGame *CGame::GetInstance()

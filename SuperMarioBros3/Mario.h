@@ -25,6 +25,10 @@
 #define MARIO_SHOOTING_TIME			150
 #define MARIO_KICKING_TIME			200	
 #define MARIO_FLAPPING_TIME			200	
+#define MARIO_RUNNING_STACK_TIME	500
+#define MARIO_RELOAD_BULLET_TIME	500
+
+#define MARIO_RUNNING_STACKS		6
 
 #define MARIO_STATE_IDLE			0
 #define MARIO_STATE_WALKING_RIGHT	100
@@ -35,6 +39,7 @@
 #define MARIO_STATE_KICK			411
 #define MARIO_STATE_SHOOTING		422
 #define MARIO_STATE_TURNING			433
+
 #define MARIO_STATE_DIE				900
 
 // SMALL
@@ -215,6 +220,8 @@
 
 #define MARIO_FIRE_BBOX_WIDTH  15
 
+#define MARIO_FIRE_BULLETS  2
+
 class CMario : public CGameObject
 {
 	DWORD untouchable_start;
@@ -223,10 +230,14 @@ class CMario : public CGameObject
 	DWORD delay_start;
 	DWORD turning_start;
 	DWORD flapping_start;
+	DWORD running_start;
+	DWORD reloading_start;
+	DWORD lastshoot;
 
 	float start_x;			// initial position of Mario at scene
 	float start_y;
 	int iBullet = 0;
+	int RunningStacks = 0;
 public: 
 	vector <CFireBullet*> Bullets;
 	int level;
@@ -238,9 +249,10 @@ public:
 	bool isReadyToSit = true;
 	bool isSitting = false;
 
-	//hight-jump
+	//high-jump
 	bool isReadyToJump = true;
 	bool isJumping = false;
+	bool isChangeDirection = false;
 
 	//using tail
 	bool isTurningTail = false;
@@ -248,11 +260,13 @@ public:
 
 	//shoot
 	bool isShooting = false;
-	int LoadBullets = 2;
+	bool isReadyToShoot = true;
+	int	ShootTimes = 0;
 
 	//hold
 	bool isHolding = false;
 	bool isReadyToHold = false;
+
 	//kick
 	bool isKicking = false;
 	bool isReadyToKick = true;
@@ -260,6 +274,7 @@ public:
 	//run
 	bool isReadyToRun = false;
 	bool isRunning = false;
+
 
 	CMario(float x = 0.0f, float y = 0.0f);
 	virtual void Update(DWORD dt, vector<LPGAMEOBJECT> *colliable_objects = NULL);
@@ -294,25 +309,46 @@ public:
 	void RenderJumping(int& ani, int ani_jump_up_right, int ani_jump_up_left, int ani_jump_down_right, int ani_jump_down_left);
 	
 	//timer
-	void DelayShooting() { delay_start = GetTickCount(); isKicking = true; }
-	void StartKicking() { kicking_start = GetTickCount(); isKicking = true; }
+	void DelayShooting() { delay_start = GetTickCount64(); isKicking = true; }
+	void StartKicking() { kicking_start = GetTickCount64(); isKicking = true; }
+	void StartRunning() { running_start = GetTickCount64(); isRunning = true; }
 	void StartShooting(float bx, float by)
 	{ 
-		shooting_start = GetTickCount(); 
-		isShooting = true;
-		if (iBullet >= MARIO_BULLET_MAX)
-			iBullet = 0;
-		Bullets[iBullet]->SetPosition(bx + nx * FIRE_BULLET_BBOX_WIDTH, by + (float)2 / 3 * (MARIO_LEVEL_SMALL ? MARIO_SMALL_BBOX_HEIGHT : MARIO_BIG_BBOX_HEIGHT));
-		Bullets[iBullet]->SetIsBeingUsed(true);
-		Bullets[iBullet]->SetSpeed(nx * FIRE_BULLET_SPEED_X, FIRE_BULLET_SPEED_Y);
-		Bullets[iBullet]->SetTemHeight(0);
-		iBullet++;
-		DebugOut(L"%f %f\n", Bullets[iBullet]->x, Bullets[iBullet]->y);
+		DWORD tmpShoot = GetTickCount64();	
+		DebugOut(L"[shoot] tmp %d last %d ShootTimes %d\n", tmpShoot, lastshoot, ShootTimes);
+		if (lastshoot)
+		{
+			//DebugOut(L"[shoot] ShootTimes %d tmp %d\n", ShootTimes, tmpShoot);
+			if (!(tmpShoot - lastshoot >= MARIO_RELOAD_BULLET_TIME || ShootTimes < MARIO_FIRE_BULLETS))
+			{
+				DebugOut(L"[shoot] tmp %d last %d ShootTimes %d\n", tmpShoot, lastshoot, ShootTimes);
+				isReadyToShoot = false;
+				return;
+			}
+			if (tmpShoot - lastshoot >= MARIO_RELOAD_BULLET_TIME)
+			{
+				ShootTimes = 0;
+				isReadyToShoot = true;
+			}
+		}
+		if (isReadyToShoot)
+		{
+			shooting_start = GetTickCount64();
+			isShooting = true;
+			if (iBullet >= MARIO_BULLET_MAX)
+				iBullet = 0;
+			Bullets[iBullet]->SetPosition(bx + nx * FIRE_BULLET_BBOX_WIDTH, by + (float)2 / 3 * (MARIO_LEVEL_SMALL ? MARIO_SMALL_BBOX_HEIGHT : MARIO_BIG_BBOX_HEIGHT));
+			Bullets[iBullet]->SetIsBeingUsed(true);
+			Bullets[iBullet]->SetSpeed(nx * FIRE_BULLET_SPEED_X, FIRE_BULLET_SPEED_Y);
+			Bullets[iBullet]->SetTemHeight(0);
+			iBullet++;
+			ShootTimes++;
+		}
 	}
-	void StartTurning() { turning_start = GetTickCount(); isTurningTail = true; }
+	void StartTurning() { turning_start = GetTickCount64(); isTurningTail = true; }
 	void StartFlapping() 
 	{ 
-			flapping_start = GetTickCount(); 
+			flapping_start = GetTickCount64(); 
 			isFlapping = true; 
 			//ay = -MARIO_GRAVITY;
 	}
@@ -320,7 +356,7 @@ public:
 	//void RenderRunning(int& ani, int ani_run_up_right, int ani_run_up_left, int ani_run_down);
 	void SetState(int vState);
 	void SetLevel(int l);
-	void StartUntouchable() { untouchable = 1; untouchable_start = GetTickCount(); }
+	void StartUntouchable() { untouchable = 1; untouchable_start = GetTickCount64(); }
 	void Reset();
 	virtual void GetBoundingBox(float &left, float &top, float &right, float &bottom);
 };
