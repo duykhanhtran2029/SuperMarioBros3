@@ -5,6 +5,8 @@
 
 #define MARIO_WALKING_SPEED_START	0.001f 
 #define MARIO_WALKING_SPEED_MAX		0.15f
+#define MARIO_RUNNING_SPEED_MAX		0.20f
+#define MARIO_SPEED_MAX				0.25f
 #define MARIO_ACCELERATION			0.0003f
 #define MARIO_WALKING_SPEED_MIN		0.05f
 
@@ -25,10 +27,13 @@
 #define MARIO_SHOOTING_TIME			150
 #define MARIO_KICKING_TIME			200	
 #define MARIO_FLAPPING_TIME			200	
-#define MARIO_RUNNING_STACK_TIME	500
+#define MARIO_RUNNING_STACK_TIME	250
+#define MARIO_SLOW_STACK_TIME		500
 #define MARIO_RELOAD_BULLET_TIME	500
+#define MARIO_TAIL_FLYING_TIME		500
 
-#define MARIO_RUNNING_STACKS		6
+#define MARIO_RUNNING_STACKS		7
+#define MARIO_WALKING_FAST_STACKS	4
 
 #define MARIO_STATE_IDLE			0
 #define MARIO_STATE_WALKING_RIGHT	100
@@ -204,6 +209,19 @@
 #define MARIO_ANI_SHOOTING_LEFT					100
 #define MARIO_ANI_SHOOTING_JUMP_RIGHT			101
 #define MARIO_ANI_SHOOTING_JUMP_LEFT			102
+//FLY
+#define MARIO_ANI_SMALL_FLY_RIGHT				103
+#define MARIO_ANI_SMALL_FLY_LEFT				104
+#define MARIO_ANI_BIG_FLY_RIGHT					105
+#define MARIO_ANI_BIG_FLY_LEFT					106
+#define MARIO_ANI_TAIL_FLY_UP_RIGHT				107
+#define MARIO_ANI_TAIL_FLY_DOWN_RIGHT			108
+#define MARIO_ANI_TAIL_FLY_FLAPPING_RIGHT		109
+#define MARIO_ANI_TAIL_FLY_UP_LEFT				110
+#define MARIO_ANI_TAIL_FLY_DOWN_LEFT			111
+#define MARIO_ANI_TAIL_FLY_FLAPPING_LEFT		112
+#define MARIO_ANI_FIRE_FLY_RIGHT				113
+#define MARIO_ANI_FIRE_FLY_LEFT					114
 
 #define	MARIO_LEVEL_SMALL	1
 #define	MARIO_LEVEL_BIG		2
@@ -233,6 +251,8 @@ class CMario : public CGameObject
 	DWORD running_start;
 	DWORD reloading_start;
 	DWORD lastshoot;
+	DWORD running_stop;
+	DWORD tailflying_start;
 
 	float start_x;			// initial position of Mario at scene
 	float start_y;
@@ -257,6 +277,7 @@ public:
 	//using tail
 	bool isTurningTail = false;
 	bool isFlapping = false;
+	bool isTailFlying = false;
 
 	//shoot
 	bool isShooting = false;
@@ -272,13 +293,15 @@ public:
 	bool isReadyToKick = true;
 
 	//run
-	bool isReadyToRun = false;
 	bool isRunning = false;
+	//fly
+	bool isFlying = false;
 
 
 	CMario(float x = 0.0f, float y = 0.0f);
 	virtual void Update(DWORD dt, vector<LPGAMEOBJECT> *colliable_objects = NULL);
 	virtual void Render();
+	void CMario::TimingFlag();
 
 	//set
 	void SetIsOnGround(bool On) { this->isReadyToHold = On; }
@@ -288,8 +311,8 @@ public:
 	void SetIsReadyToJump(bool jump) { isReadyToJump = jump; }
 	void SetIsJumping(bool jump) { this->isJumping = jump; }
 	void SetIsFlapping(bool flap) { this->isFlapping = flap; }
+	void SetIsTailFlying(bool fly) { this->isTailFlying = fly; }
 
-	void SetIsReadyToRun(bool run) { this->isReadyToRun = run; }
 	void SetIsRunning(bool run) { this->isRunning = run; }
 
 	void SetIsReadyToSit(bool sit) { this->isReadyToSit = sit; }
@@ -312,16 +335,15 @@ public:
 	void DelayShooting() { delay_start = GetTickCount64(); isKicking = true; }
 	void StartKicking() { kicking_start = GetTickCount64(); isKicking = true; }
 	void StartRunning() { running_start = GetTickCount64(); isRunning = true; }
+	void StopRunning() { running_stop = GetTickCount64(); isRunning = false; }
 	void StartShooting(float bx, float by)
 	{ 
 		DWORD tmpShoot = GetTickCount64();	
-		DebugOut(L"[shoot] tmp %d last %d ShootTimes %d\n", tmpShoot, lastshoot, ShootTimes);
 		if (lastshoot)
 		{
 			//DebugOut(L"[shoot] ShootTimes %d tmp %d\n", ShootTimes, tmpShoot);
 			if (!(tmpShoot - lastshoot >= MARIO_RELOAD_BULLET_TIME || ShootTimes < MARIO_FIRE_BULLETS))
 			{
-				DebugOut(L"[shoot] tmp %d last %d ShootTimes %d\n", tmpShoot, lastshoot, ShootTimes);
 				isReadyToShoot = false;
 				return;
 			}
@@ -350,7 +372,11 @@ public:
 	{ 
 			flapping_start = GetTickCount64(); 
 			isFlapping = true; 
-			//ay = -MARIO_GRAVITY;
+	}
+	void StartTailFlying()
+	{
+		tailflying_start = GetTickCount64();
+		isTailFlying = true;
 	}
 
 	//void RenderRunning(int& ani, int ani_run_up_right, int ani_run_up_left, int ani_run_down);

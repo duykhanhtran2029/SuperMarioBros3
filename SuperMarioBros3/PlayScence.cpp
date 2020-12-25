@@ -286,19 +286,6 @@ void CPlayScene::Update(DWORD dt)
 {
 	// We know that Mario is the first object in the list hence we won't add him into the colliable object list
 	// TO-DO: This is a "dirty" way, need a more organized way 
-	//for (auto i = objects.begin() + 1; i != objects.end(); ++i)
-	//{
-	//	if (dynamic_cast<CGoomba*>(*i))
-	//	{
-	//		CGoomba* goomba = dynamic_cast<CGoomba*>(*i);
-	//		if (goomba->GetState() == GOOMBA_STATE_DIE)
-	//		{
-	//			objects.erase(i);
-	//			i--;
-	//			delete goomba;
-	//		}
-	//	}
-	//}
 	vector<LPGAMEOBJECT> coObjects;
 	for (size_t i = 1; i < objects.size(); i++)
 	{
@@ -361,7 +348,6 @@ void CPlayScene::Unload()
 
 	DebugOut(L"[INFO] Scene %s unloaded! \n", sceneFilePath);
 }
-int cc = 0;
 void CPlayScenceKeyHandler::OnKeyDown(int KeyCode)
 {
 	//DebugOut(L"[INFO] KeyDown: %d\n", KeyCode);
@@ -381,7 +367,7 @@ void CPlayScenceKeyHandler::OnKeyDown(int KeyCode)
 	case DIK_4:
 		mario->SetLevel(MARIO_LEVEL_FIRE);
 		break;
-	case DIK_B:
+	case DIK_A:
 		if (mario->level == MARIO_LEVEL_FIRE && !mario->isShooting && !mario->isSitting)
 		{
 			mario->StartShooting(mario->x, mario->y);
@@ -390,18 +376,21 @@ void CPlayScenceKeyHandler::OnKeyDown(int KeyCode)
 		if (mario->level == MARIO_LEVEL_TAIL && !mario->isTurningTail && !mario->isSitting)
 			mario->StartTurning();
 		break;
-	case DIK_A:
+	case DIK_R:
 		mario->Reset();
 		break;
-	case DIK_SPACE:
+	case DIK_S:
 		if (mario->isOnGround)
 		{
 			mario->SetIsReadyToJump(true);
 			//mario->
 		}
-		else if (mario->level == MARIO_LEVEL_TAIL && !mario->isFlapping && mario->vy >0)
+		else if (mario->level == MARIO_LEVEL_TAIL && (!mario->isFlying && !mario->isFlapping && mario->vy > 0))
+				mario->StartFlapping();
+		if (mario->isFlying && mario->level == MARIO_LEVEL_TAIL)
 		{
-			mario->StartFlapping();
+			mario->StartTailFlying();
+			DebugOut(L"[TAILFLY] vy %f ay %f\n", mario->vy, mario->ay);
 		}
 		break;
 	}
@@ -411,7 +400,7 @@ void CPlayScenceKeyHandler::OnKeyUp(int KeyCode)
 	CMario* mario = ((CPlayScene*)scence)->GetPlayer();
 	switch (KeyCode)
 	{
-	case DIK_SPACE:
+	case DIK_S:
 		if (!mario->isOnGround)
 		{
 			mario->SetIsReadyToJump(false);
@@ -421,23 +410,15 @@ void CPlayScenceKeyHandler::OnKeyUp(int KeyCode)
 		break;
 	case DIK_DOWN:
 		mario->SetIsSitting(false);
-	case DIK_B:
+	case DIK_A:
 		mario->SetIsHolding(false);
 		mario->SetIsReadyToHold(false);
+		mario->StopRunning();
 		if (mario->isHolding)
 		{
 			mario->StartKicking();
 		}
-		//mario->SetIs
 		break;
-		/*case DIK_DOWN:
-			mario->SetPosition(mario->x, mario->y - 9);*/
-			//case DIK_RIGHT:
-			//	mario->SetState(MARIO_STATE_INERTIA);
-			//	break;
-			//case DIK_LEFT:
-			//	mario->SetState(MARIO_STATE_INERTIA);
-			//	break;
 	}
 }
 void CPlayScenceKeyHandler::KeyState(BYTE* states)
@@ -447,9 +428,13 @@ void CPlayScenceKeyHandler::KeyState(BYTE* states)
 
 	// disable control key when Mario die 
 	if (mario->GetState() == MARIO_STATE_DIE) return;
-	if (game->IsKeyDown(DIK_B))
+	if (game->IsKeyDown(DIK_A))
+	{
 		mario->SetIsReadyToHold(true);
-	if (game->IsKeyDown(DIK_SPACE) && mario->isReadyToJump)
+		if(!mario->isRunning)
+			mario->StartRunning();
+	}
+	if (game->IsKeyDown(DIK_S) && mario->isReadyToJump)
 	{
 		mario->SetState(MARIO_STATE_JUMPING);
 		mario->SetIsJumping(true);

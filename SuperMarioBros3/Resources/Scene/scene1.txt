@@ -1,6 +1,8 @@
 # id	file_path	transparent_color_r	g	b
 [TEXTURES]
 0	Resources\Textures\mario.png	255	255	255
+1	Resources\Textures\mar.png	68	145	190
+2	Resources\Textures\mar2.png	68	145	190
 20	Resources\Textures\misc.png	176	224	248
 10	Resources\Textures\enemies.png	3	26	110
 30	Resources\Tilemap\world1-1_bank.png	0	0	0
@@ -15,7 +17,7 @@ Resources\Tilemap\world1-1.txt
 # Type	Level	State	Direction	Serial
 # Type: 1 = Mario
 # Level: 0 = Small; 1 = Big; 2 = Tail; 3 = Fire
-# State: 0 = Walk; 1 = Run; 2 = Jump; 3 = Brake; 4 = Sitdown; 5 = Hold; 6 = Fly, 7 = Kick 
+# State: 0 = Walk; 1 = Max Speed; 2 = Jump; 3 = Brake; 4 = Sitdown; 5 = Hold; 6 = Fly, 7 = Kick 
 # Direction: 0 = Right; 1 = Left, null = Idle
 # Serial: Optional
 # die 
@@ -27,10 +29,9 @@ Resources\Tilemap\world1-1.txt
 #walk right
 10002	275	0	291	15	0
 10003	306	0	320	15	0
-#run right
+#max speed right
 10104	335	0	351	16	0
-10105	367	0	379	15	0
-10106	397	0	410	16	0
+10105	275	0	291	15	0
 #jump up right
 10201	395	80	411	96	0
 #jump down right
@@ -44,10 +45,8 @@ Resources\Tilemap\world1-1.txt
 10502	246	120	260	136	0
 #hold jump right
 10503	276	120	291	136	0
-#max speed right
-10600	355	0	371	16	0
 #fly right
-10601	355	0	371	16	0
+10602	365	40	381	56	0
 #kick right
 10700	425	80	441	96	0
 # --Left--
@@ -56,10 +55,9 @@ Resources\Tilemap\world1-1.txt
 #walk left
 10012	155	0	170	15	0
 10013	125	0	139	15	0
-#run left
+#max speed left
 10114	95	0	111	16	0
-10115	67	0	81	15	0
-10116	36	0	50	16	0
+10115	155	0	170	15	0
 #jump up left
 10211	35	80	51	96	0
 #jump down left
@@ -73,6 +71,8 @@ Resources\Tilemap\world1-1.txt
 10512	186	120	200	136	0
 #hold jump left
 10513	155	120	170	136	0
+#fly left
+10612	65	40	81	56	0
 #kick left
 10710	5	80	21	96	0
 #  ==== Big Mario  ==== 
@@ -82,10 +82,9 @@ Resources\Tilemap\world1-1.txt
 #walk right
 11002	275	154	291	181	0
 11003	305	155	321	181	0
-#run right
+#max speed right
 11104	334	154	353	181	0
 11105	362	154	381	181	0
-11106	392	155	411	181	0
 #jump up right
 11201	395	275	411	301	0
 #jump down right
@@ -101,6 +100,8 @@ Resources\Tilemap\world1-1.txt
 11502	276	314	291	341	0
 #hold jump right
 11503	305	315	321	341	0
+#fly right
+11602	394	195	413	221	0
 #kick right
 11700	423	274	444	301	0
 # --Left--
@@ -109,10 +110,9 @@ Resources\Tilemap\world1-1.txt
 #walk left
 11012	155	154	170	181	0
 11013	125	154	140	181	0
-#run left
+#max speed left
 11114	93	154	112	181	0
 11115	65	154	84	181	0
-11116	35	155	54	181	0
 #jump up left
 11211	35	275	51	301	0
 #jump down left
@@ -128,6 +128,8 @@ Resources\Tilemap\world1-1.txt
 11512	155	314	170	341	0
 #hold jump left
 11513	125	315	141	341	0
+#fly left
+11612	33	195	52	221	0
 #kick left
 11710	2	274	23	301	0
 #  ==== Tail Mario ==== 
@@ -137,10 +139,9 @@ Resources\Tilemap\world1-1.txt
 #walk right
 12002	104	142	126	170	110
 12003	129	143	152	170	110
-#run right
+#max speed right
 12104	360	142	384	170	110
-12105	429	142	453	170	110
-12106	402	143	426	170	110
+12105	387	142	411	170	110
 #jump up right
 12201	257	143	280	170	110
 #jump down right
@@ -156,6 +157,14 @@ Resources\Tilemap\world1-1.txt
 12502	615	143	638	170	110
 #hold jump right
 12503	615	143	638	170	110
+#fly up right
+12602	495	142	519	170	110
+#fly down right
+12603	441	143	465	170	110
+#fly flapping right
+12604	441	143	465	170	110
+12605	468	143	492	170	110
+12606	495	142	519	170	110
 #kick right
 12700	641	142	663	170	110
 #turning tail right
@@ -173,10 +182,9 @@ Resources\Tilemap\world1-1.txt
 #walk left
 12012	714	142	736	170	100
 12013	688	143	711	170	100
-#run left
+#max speed left
 12114	456	142	480	170	100
 12115	429	142	453	170	100
-12116	402	143	426	170	100
 #jump up left
 12211	560	143	583	170	100
 #jump down left
@@ -192,6 +200,14 @@ Resources\Tilemap\world1-1.txt
 12512	202	143	225	170	100
 #hold jump left
 12513	202	143	225	170	100
+#fly up left
+12612	321	142	345	170	100
+#fly down left
+12613	375	143	399	170	100
+#fly left
+12614	375	143	399	170	100
+12615	348	143	372	170	100
+12616	321	142	345	170	100
 #kick left
 12710	177	142	199	170	100
 #turning tail left
@@ -210,10 +226,9 @@ Resources\Tilemap\world1-1.txt
 #walk right
 13002	275	394	291	421	0
 13003	305	395	321	421	0
-#run right
+#max speed right
 13104	334	394	353	421	0
 13105	362	394	381	421	0
-13106	392	395	411	421	0
 #jump up right
 13201	395	515	411	541	0
 #jump down right
@@ -229,6 +244,8 @@ Resources\Tilemap\world1-1.txt
 13502	276	554	291	581	0
 #hold jump right
 13503	305	555	321	581	0
+#fly right
+13602	394	435	413	461	0
 #kick right
 13700	423	514	444	541	0
 #shoot right
@@ -245,10 +262,9 @@ Resources\Tilemap\world1-1.txt
 #walk left
 13012	155	394	171	421	0
 13013	125	395	141	421	0
-#run left
+#max speed left
 13114	93	394	112	421	0
 13115	65	394	84	421	0
-13116	35	395	54	421	0
 #jump up left
 13211	35	515	51	541	0
 #jump down left
@@ -264,6 +280,8 @@ Resources\Tilemap\world1-1.txt
 13512	155	554	170	581	0
 #hold jump left
 13513	125	555	141	581	0
+#fly left
+13612	33	435	52	461	0
 #kick right
 13710	2	514	23	541	0
 #shoot left
@@ -374,7 +392,7 @@ Resources\Tilemap\world1-1.txt
 #Type Level State Direction
 # Type: 1 = Mario
 # Level: 0 = Small; 1 = Big; 2 = Tail; 3 = Fire
-# State: 0 = Walk; 1 = Run; 2 = Jump; 3 = Brake; 4 = Sitdown; 5 = Hold; 6 = Fast 
+# State: 0 = Walk; 1 = max speed; 2 = Jump; 3 = Brake; 4 = Sitdown; 5 = Hold; 6 = Fast 
 # Direction: 0 = Right; 1 = Left, null = Idle; 3 = RightDown; 4 = LeftDown
 # ==== SMALL =====
 #idle small right
@@ -383,8 +401,8 @@ Resources\Tilemap\world1-1.txt
 1000	10001	100	10002	100	10003	100
 #walk fast small right
 1060	10001	50	10002	50	10003	50
-#run small right
-1010	10104	100	10105	100	10106	100
+#max speed small right
+1010	10104	50	10105	50
 #jump up small right
 1020	10201	100
 #jump down small right
@@ -397,6 +415,8 @@ Resources\Tilemap\world1-1.txt
 10510	10501	100	10502	100
 #hold jump small right
 10530	10503	100
+#fly right
+10620	10602	100
 #hold kick small right
 10570	10700	200
 #idle small left
@@ -405,8 +425,8 @@ Resources\Tilemap\world1-1.txt
 1001	10011	100	10012	100	10013	100
 #walk fast small left
 1061	10011	50	10012	50	10013	50
-#run small left
-1011	10114	100	10115	100	10116	100
+#max speed small left
+1011	10114	50	10115	50
 #jump up small left
 1021	10211	100
 #jump down small left
@@ -419,6 +439,8 @@ Resources\Tilemap\world1-1.txt
 10511	10501	100	10502	100
 #hold jump small left
 10531	10503	100
+#fly left
+10621	10612	100
 #hold kick small left
 10571	10700	200
 # ==== BIG =====
@@ -428,8 +450,8 @@ Resources\Tilemap\world1-1.txt
 1100	11001	100	11002	100	11003	100
 #walk fast big right
 1160	11001	50	11002	50	11003	50
-#run big right
-1110	11104	100	11105	100	11106	100
+#max speed big right
+1110	11104	100	11105	100
 #jump up big right
 1120	11201	100
 #jump down big right
@@ -444,6 +466,8 @@ Resources\Tilemap\world1-1.txt
 11510	11501	100	11502	100
 #hold jump big right
 11530	11503	100
+#fly right
+11620	11602	100
 #hold kick big right
 11570	11700	200
 
@@ -453,8 +477,8 @@ Resources\Tilemap\world1-1.txt
 1101	11011	100	11012	100	11013	100
 #walk fast big left
 1161	11011	50	11012	50	11013	50
-#run big left
-1111	11114	100	11115	100	11116	100
+#max speed big left
+1111	11114	100	11115	100
 #jump up big left
 1121	11211	100
 #jump down big left
@@ -469,6 +493,8 @@ Resources\Tilemap\world1-1.txt
 11511	11511	100	11512	100
 #hold jump big left
 11531	11513	100
+#fly left
+11621	11612	100
 #hold kick big left
 11571	11710	200
 # ==== TAIL =====
@@ -478,8 +504,8 @@ Resources\Tilemap\world1-1.txt
 1200	12001	100	12002	100	12003	100
 #walk fast tail right
 1260	12001	50	12002	50	12003	50
-#run tail right
-1210	12104	100	12105	100	12106	100
+#max speed tail right
+1210	12104	100	12105	100
 #jump up tail right
 1220	12201	100
 #jump down tail right
@@ -494,6 +520,12 @@ Resources\Tilemap\world1-1.txt
 12510	12501	100	12502	100
 #hold jump tail right
 12530	12503	100
+#fly up right
+12620	12602	100
+#fly down right
+12630	12603	100
+#fly flapping right
+12640	12604	100	12605	100	12606	100
 #hold kick tail right
 12570	12700	200
 #turning tail right
@@ -507,8 +539,8 @@ Resources\Tilemap\world1-1.txt
 1201	12011	100	12012	100	12013	100
 #walk fast tail left
 1261	12011	50	12012	50	12013	50
-#run tail left
-1211	12114	100	12115	100	12116	100
+#max speed tail left
+1211	12114	100	12115	100
 #jump up tail left
 1221	12211	100
 #jump down tail left
@@ -523,6 +555,12 @@ Resources\Tilemap\world1-1.txt
 12511	12511	100	12512	100
 #hold jump tail left
 12531	12513	100
+#fly up left
+12621	12612	100
+#fly down left
+12631	12613	100
+#fly flapping left
+12641	12614	100	12615	100	12616	100
 #hold kick tail left
 12571	12710	200
 #turning tail left
@@ -536,8 +574,8 @@ Resources\Tilemap\world1-1.txt
 1300	13001	100	13002	100	13003	100
 #walk fast fire right
 1360	13001	50	13002	50	13003	50
-#run fire right
-1310	13104	100	13105	100	13106	100
+#max speed fire right
+1310	13104	100	13105	100
 #jump up fire right
 1320	13201	100
 #jump down fire right
@@ -552,6 +590,8 @@ Resources\Tilemap\world1-1.txt
 13510	13501	100	13502	100
 #hold jump fire right
 13530	13503	100
+#fly right
+13620	13602	100
 #hold kick fire right
 13570	13700	200
 #shoot fire right
@@ -564,8 +604,8 @@ Resources\Tilemap\world1-1.txt
 1301	13011	100	13012	100	13013	100
 #walk fire left
 1361	13011	50	13012	50	13013	50
-#run fire left
-1311	13114	100	13115	100	13116	100
+#max speed fire left
+1311	13114	100	13115	100
 #jump up fire left
 1321	13211	100
 #jump down fire left
@@ -580,6 +620,8 @@ Resources\Tilemap\world1-1.txt
 13511	13511	100	13512	100
 #hold jump fire left
 13531	13513	100
+#fly left
+13621	13612	100
 #hold kick fire left
 13571	13710	200
 #shoot fire leftt
@@ -661,15 +703,16 @@ Resources\Tilemap\world1-1.txt
 #
 [ANIMATION_SETS]
 # Mario
-1	100	1000	1010	1060	1020	1023	1030	101	1001	1011	1061	1021	1024	1031
-1	110	1100	1110	1160	1120	1123	1130	1140	111	1101	1111	1161	1121	1124	1131	1141
-1	120	1200	1210	1260	1220	1223	1230	1240	121	1201	1211	1261	1221	1224	1231	1241
-1	130	1300	1310	1360	1320	1323	1330	1340	131	1301	1311	1361	1321	1324	1331	1341	1099
+1	100	1000	1060	1010	1020	1023	1030	101	1001	1061	1011	1021	1024	1031
+1	110	1100	1160	1110	1120	1123	1130	1140	111	1101	1161	1111	1121	1124	1131	1141
+1	120	1200	1260	1210	1220	1223	1230	1240	121	1201	1261	1211	1221	1224	1231	1241
+1	130	1300	1360	1310	1320	1323	1330	1340	131	1301	1361	1311	1321	1324	1331	1341	1099
 1	10500	10510	10530	10570	10501	10511	10531	10571
 1	11500	11510	11530	11570	11501	11511	11531	11571
 1	12500	12510	12530	12570	12501	12511	12531	12571
 1	13500	13510	13530	13570	13501	13511	13531	13571
 1	1280	1281	1226	1228	1380	1381	1382	1383
+1	10620	10621	11620	11621	12620	12630	12640	12621	12631	12641	13620	13621
 9	90	91
 # Brick
 46	601
@@ -1022,13 +1065,13 @@ Resources\Tilemap\world1-1.txt
 1	2336	400	14	10
 # === Goomba === 
 # --- Yellow ---
-2	224	340	2	0
-2	528	340	2	0
+#2	224	340	2	0
+#2	528	340	2	0
 
 # --- Red ---
 # === Koopas === 
-3	1344	140	3	0
-3	528	340	3	0
+#3	1344	140	3	0
+#3	528	340	3	0
 
 # === Block Line === 
 4	1312	144	15	2
@@ -1089,4 +1132,4 @@ Resources\Tilemap\world1-1.txt
 4	560	304	45	3
 # --- SCENE PORTAL ----
 # type	l	t	ani_set_id	r	b	scene_id
-50	300	98	0	316	150	2
+#50	300	98	0	316	150	2
