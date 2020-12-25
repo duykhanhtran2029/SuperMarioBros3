@@ -9,6 +9,7 @@
 #include "Map.h"
 #include "Block.h"
 #include "Define.h"
+#include "Coin.h"
 
 using namespace std;
 
@@ -36,6 +37,7 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath) :
 #define OBJECT_TYPE_GOOMBA	2
 #define OBJECT_TYPE_KOOPAS	3
 #define OBJECT_TYPE_BLOCK	4
+#define OBJECT_TYPE_COIN	6
 #define OBJECT_TYPE_FIRE_BULLET	9
 
 #define OBJECT_TYPE_PORTAL	50
@@ -175,6 +177,9 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	case OBJECT_TYPE_BLOCK:
 		obj = new CBlock();
 		obj->SetTag(tag);
+		break;
+	case OBJECT_TYPE_COIN:
+		obj = new CCoin(tag);
 		break;
 	case OBJECT_TYPE_FIRE_BULLET: obj = new CFireBullet(); break;
 		//case OBJECT_TYPE_PORTAL:

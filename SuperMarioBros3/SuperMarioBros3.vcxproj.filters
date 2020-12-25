@@ -35,9 +35,6 @@
     <ClCompile Include="Block.cpp">
       <Filter>Map Objects</Filter>
     </ClCompile>
-    <ClCompile Include="Brick.cpp">
-      <Filter>Map Objects</Filter>
-    </ClCompile>
     <ClCompile Include="Koopas.cpp">
       <Filter>Map Objects</Filter>
     </ClCompile>
@@ -52,6 +49,12 @@
     </ClCompile>
     <ClCompile Include="FireBullet.cpp">
       <Filter>Mario</Filter>
+    </ClCompile>
+    <ClCompile Include="Brick.cpp">
+      <Filter>Map Objects\Bricks</Filter>
+    </ClCompile>
+    <ClCompile Include="Coin.cpp">
+      <Filter>Map Objects</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -91,9 +94,6 @@
     <ClInclude Include="Block.h">
       <Filter>Map Objects</Filter>
     </ClInclude>
-    <ClInclude Include="Brick.h">
-      <Filter>Map Objects</Filter>
-    </ClInclude>
     <ClInclude Include="Koopas.h">
       <Filter>Map Objects</Filter>
     </ClInclude>
@@ -111,6 +111,12 @@
     </ClInclude>
     <ClInclude Include="FireBullet.h">
       <Filter>Mario</Filter>
+    </ClInclude>
+    <ClInclude Include="Brick.h">
+      <Filter>Map Objects\Bricks</Filter>
+    </ClInclude>
+    <ClInclude Include="Coin.h">
+      <Filter>Map Objects</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -131,6 +137,9 @@
     </Filter>
     <Filter Include="Mario">
       <UniqueIdentifier>{b21e6db8-be01-40d2-8def-ec37276fddee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Map Objects\Bricks">
+      <UniqueIdentifier>{bb0a78db-7f0d-4617-a4a1-22b79eaf9f11}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

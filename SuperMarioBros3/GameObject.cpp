@@ -115,7 +115,7 @@ void CGameObject::FilterCollision(
 }
 
 
-void CGameObject::RenderBoundingBox()
+void CGameObject::RenderBoundingBox(int alpha)
 {
 	D3DXVECTOR3 p(x, y, 0);
 	RECT rect;
@@ -130,7 +130,7 @@ void CGameObject::RenderBoundingBox()
 	rect.right = (int)r - (int)l;
 	rect.bottom = (int)b - (int)t;
 
-	CGame::GetInstance()->Draw(x + deltaX, y + deltaY, bbox, rect.left, rect.top, rect.right, rect.bottom, DebugAlpha);
+	CGame::GetInstance()->Draw(x + deltaX, y + deltaY, bbox, rect.left, rect.top, rect.right, rect.bottom, alpha);
 }
 bool CGameObject::isColliding(float friend_left, float friend_top, float friend_right, float friend_bottom)
 {

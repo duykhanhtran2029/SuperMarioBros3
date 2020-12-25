@@ -83,13 +83,13 @@ public:
 	void SetPosition(float x, float y) { this->x = x, this->y = y; }
 	void SetSpeed(float vx, float vy) { this->vx = vx, this->vy = vy; }
 	void SetDirection(int nx) { this->nx = nx; }
-	void SetTag(float tag) { this->tag = tag; }
+	void SetTag(int tag) { this->tag = tag; }
 	void SetDelta(float mx, float my) { deltaX = mx; deltaY = my; }
 	
 	void SetDebugAlpha(int Da) { DebugAlpha = Da; }
 	void SetDebugTag(int tag) { DebugTag = tag; }
 
-	void RenderBoundingBox();
+	void RenderBoundingBox(int alpha = 0);
 	bool isColliding(float friend_left, float friend_top, float friend_right, float friend_bottom);
 	void SetAnimationSet(LPANIMATION_SET ani_set) { animation_set = ani_set; }
 

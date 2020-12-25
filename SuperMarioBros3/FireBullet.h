@@ -4,6 +4,19 @@
 #include "Define.h"
 #include "Brick.h"
 
+#define FIRE_BULLET_BBOX_WIDTH  9
+#define FIRE_BULLET_BBOX_HEIGHT 9
+
+#define FIRE_BULLET_SPEED_X	0.2f
+#define FIRE_BULLET_SPEED_Y	0.1f
+#define FIRE_BULLET_LIMITED_HEIGHT  23
+
+#define FIRE_BULLET_STATE_FLYING		100
+#define FIRE_BULLET_STATE_HIDDEN		200
+
+#define FIRE_BULLET_ANI_RIGHT		0
+#define FIRE_BULLET_ANI_LEFT		1
+
 class CFireBullet : public CGameObject
 {
 public:

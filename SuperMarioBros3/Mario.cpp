@@ -10,7 +10,9 @@
 #include "Block.h"
 #include "Portal.h"
 #include "Define.h"
+#include "Coin.h"
 #include "FireBullet.h"
+
 CMario::CMario(float x, float y) : CGameObject()
 {
 	level = MARIO_LEVEL_FIRE;
@@ -105,22 +107,14 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 					vx = nx * MARIO_SPEED_MAX;
 	}
 
-	if (vy <= -MARIO_JUMP_SPEED_MAX )
-	{
-		vy = -MARIO_JUMP_SPEED_MAX;
-		if (level == MARIO_LEVEL_TAIL && isTailFlying)
-			ay = -MARIO_GRAVITY;
-		else
-			ay = MARIO_GRAVITY;
-		isReadyToJump = false;
-	}
-	//if (state == MARIO_STATE_IDLE)//slow down
+	//if (vy <= -MARIO_JUMP_SPEED_MAX )
 	//{
-	//	ax = -nx * MARIO_ACCELERATION;
-	//	ay = MARIO_GRAVITY;
-	//	if (abs(vx) <= MARIO_WALKING_SPEED_MIN)
-	//		vx = 0;
-	//	DebugOut(L"ax:	%f, vx:	%f\n", ax, vx);
+	//	vy = -MARIO_JUMP_SPEED_MAX;
+	//	if (level == MARIO_LEVEL_TAIL && isTailFlying)
+	//		ay = -MARIO_GRAVITY;
+	//	else
+	//		ay = MARIO_GRAVITY;
+	//	isReadyToJump = false;
 	//}
 	TimingFlag();
 
@@ -166,8 +160,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 		// how to push back Mario if collides with a moving objects, what if Mario is pushed this way into another object?
 		//if (rdx != 0 && rdx!=dx)
 		//	x += nx*abs(rdx); 
-		x += min_tx * dx + nx * 0.4f;
-		y += min_ty * dy + ny * 0.4f;
+		float x0 = x, y0 = y;
 		//
 		// Collision logic with other objects
 		//
@@ -175,11 +168,17 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 		float mLeft, mTop, mRight, mBottom;
 		for (UINT i = 0; i < coEventsResult.size(); i++)
 		{
+			x = x0 + min_tx * dx + nx * 0.4f;
+			y = y0 + min_ty * dy + ny * 0.4f;
 			LPCOLLISIONEVENT e = coEventsResult[i];
 			if (e->obj != NULL)
 				if (e->obj->isDestroyed == true)
+				{
+					x = x0 + dx;
+					y = y0 + dy;					
 					continue;
-			if (e->ny != 0)
+				}
+			if (e->ny != 0 && !(dynamic_cast<CBlock*>(e->obj) && ny >= 0))
 			{
 				isOnGround = true;
 				isJumping = false;
@@ -318,24 +317,36 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 						if (ceil(mBottom) != oTop)
 							vx = 0;
 					}
+					if (object->tag == QUESTION && e->ny > 0)
+					{
+						object->SetState(BRICK_STATE_QUESTION_HIT);
+					}
 				}					
 			}
 			else if (dynamic_cast<CBlock*>(e->obj))
 			{
 				//DebugOut(L"Tag: %d\n", tag);
 				CBlock* block = dynamic_cast<CBlock*>(e->obj);
-				x += dx;
+				x = x0 + dx;
 				if (ny < 0)
 					vy = 0;
 				else
 				{
-					y += dy;
+					y = y0 + dy;
 				}
 			}
 			else if (dynamic_cast<CFireBullet*>(e->obj))
 			{
-				x += dx;
-				y += dy;
+				x = x0 + dx;
+				y = y0 + dy;
+			}
+			else if (dynamic_cast<CCoin*>(e->obj))
+			{	
+				CCoin* coin = dynamic_cast<CCoin*>(e->obj);
+				coin->isDestroyed = true;
+				coin->SetIsAppear(false);
+				x = x0 + dx;
+				y = y0 + dy;
 			}
 			else if (dynamic_cast<CPortal *>(e->obj))
 			{

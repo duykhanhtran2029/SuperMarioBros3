@@ -29,7 +29,7 @@ void Map::Render()
 		{
 			int index = TileMap[CurrentRow][CurrentColumn] - 1;
 			if(index < TotalTiles )
-				Tiles.at(index)->Draw(CurrentColumn * TILE_WIDTH, CurrentRow * TILE_HEIGHT);
+				Tiles.at(index)->Draw(CurrentColumn * TILE_WIDTH, CurrentRow * TILE_HEIGHT, 120);
 		}
 }
 
