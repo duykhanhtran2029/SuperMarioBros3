@@ -11,11 +11,14 @@
 #include "Portal.h"
 #include "Define.h"
 #include "Coin.h"
+#include "Leaf.h"
+#include "MushRoom.h"
+#include "QuestionBrick.h"
 #include "FireBullet.h"
 
 CMario::CMario(float x, float y) : CGameObject()
 {
-	level = MARIO_LEVEL_FIRE;
+	level = MARIO_LEVEL_SMALL;
 	untouchable = 0;
 	SetState(MARIO_STATE_IDLE);
 	ax = MARIO_ACCELERATION;
@@ -25,6 +28,26 @@ CMario::CMario(float x, float y) : CGameObject()
 	start_y = y; 
 	this->x = x; 
 	this->y = y; 
+}
+void CMario::CalcPotentialCollisions(
+	vector<LPGAMEOBJECT>* coObjects,
+	vector<LPCOLLISIONEVENT>& coEvents)
+{
+	for (UINT i = 0; i < coObjects->size(); i++)
+	{
+		LPGAMEOBJECT object = coObjects->at(i);
+		if (dynamic_cast<CCoin*>(object) || dynamic_cast<CLeaf*>(object) || dynamic_cast<CMushRoom*>(object))
+			continue;
+		else
+		{
+			LPCOLLISIONEVENT e = SweptAABBEx(coObjects->at(i));
+			if (e->t > 0 && e->t <= 1.0f)
+				coEvents.push_back(e);
+			else
+				delete e;
+		}
+	}
+	std::sort(coEvents.begin(), coEvents.end(), CCollisionEvent::compare);
 }
 void CMario::TimingFlag()
 {
@@ -139,8 +162,8 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 	// No collision occured, proceed normally
 	if (coEvents.size()==0)
 	{	
-		if (x + dx >= game->GetCamX() + game->GetScreenWidth() - 16)//Right edge
-			x = game->GetCamX() + game->GetScreenWidth() - 16;
+		if (x + dx >= ((CPlayScene*)game->GetCurrentScene())->GetMap()->GetMapWidth() - 16)//Right edge
+			x = ((CPlayScene*)game->GetCurrentScene())->GetMap()->GetMapWidth() - 16;
 		else if (x + dx <= 0)//Left edge
 			x = 0;
 		else
@@ -161,6 +184,8 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 		//if (rdx != 0 && rdx!=dx)
 		//	x += nx*abs(rdx); 
 		float x0 = x, y0 = y;
+		x = x0 + min_tx * dx + nx * 0.4f;
+		y = y0 + min_ty * dy + ny * 0.4f;
 		//
 		// Collision logic with other objects
 		//
@@ -168,8 +193,6 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 		float mLeft, mTop, mRight, mBottom;
 		for (UINT i = 0; i < coEventsResult.size(); i++)
 		{
-			x = x0 + min_tx * dx + nx * 0.4f;
-			y = y0 + min_ty * dy + ny * 0.4f;
 			LPCOLLISIONEVENT e = coEventsResult[i];
 			if (e->obj != NULL)
 				if (e->obj->isDestroyed == true)
@@ -226,7 +249,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 						}
 					}
 			}
-			else if (dynamic_cast<CKoopas*>(e->obj)) // if e->obj is Koopas 
+			if (dynamic_cast<CKoopas*>(e->obj)) // if e->obj is Koopas 
 			{
 				//DebugOut(L"nx: %f\n", e->nx);
 				CKoopas* koopas = dynamic_cast<CKoopas*>(e->obj);
@@ -283,7 +306,26 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 				}
 
 			}
-			else if (dynamic_cast<CBrick*>(e->obj)) 
+			if (dynamic_cast<CQuestionBrick*>(e->obj))
+			{
+				CQuestionBrick* object = dynamic_cast<CQuestionBrick*>(e->obj);
+				if (e->ny > 0)
+				{
+					ay = MARIO_GRAVITY;
+					isReadyToJump = false;
+					object->SetState(QUESTIONBRICK_STATE_HIT);
+				}
+				else if (e->ny < 0)
+					vy = 0;
+				if (e->nx != 0)
+				{
+					if (ceil(mBottom) != oTop)
+						vx = 0;
+					if(level == MARIO_LEVEL_TAIL && isTurningTail)
+						object->SetState(QUESTIONBRICK_STATE_HIT);
+				}
+			}
+			if (dynamic_cast<CBrick*>(e->obj)) 
 			{
 				CBrick* object = dynamic_cast<CBrick*>(e->obj);
 				//object->SetDebugAlpha(255);
@@ -317,13 +359,9 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 						if (ceil(mBottom) != oTop)
 							vx = 0;
 					}
-					if (object->tag == QUESTION && e->ny > 0)
-					{
-						object->SetState(BRICK_STATE_QUESTION_HIT);
-					}
 				}					
 			}
-			else if (dynamic_cast<CBlock*>(e->obj))
+			if (dynamic_cast<CBlock*>(e->obj))
 			{
 				//DebugOut(L"Tag: %d\n", tag);
 				CBlock* block = dynamic_cast<CBlock*>(e->obj);
@@ -335,25 +373,16 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 					y = y0 + dy;
 				}
 			}
-			else if (dynamic_cast<CFireBullet*>(e->obj))
+			if (dynamic_cast<CFireBullet*>(e->obj))
 			{
 				x = x0 + dx;
 				y = y0 + dy;
 			}
-			else if (dynamic_cast<CCoin*>(e->obj))
-			{	
-				CCoin* coin = dynamic_cast<CCoin*>(e->obj);
-				coin->isDestroyed = true;
-				coin->SetIsAppear(false);
-				x = x0 + dx;
-				y = y0 + dy;
-			}
-			else if (dynamic_cast<CPortal *>(e->obj))
+			if (dynamic_cast<CPortal *>(e->obj))
 			{
 				CPortal *p = dynamic_cast<CPortal *>(e->obj);
 				CGame::GetInstance()->SwitchScene(p->GetSceneId());
 			}
-
 		}
 	}
 	// clean up collision events
@@ -848,8 +877,7 @@ void CMario::Reset()
 {
 	SetState(MARIO_STATE_IDLE);
 	SetLevel(MARIO_LEVEL_BIG);
-	//SetPosition(start_x, start_y);
-	SetPosition(2267.0f, 340.0f);
+	SetPosition(start_x, start_y);
 	SetSpeed(0, 0);
 }
 void CMario::SetLevel(int l)

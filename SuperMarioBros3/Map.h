@@ -6,7 +6,7 @@
 
 #define TILE_WIDTH 16
 #define TILE_HEIGHT 16
-class Map
+class CMap
 {
 	int TotalRowsOfMap, TotalColumnsOfMap;
 	int TotalRowsOfTileSet, TotalColumnsOfTileSet;
@@ -16,8 +16,8 @@ class Map
 	int** TileMap;
 	float CamX, CamY;
 public:
-	Map(int TileSetID, int TotalRowsOfMap, int TotalColumnsOfMap, int TotalRowsOfTileSet, int  TotalColumnsOfTileSet, int TotalTiles);
-	~Map();
+	CMap(int TileSetID, int TotalRowsOfMap, int TotalColumnsOfMap, int TotalRowsOfTileSet, int  TotalColumnsOfTileSet, int TotalTiles);
+	~CMap();
 	void Render();
 	void SetTileMapData(int** TileMapData);
 	void ExtractTileFromTileSet();

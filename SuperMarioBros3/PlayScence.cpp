@@ -6,10 +6,11 @@
 #include "Textures.h"
 #include "Sprites.h"
 #include "Portal.h"
-#include "Map.h"
 #include "Block.h"
 #include "Define.h"
 #include "Coin.h"
+#include "Brick.h"
+#include "QuestionBrick.h"
 
 using namespace std;
 
@@ -34,17 +35,19 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath) :
 
 #define OBJECT_TYPE_MARIO	0
 #define OBJECT_TYPE_BRICK	1
+#define OBJECT_TYPE_QUESTIONBRICK	142
 #define OBJECT_TYPE_GOOMBA	2
 #define OBJECT_TYPE_KOOPAS	3
 #define OBJECT_TYPE_BLOCK	4
 #define OBJECT_TYPE_COIN	6
+#define OBJECT_TYPE_LEAF	36
+#define OBJECT_TYPE_MUSHROOM	37
 #define OBJECT_TYPE_FIRE_BULLET	9
 
 #define OBJECT_TYPE_PORTAL	50
 
 #define MAX_SCENE_LINE 1024
 
-Map* TileMap;
 void CPlayScene::_ParseSection_TEXTURES(string line)
 {
 	vector<string> tokens = split(line);
@@ -138,15 +141,18 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	//DebugOut(L"--> %s\n",ToWSTR(line).c_str());
 
 	if (tokens.size() < 3) return; // skip invalid lines - an object set must have at least id, x, y
-	int tag = 0;
+	int tag = 0, tag1 = 0, tag2 = 0;
 	int object_type = atoi(tokens[0].c_str());
 	float x = atof(tokens[1].c_str());
 	float y = atof(tokens[2].c_str());
 
 	int ani_set_id = atoi(tokens[3].c_str());
-	if (tokens.size() == 5)
+	if (tokens.size() >= 5)
 		tag = atof(tokens[4].c_str());
-
+	if (tokens.size() >= 6)
+		tag1 = atof(tokens[5].c_str());
+	if (tokens.size() >= 7)
+		tag2 = atof(tokens[6].c_str());
 	CAnimationSets* animation_sets = CAnimationSets::GetInstance();
 
 	CGameObject* obj = NULL;
@@ -169,6 +175,9 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	case OBJECT_TYPE_BRICK: 
 		obj = new CBrick();
 		obj->SetTag(tag);
+		break;
+	case OBJECT_TYPE_QUESTIONBRICK:
+		obj = new CQuestionBrick(tag);
 		break;
 	case OBJECT_TYPE_KOOPAS:
 		obj = new CKoopas();
@@ -227,9 +236,9 @@ void CPlayScene::_ParseSection_TILEMAP_DATA(string line)
 	}
 	f.close();
 
-	TileMap = new Map(ID, rowMap, columnMap, rowTile, columnTile, totalTiles);
-	TileMap->ExtractTileFromTileSet();
-	TileMap->SetTileMapData(TileMapData);
+	current_map = new CMap(ID, rowMap, columnMap, rowTile, columnTile, totalTiles);
+	current_map->ExtractTileFromTileSet();
+	current_map->SetTileMapData(TileMapData);
 	DebugOut(L"[DETAILS] rowmap: %d	%d	%d	%d	%d\n", rowMap, columnMap, columnTile, rowTile, totalTiles);
 }
 void CPlayScene::Load()
@@ -312,8 +321,8 @@ void CPlayScene::Update(DWORD dt)
 	CGame* game = CGame::GetInstance();
 	sw = game->GetScreenWidth();
 	sh = game->GetScreenHeight();
-	mw = TileMap->GetMapWidth();
-	mh = TileMap->GetMapHeight();
+	mw = current_map->GetMapWidth();
+	mh = current_map->GetMapHeight();
 
 	// Update camera to follow mario
 	if (cx >= sw / 2 //Left Edge
@@ -328,14 +337,13 @@ void CPlayScene::Update(DWORD dt)
 	else if (cy + sh / 2 >= mh)//Bottom Edge
 		cy = mh - sh;
 	else cy -= sh / 2;
-	CGame::GetInstance()->SetCamPos((int)cx, (int)cy);
-	//TileMap->SetCamPos((int)cx, (int)cy);
-	TileMap->SetCamPos(cx, cy);
+	CGame::GetInstance()->SetCamPos(ceil(cx), ceil(cy));
+	current_map->SetCamPos(cx, cy);
 }
 
 void CPlayScene::Render()
 {
-	TileMap->Render();
+	current_map->Render();
 	for (int i = 0; i < objects.size(); i++)
 		objects[i]->Render();
 }

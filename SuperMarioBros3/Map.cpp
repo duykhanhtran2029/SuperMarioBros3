@@ -2,7 +2,7 @@
 #include "Utils.h"
 #include "Game.h"
 #include "Define.h"
-Map::Map(int TileSetID, int TotalRowsOfMap, int TotalColumnsOfMap, int TotalRowsOfTileSet, int  TotalColumnsOfTileSet, int TotalTiles)
+CMap::CMap(int TileSetID, int TotalRowsOfMap, int TotalColumnsOfMap, int TotalRowsOfTileSet, int  TotalColumnsOfTileSet, int TotalTiles)
 {
 	TileSet = CTextures::GetInstance()->Get(TileSetID);
 	this->TotalRowsOfMap = TotalRowsOfMap;
@@ -14,11 +14,11 @@ Map::Map(int TileSetID, int TotalRowsOfMap, int TotalColumnsOfMap, int TotalRows
 	TileMap = NULL;
 }
 
-Map::~Map()
+CMap::~CMap()
 {
 }
 
-void Map::Render()
+void CMap::Render()
 {
 	int FirstColumn = floor(CamX / TILE_WIDTH);
 	int LastColumn = ceil( (CamX + CGame::GetInstance()->GetScreenWidth()) / TILE_WIDTH);
@@ -33,13 +33,13 @@ void Map::Render()
 		}
 }
 
-void Map::SetTileMapData(int** TileMapData)
+void CMap::SetTileMapData(int** TileMapData)
 {
 	TileMap = TileMapData;
 }
 
 
-void Map::ExtractTileFromTileSet()
+void CMap::ExtractTileFromTileSet()
 {
 	for (int TileNum = 0; TileNum < TotalTiles; TileNum++)
 	{
@@ -53,12 +53,12 @@ void Map::ExtractTileFromTileSet()
 	}
 }
 
-int Map::GetMapWidth()
+int CMap::GetMapWidth()
 {
 	return TotalColumnsOfMap * TILE_WIDTH;
 }
 
-int Map::GetMapHeight()
+int CMap::GetMapHeight()
 {
 	return TotalRowsOfMap * TILE_HEIGHT;
 }

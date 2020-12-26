@@ -1,6 +1,7 @@
 #include "Coin.h"
-
-CCoin::CCoin(int tag) {
+#include "Utils.h"
+#include "PlayScence.h"
+CCoin::CCoin(int tag) : CGameObject() {
 	CGameObject::SetTag(tag);
 	if (tag == COIN_TYPE_INBRICK)
 		isAppear = false;
@@ -8,40 +9,32 @@ CCoin::CCoin(int tag) {
 		isAppear = true;
 	state = COIN_STATE_IDLE;
 }
+CMario* cmario;
+CPlayScene* cscence;
 void CCoin::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
+	if (isDestroyed)
+		return;
 	CGameObject::Update(dt);
 	y += dy;
-	float oLeft, oTop, oRight, oBottom;
-	if(tag == COIN_TYPE_INBRICK)
-		for (UINT i = 0; i < coObjects->size(); i++)
+	if (state == COIN_STATE_IDLE)
+	{
+		float mLeft, mTop, mRight, mBottom;
+		cscence = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
+		if (cscence != NULL)
+			cmario = ((CPlayScene*)cscence)->GetPlayer();
+		if (cmario != NULL)
 		{
-			LPGAMEOBJECT obj = coObjects->at(i);
-			if (obj != NULL)
-				if (obj->isDestroyed == true)
-					continue;
-			obj->GetBoundingBox(oLeft, oTop, oRight, oBottom);
-			if (isColliding(oLeft, oTop, oRight, oBottom))
+			cmario->GetBoundingBox(mLeft, mTop, mRight, mBottom);
+			if (isColliding(mLeft, mTop, mRight, mBottom))
 			{
-				if (dynamic_cast<CBrick*>(obj) && obj->tag == QUESTION)
-				{
-					CBrick* question_brick = dynamic_cast<CBrick*>(obj);
-					if (question_brick->state == BRICK_STATE_QUESTION_HIT)
-					{
-						if (!isAppear)
-						{
-							SetState(COIN_STATE_UP);
-							StartTiming();
-							isAppear = true;
-							DebugOut(L"[INBRICK]");
-						}
-						else
-							isAppear = false;
-					}
-				}
+				isAppear = false;
+				isDestroyed = true;
+				x = y = -50;
 			}
 
 		}
+	}
 	if (state == COIN_STATE_UP)
 	{
 		if (GetTickCount64() - timing_start >= COIN_FALLING_TIME)
@@ -56,20 +49,18 @@ void CCoin::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		{
 			isAppear = false;
 			SetState(COIN_STATE_IDLE);
-			x = y = -20;
+			x = y = -50;
 			isDestroyed = true;
 		}
 	}
-
-	// clean up collision events
 }
 
 void CCoin::Render()
 {
-	if (!isAppear)
+	if (!isAppear || isDestroyed)
 		return;
 	animation_set->at(0)->Render(x, y);
-	RenderBoundingBox();
+	RenderBoundingBox(0);
 }
 
 void CCoin::GetBoundingBox(float& l, float& t, float& r, float& b)
@@ -90,6 +81,7 @@ void CCoin::SetState(int state)
 		break;
 	case COIN_STATE_UP:
 		vy = -0.2f;
+		StartTiming();
 		break;
 	case COIN_STATE_DOWN:
 		vy = 0.2f;

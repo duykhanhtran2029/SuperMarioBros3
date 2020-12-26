@@ -378,7 +378,9 @@ public:
 		tailflying_start = GetTickCount64();
 		isTailFlying = true;
 	}
-
+	void CalcPotentialCollisions(
+		vector<LPGAMEOBJECT>* coObjects,
+		vector<LPCOLLISIONEVENT>& coEvents);
 	//void RenderRunning(int& ani, int ani_run_up_right, int ani_run_up_left, int ani_run_down);
 	void SetState(int vState);
 	void SetLevel(int l);
