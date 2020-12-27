@@ -31,6 +31,7 @@
 #define MARIO_SLOW_STACK_TIME		500
 #define MARIO_RELOAD_BULLET_TIME	500
 #define MARIO_TAIL_FLYING_TIME		500
+#define MARIO_TRANSFORMING_TIME		500
 
 #define MARIO_RUNNING_STACKS		7
 #define MARIO_WALKING_FAST_STACKS	4
@@ -223,6 +224,10 @@
 #define MARIO_ANI_FIRE_FLY_RIGHT				113
 #define MARIO_ANI_FIRE_FLY_LEFT					114
 
+#define MARIO_ANI_TRANSFORM_SMALL_RIGHT			115
+#define MARIO_ANI_TRANSFORM_SMALL_LEFT			116
+#define MARIO_ANI_TRANSFORM_BANG				117
+
 #define	MARIO_LEVEL_SMALL	1
 #define	MARIO_LEVEL_BIG		2
 #define	MARIO_LEVEL_TAIL	3
@@ -253,6 +258,7 @@ class CMario : public CGameObject
 	DWORD lastshoot;
 	DWORD running_stop;
 	DWORD tailflying_start;
+	DWORD transforming_start;
 
 	float start_x;			// initial position of Mario at scene
 	float start_y;
@@ -261,6 +267,7 @@ class CMario : public CGameObject
 public: 
 	vector <CFireBullet*> Bullets;
 	int level;
+	int prelevel;
 	int untouchable;
 	//state
 	bool isOnGround = false;
@@ -296,7 +303,9 @@ public:
 	bool isRunning = false;
 	//fly
 	bool isFlying = false;
-
+	//trasnforming
+	bool isTransforming = false;
+	bool transformState = false;
 
 	CMario(float x = 0.0f, float y = 0.0f);
 	virtual void Update(DWORD dt, vector<LPGAMEOBJECT> *colliable_objects = NULL);
@@ -378,6 +387,7 @@ public:
 		tailflying_start = GetTickCount64();
 		isTailFlying = true;
 	}
+	void StartTransforming() { transforming_start = GetTickCount64(); isTransforming = true; }
 	void CalcPotentialCollisions(
 		vector<LPGAMEOBJECT>* coObjects,
 		vector<LPCOLLISIONEVENT>& coEvents);
