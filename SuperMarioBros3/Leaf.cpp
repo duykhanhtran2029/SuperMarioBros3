@@ -13,7 +13,6 @@ void CLeaf::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		return;
 	CGameObject::Update(dt);
 	x += dx;
-	DebugOut(L"[leaf] %f\n", dx);
 	y += dy;
 	if (state == LEAF_STATE_FALLING)
 	{

@@ -1,6 +1,7 @@
 #include "MushRoom.h"
 #include "Utils.h"
 #include "Mario.h"
+#include "Block.h"
 #include "PlayScence.h"
 
 CMario* mmario;
@@ -22,7 +23,12 @@ void CMushRoom::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			mmario->GetBoundingBox(mLeft, mTop, mRight, mBottom);
 			if (isColliding(mLeft, mTop, mRight, mBottom))
 			{
-				mmario->SetLevel(MARIO_LEVEL_BIG);
+				if(tag == MUSHROOM_TYPE_RED)
+					mmario->SetLevel(MARIO_LEVEL_BIG);
+				if (tag == MUSHROOM_TYPE_GREEN)
+				{
+					//set extra later
+				}
 				isAppear = false;
 				isDestroyed = true;
 				x = y = -50;
@@ -71,12 +77,30 @@ void CMushRoom::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 						e->obj->GetBoundingBox(oLeft, oTop, oRight, oBottom);
 						if (e->ny != 0)
 						{
-							vy = 0;
+							if(!dynamic_cast<CBlock*>(e->obj))
+								vy = 0;
+							else 
+							{
+								if (ny < 0)
+									vy = 0;
+								else
+								{
+									y = y0 + dy;
+								}
+							}
+
 						}
 						if (e->nx != 0)
 						{
-							if (ceil(mBottom) != oTop)
-								vx = -vx;
+							if (!dynamic_cast<CBlock*>(e->obj))
+							{
+								if (ceil(mBottom) != oTop)
+									vx = -vx;
+							}
+							else
+							{
+								x = x0 + dx;
+							}
 						}
 					}
 				}
@@ -108,7 +132,10 @@ void CMushRoom::Render()
 {
 	if (!isAppear || isDestroyed)
 		return;
-	animation_set->at(MUSHROOM_ANI_RED_ID)->Render(x, y);
+	if(tag == MUSHROOM_TYPE_GREEN)
+		animation_set->at(MUSHROOM_ANI_GREEN_ID)->Render(x, y);
+	else
+		animation_set->at(MUSHROOM_ANI_RED_ID)->Render(x, y);
 	RenderBoundingBox();
 }
 

@@ -19,6 +19,9 @@
 #define MUSHROOM_STATE_UP		100
 #define MUSHROOM_STATE_WALK		200
 
+#define MUSHROOM_TYPE_RED		100
+#define MUSHROOM_TYPE_GREEN		200
+
 
 class CMushRoom : public CGameObject
 {

@@ -12,8 +12,8 @@
 class CPlayScene : public CScene
 {
 protected:
-	CMario* player;					// A play scene has to have player, right? 
-	CMap* current_map;
+	CMario* player = NULL;					// A play scene has to have player, right? 
+	CMap* current_map = NULL;
 	vector<LPGAMEOBJECT> objects;
 	
 
@@ -32,6 +32,7 @@ public:
 	virtual void Render();
 	virtual void Unload();
 	void PushBack(CGameObject* obj) { objects.push_back(obj); }
+	vector<LPGAMEOBJECT> GetObjects() { return objects; }
 
 	CMario* GetPlayer() { return player; }
 	CMap* GetMap() { return current_map; }

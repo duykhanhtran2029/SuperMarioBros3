@@ -65,6 +65,15 @@
     <ClCompile Include="MushRoom.cpp">
       <Filter>Map Objects\Item</Filter>
     </ClCompile>
+    <ClCompile Include="BreakableBrick.cpp">
+      <Filter>Map Objects\Bricks</Filter>
+    </ClCompile>
+    <ClCompile Include="Switch.cpp">
+      <Filter>Map Objects\Item</Filter>
+    </ClCompile>
+    <ClCompile Include="Piece.cpp">
+      <Filter>Map Objects\Bricks</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Map.h">
@@ -135,6 +144,15 @@
     </ClInclude>
     <ClInclude Include="MushRoom.h">
       <Filter>Map Objects\Item</Filter>
+    </ClInclude>
+    <ClInclude Include="BreakableBrick.h">
+      <Filter>Map Objects\Bricks</Filter>
+    </ClInclude>
+    <ClInclude Include="Switch.h">
+      <Filter>Map Objects\Item</Filter>
+    </ClInclude>
+    <ClInclude Include="Piece.h">
+      <Filter>Map Objects\Bricks</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

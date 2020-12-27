@@ -11,6 +11,7 @@
 #include "Coin.h"
 #include "Brick.h"
 #include "QuestionBrick.h"
+#include "BreakableBrick.h"
 
 using namespace std;
 
@@ -36,6 +37,7 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath) :
 #define OBJECT_TYPE_MARIO	0
 #define OBJECT_TYPE_BRICK	1
 #define OBJECT_TYPE_QUESTIONBRICK	142
+#define OBJECT_TYPE_BREAKABLEBRICK	112
 #define OBJECT_TYPE_GOOMBA	2
 #define OBJECT_TYPE_KOOPAS	3
 #define OBJECT_TYPE_BLOCK	4
@@ -177,7 +179,10 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 		obj->SetTag(tag);
 		break;
 	case OBJECT_TYPE_QUESTIONBRICK:
-		obj = new CQuestionBrick(tag);
+		obj = new CQuestionBrick(tag,tag1);
+		break;
+	case OBJECT_TYPE_BREAKABLEBRICK:
+		obj = new CBreakableBrick();
 		break;
 	case OBJECT_TYPE_KOOPAS:
 		obj = new CKoopas();
@@ -303,12 +308,14 @@ void CPlayScene::Update(DWORD dt)
 	vector<LPGAMEOBJECT> coObjects;
 	for (size_t i = 1; i < objects.size(); i++)
 	{
-		coObjects.push_back(objects[i]);
+		if(!objects[i]->isDestroyed)
+			coObjects.push_back(objects[i]);
 	}
 
 	for (size_t i = 0; i < objects.size(); i++)
 	{
-		objects[i]->Update(dt, &coObjects);
+		if (!objects[i]->isDestroyed)
+			objects[i]->Update(dt, &coObjects);
 	}
 
 	// skip the rest if scene was already unloaded (Mario::Update might trigger PlayScene::Unload)
@@ -345,7 +352,8 @@ void CPlayScene::Render()
 {
 	current_map->Render();
 	for (int i = 0; i < objects.size(); i++)
-		objects[i]->Render();
+		if (!objects[i]->isDestroyed)
+			objects[i]->Render();
 }
 
 /*

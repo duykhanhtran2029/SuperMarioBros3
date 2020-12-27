@@ -13,7 +13,9 @@
 #include "Coin.h"
 #include "Leaf.h"
 #include "MushRoom.h"
+#include "Switch.h"
 #include "QuestionBrick.h"
+#include "BreakableBrick.h"
 #include "FireBullet.h"
 
 CMario::CMario(float x, float y) : CGameObject()
@@ -36,7 +38,7 @@ void CMario::CalcPotentialCollisions(
 	for (UINT i = 0; i < coObjects->size(); i++)
 	{
 		LPGAMEOBJECT object = coObjects->at(i);
-		if (dynamic_cast<CCoin*>(object) || dynamic_cast<CLeaf*>(object) || dynamic_cast<CMushRoom*>(object))
+		if (dynamic_cast<CCoin*>(object) || dynamic_cast<CLeaf*>(object) || dynamic_cast<CMushRoom*>(object) || dynamic_cast<CPiece*>(object))
 			continue;
 		else
 		{
@@ -120,8 +122,16 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 	}
 
 	//update speed
-	vx += ax * dt + RunningStacks*ax;
-	vy += ay * dt;
+	if (isTransforming)
+	{
+		vx = vy = 0;
+	}
+	else
+	{
+		vx += ax * dt + RunningStacks * ax;
+		vy += ay * dt;
+	}
+
 
 	//limited the speed of mario 
 	if (abs(vx) >= MARIO_WALKING_SPEED_MAX)
@@ -218,6 +228,27 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 			}
 			GetBoundingBox(mLeft, mTop, mRight, mBottom);
 			e->obj->GetBoundingBox(oLeft, oTop, oRight, oBottom);
+			if (dynamic_cast<CSwitch*>(e->obj))
+			{
+				CSwitch* sw = dynamic_cast<CSwitch*>(e->obj);
+				if (e->ny > 0)
+				{
+					//vy = -MARIO_JUMP_SPEED_MAX;
+					ay = MARIO_GRAVITY;
+					isReadyToJump = false;
+				}
+				else if (e->ny < 0)
+				{
+					vy = 0;
+					if(sw->state != SWITCH_STATE_PRESSED)
+						sw->SetState(SWITCH_STATE_PRESSED);
+				}
+				if (e->nx != 0)
+				{
+					if (ceil(mBottom) != oTop)
+						vx = 0;
+				}
+			}
 			if (dynamic_cast<CGoomba*>(e->obj)) // if e->obj is Goomba 
 			{
 				CGoomba* goomba = dynamic_cast<CGoomba*>(e->obj);
@@ -312,25 +343,6 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 				}
 
 			}
-			if (dynamic_cast<CQuestionBrick*>(e->obj))
-			{
-				CQuestionBrick* object = dynamic_cast<CQuestionBrick*>(e->obj);
-				if (e->ny > 0)
-				{
-					ay = MARIO_GRAVITY;
-					isReadyToJump = false;
-					object->SetState(QUESTIONBRICK_STATE_HIT);
-				}
-				else if (e->ny < 0)
-					vy = 0;
-				if (e->nx != 0)
-				{
-					if (ceil(mBottom) != oTop)
-						vx = 0;
-					if(level == MARIO_LEVEL_TAIL && isTurningTail)
-						object->SetState(QUESTIONBRICK_STATE_HIT);
-				}
-			}
 			if (dynamic_cast<CBrick*>(e->obj)) 
 			{
 				CBrick* object = dynamic_cast<CBrick*>(e->obj);
@@ -366,6 +378,11 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 							vx = 0;
 					}
 				}					
+			}
+			if (dynamic_cast<CQuestionBrick*>(e->obj))
+			{
+				if (e->ny > 0)
+					e->obj->SetState(QUESTIONBRICK_STATE_HIT);
 			}
 			if (dynamic_cast<CBlock*>(e->obj))
 			{
@@ -462,13 +479,13 @@ void CMario::RenderSitting(int& ani, int ani_sit_right, int ani_sit_left)
 }
 void CMario::RenderJumping(int& ani, int ani_jump_up_right, int ani_jump_up_left, int ani_jump_down_right, int ani_jump_down_left)
 {
-	if (nx > 0 && vy < 0)
+	if (nx > 0 && vy <= 0)
 		ani = ani_jump_up_right;
-	else if (nx < 0 && vy < 0)
+	else if (nx < 0 && vy <= 0)
 		ani = ani_jump_up_left;
-	else if (nx > 0 && vy > 0)
+	else if (nx > 0 && vy >= 0)
 		ani = ani_jump_down_right;
-	else if (nx < 0 && vy > 0)
+	else if (nx < 0 && vy >= 0)
 		ani = ani_jump_down_left;
 	if (isShooting)
 	{

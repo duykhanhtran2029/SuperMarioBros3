@@ -7,6 +7,7 @@
 #include "Game.h"
 #include "GameObject.h"
 #include "Sprites.h"
+#include "Piece.h"
 
 
 CGameObject::CGameObject()
@@ -72,11 +73,14 @@ void CGameObject::CalcPotentialCollisions(
 {
 	for (UINT i = 0; i < coObjects->size(); i++)
 	{
-		LPCOLLISIONEVENT e = SweptAABBEx(coObjects->at(i));
-		if (e->t > 0 && e->t <= 1.0f)
-			coEvents.push_back(e);
-		else
-			delete e;
+		if (!dynamic_cast<CPiece*>(coObjects->at(i)))
+		{
+			LPCOLLISIONEVENT e = SweptAABBEx(coObjects->at(i));
+			if (e->t > 0 && e->t <= 1.0f)
+				coEvents.push_back(e);
+			else
+				delete e;
+		}
 	}
 	std::sort(coEvents.begin(), coEvents.end(), CCollisionEvent::compare);
 }
@@ -142,10 +146,10 @@ bool CGameObject::isColliding(float friend_left, float friend_top, float friend_
 		this_right,
 		this_bottom);
 
-	bool on1 = friend_left < this_right;
-	bool on2 = friend_top < this_bottom;
-	bool down1 = friend_right > this_left;
-	bool down2 = friend_bottom > this_top;
+	bool on1 = friend_left <= this_right;
+	bool on2 = friend_top <= this_bottom;
+	bool down1 = friend_right >= this_left;
+	bool down2 = friend_bottom >= this_top;
 
 	return on1 && on2 && down1 && down2;
 }
