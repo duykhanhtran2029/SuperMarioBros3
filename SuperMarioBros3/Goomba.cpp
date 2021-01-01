@@ -4,6 +4,8 @@
 #include "Block.h"
 CGoomba::CGoomba()
 {
+	vx = -GOOMBA_WALKING_SPEED;
+	vy = GOOMBA_GRAVITY;
 	SetState(GOOMBA_STATE_WALKING);
 }
 void CGoomba::CalcPotentialCollisions(vector<LPGAMEOBJECT>* coObjects, vector<LPCOLLISIONEVENT>& coEvents)
@@ -24,8 +26,7 @@ void CGoomba::CalcPotentialCollisions(vector<LPGAMEOBJECT>* coObjects, vector<LP
 }
 void CGoomba::GetBoundingBox(float& left, float& top, float& right, float& bottom)
 {
-
-	if (state == GOOMBA_STATE_DIE_BY_KICK || state == GOOMBA_STATE_DISAPPEAR)
+	if (state == GOOMBA_STATE_DIE_BY_TAIL)
 	{
 		left = top = right = bottom = 0;
 		return;
@@ -37,29 +38,60 @@ void CGoomba::GetBoundingBox(float& left, float& top, float& right, float& botto
 		bottom = y + GOOMBA_BBOX_HEIGHT_DIE;
 	else
 		bottom = y + GOOMBA_NORMAL_BBOX_HEIGHT;
+	if (tag == GOOMBA_RED)
+	{
+		right = x + GOOMBA_RED_BBOX_WIDTH;
+		bottom = y + GOOMBA_RED_BBOX_WINGS_HEIGHT;
+		if(state != GOOMBA_STATE_RED_JUMPING)
+			bottom = y + GOOMBA_RED_BBOX_HEIGHT;
+	}
 }
 
 void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
-	if (state == GOOMBA_STATE_DISAPPEAR)
-		return;
 	CGameObject::Update(dt, coObjects);
-
+	if (GetTickCount64() - dying_start >= GOOMBA_TIME_DIYING && isDying)
+	{
+		isDestroyed = true;
+		return;
+	}
+	if (tag == GOOMBA_RED)
+	{
+		if (GetTickCount64() - walking_start >= GOOMBA_RED_TIME_WALKING && isWalking)
+		{
+			isWalking = false;
+			jumping_stacks = 0;
+			y -= 5;
+			SetState(GOOMBA_STATE_RED_JUMPING);
+			return;
+		}
+		if (GetTickCount64() - jumping_start >= GOOMBA_RED_TIME_JUMPING && isJumping)
+		{
+			vy = GOOMBA_JUMP_SPEED;
+			isJumping = false;
+			jumping_stacks++;
+			return;
+		}
+		if (GetTickCount64() - highjumping_start >= GOOMBA_RED_TIME_HIGHJUMPING && isHighJumping)
+		{
+			isHighJumping = false;
+			vy = GOOMBA_GRAVITY;
+			jumping_stacks = -1;
+			return;
+		}
+	}
 	//
 	// TO-DO: make sure Goomba can interact with the world and to each of them too!
 	// 
 	// Simple fall down
-	vy += GOOMBA_GRAVITY * dt;
 
 	vector<LPCOLLISIONEVENT> coEvents;
 	vector<LPCOLLISIONEVENT> coEventsResult;
 
 	coEvents.clear();
 	// turn off collision when goomba kicked 
-	if (state != GOOMBA_STATE_DIE_BY_KICK && state != GOOMBA_STATE_DIE)
+	if (state != GOOMBA_STATE_DIE_BY_TAIL)
 		CalcPotentialCollisions(coObjects, coEvents);
-
-
 
 	// No collision occured, proceed normally
 	if (coEvents.size() == 0)
@@ -70,7 +102,7 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	else
 	{
 
-		float min_tx, min_ty;
+		float min_tx, min_ty, x0, y0;
 		int nx = 0, ny = 0;
 		float rdx = 0;
 		float rdy = 0;
@@ -79,10 +111,15 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		FilterCollision(coEvents, coEventsResult, min_tx, min_ty, nx, ny, rdx, rdy);
 
 		// block 
+		x0 = x;
+		y0 = y;
+
 		x += min_tx * dx + nx * 0.4f;		// nx*0.4f : need to push out a bit to avoid overlapping next frame
 		y += min_ty * dy + ny * 0.4f;
 
-		if (ny != 0) vy = 0;
+		if (ny != 0)
+			vy = 0;			
+
 
 		for (UINT i = 0; i < coEventsResult.size(); i++)
 		{
@@ -111,19 +148,41 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				CBrick* object = dynamic_cast<CBrick*>(e->obj);
 				object->GetBoundingBox(oLeft, oTop, oRight, oBottom);
 
-				if (e->ny != 0) vy = 0;
+				if (e->ny != 0)
+				{
+					vy = 0;
+					if (e->ny < 0 && tag == GOOMBA_RED)
+					{
+						if (jumping_stacks == GOOMBA_RED_JUMPING_STACKS)
+						{
+							jumping_stacks = -1;
+							StartHighJumping();
+							//DebugOut(L"[JUMP]\n");
+						}
+						else
+						{
+							if (jumping_stacks == -1)
+							{
+								y += 5;
+								SetState(GOOMBA_STATE_RED_WINGSWALKING);
+							}							
+							else
+								SetState(GOOMBA_STATE_RED_JUMPING);
+						}
+						
+					}
+				}
 				if (e->nx != 0)
 				{
 					if (ceil(mBottom) != oTop)
 						vx = - vx;
-					//DebugOut(L"[RESULT]	e->nx: %f\t mBottom: %f\toTop: %f\t\n",e->nx, mBottom, oTop);
 				}
 			}
 			else if (dynamic_cast<CBlock*>(e->obj))
 			{
 				CBlock* block = dynamic_cast<CBlock*>(e->obj);
-				x += dx;
-				y += dy;
+				x = x0 + dx;
+				y = y0 + dy;
 			}
 			else if (dynamic_cast<CFireBullet*>(e->obj))
 			{
@@ -137,8 +196,8 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		vx = -vx;
 	}
 	// clean up collision events
-	for (UINT i = 0; i < coEvents.size(); i++) delete coEvents[i];
-	//DebugOut(L"final: %f %f\n", y, vy);
+	for (UINT i = 0; i < coEvents.size(); i++) 
+		delete coEvents[i];
 }
 
 void CGoomba::Render()
@@ -148,18 +207,22 @@ void CGoomba::Render()
 	{
 	case GOOMBA_NORMAL:
 		ani = GOOMBA_NORMAL_ANI_WALKING;
-		if (state == GOOMBA_STATE_DISAPPEAR)
-		{
-			SetIsDestroyed(true);
-			return;
-		}
-		else if (state == GOOMBA_STATE_DIE) {
+		if (state == GOOMBA_STATE_DIE)
 			ani = GOOMBA_NORMAL_ANI_DIE;
-			state = GOOMBA_STATE_DISAPPEAR;
-		}
-		else if (state == GOOMBA_STATE_DIE_BY_KICK) {
-			ani = GOOMBA_NORMAL_ANI_WALKING;
-		}
+		break;
+	case GOOMBA_RED:
+		ani = GOOMBA_RED_ANI_WINGSWALKING;
+		if (state == GOOMBA_STATE_DIE)
+			ani = GOOMBA_RED_ANI_DIE;
+		if (state == GOOMBA_STATE_DIE_BY_TAIL)
+			ani = GOOMBA_RED_ANI_WALKING;
+		if (vy != 0)
+			ani = GOOMBA_RED_ANI_JUMPING;
+		break;
+	case GOOMBA_RED_NORMAL:
+		ani = GOOMBA_RED_ANI_WALKING;
+		if (state == GOOMBA_STATE_DIE)
+			ani = GOOMBA_RED_ANI_DIE;
 		break;
 	}
 	animation_set->at(ani)->Render(x, y);
@@ -168,23 +231,35 @@ void CGoomba::Render()
 
 void CGoomba::SetState(int state)
 {
-	CGameObject::SetState(state);
 	switch (state)
 	{
 	case GOOMBA_STATE_DIE:
-		y += GOOMBA_NORMAL_BBOX_HEIGHT - GOOMBA_BBOX_HEIGHT_DIE + 1;
+		y += GOOMBA_NORMAL_BBOX_HEIGHT - GOOMBA_BBOX_HEIGHT_DIE;
 		vx = 0;
 		vy = 0;
+		StartDying();
 		break;
-	case GOOMBA_STATE_DIE_BY_KICK:
+	case GOOMBA_STATE_DIE_BY_TAIL:
 		vy = -GOOMBA_DIE_DEFLECT_SPEED;
 		vx = -vx;
+		//StartDying();
 		break;
-	case GOOMBA_STATE_RED_LOSE_WINGS:
-		vy = 0;
+	case GOOMBA_STATE_RED_JUMPING:
+		//if (this->state == GOOMBA_STATE_RED_WINGSWALKING)
+			//y -= 5;
+		StartJumping();
 		break;
 	case GOOMBA_STATE_WALKING:
-		vx = -GOOMBA_WALKING_SPEED;
+		if (tag == GOOMBA_RED)
+		{
+			StartWalking();
+			vy = 0;
+		}
+		else
+			vy = GOOMBA_GRAVITY;
+	case GOOMBA_STATE_RED_WINGSWALKING:
+		StartWalking();
 		break;
 	}
+	CGameObject::SetState(state);
 }

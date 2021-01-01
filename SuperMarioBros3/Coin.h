@@ -15,13 +15,16 @@
 
 #define COIN_TYPE_NORMAL	6
 #define COIN_TYPE_INBRICK	61
+#define COIN_TYPE_TRANSFORM	60
 
-#define COIN_FALLING_TIME	300
+#define COIN_FALLING_TIME			300
 #define COIN_BEING_PUSHEDUP_TIME	300
+#define COIN_EXIST_TIME				10000
 
 class CCoin : public CGameObject
 {
 	DWORD timing_start = 0;
+	DWORD exist_start = 0;
 public:
 	bool isAppear = true;
 	CCoin(int tag = 6);
@@ -33,6 +36,10 @@ public:
 	void StartTiming()
 	{
 		timing_start = GetTickCount64();
+	}
+	void StartExist()
+	{
+		exist_start = GetTickCount64();
 	}
 	void SetIsAppear(bool isAppearBool)
 	{

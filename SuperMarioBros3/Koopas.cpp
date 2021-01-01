@@ -160,7 +160,7 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				CGoomba* goomba = dynamic_cast<CGoomba*>(e->obj);
 				if (goomba->GetState() != GOOMBA_STATE_DIE && (this->GetState() == KOOPAS_STATE_SPINNING || isBeingHeld))
 				{
-					goomba->SetState(GOOMBA_STATE_DIE_BY_KICK);
+					goomba->SetState(GOOMBA_STATE_DIE_BY_TAIL);
 				}
 			}
 			else if (dynamic_cast<CBrick*>(e->obj))

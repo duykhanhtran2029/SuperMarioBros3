@@ -1,16 +1,18 @@
 #include "Coin.h"
 #include "Utils.h"
 #include "PlayScence.h"
+#include "BreakableBrick.h"
+
 CCoin::CCoin(int tag) : CGameObject() {
 	CGameObject::SetTag(tag);
 	if (tag == COIN_TYPE_INBRICK)
 		isAppear = false;
 	else
 		isAppear = true;
+	if (tag == COIN_TYPE_TRANSFORM)
+		StartExist();
 	state = COIN_STATE_IDLE;
 }
-CMario* cmario;
-CPlayScene* cscence;
 void CCoin::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
 	if (isDestroyed)
@@ -19,20 +21,35 @@ void CCoin::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	y += dy;
 	if (state == COIN_STATE_IDLE)
 	{
+		CMario* coinmario = {};
+		CPlayScene* coinscence = NULL;
 		float mLeft, mTop, mRight, mBottom;
-		cscence = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
-		if (cscence != NULL)
-			cmario = ((CPlayScene*)cscence)->GetPlayer();
-		if (cmario != NULL)
+		coinscence = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
+		if (coinscence != NULL)
+			coinmario = ((CPlayScene*)coinscence)->GetPlayer();
+		if (coinmario != NULL)
 		{
-			cmario->GetBoundingBox(mLeft, mTop, mRight, mBottom);
+			coinmario->GetBoundingBox(mLeft, mTop, mRight, mBottom);
 			if (isColliding(mLeft, mTop, mRight, mBottom))
 			{
 				isAppear = false;
 				isDestroyed = true;
-				x = y = -50;
 			}
 
+		}
+		if (tag == COIN_TYPE_TRANSFORM)
+		{
+			if (GetTickCount64() - exist_start >= COIN_EXIST_TIME)
+			{
+				CBreakableBrick* item = new CBreakableBrick();
+				CAnimationSets* animation_sets = CAnimationSets::GetInstance();
+				LPANIMATION_SET tmp_ani_set = animation_sets->Get(BREAKABLEBRICK_ANI_SET_ID);
+
+				item->SetAnimationSet(tmp_ani_set);
+				item->SetPosition(x, y);
+				coinscence->PushBack(item);
+				isDestroyed = true;
+			}
 		}
 	}
 	if (state == COIN_STATE_UP)
@@ -49,7 +66,6 @@ void CCoin::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		{
 			isAppear = false;
 			SetState(COIN_STATE_IDLE);
-			x = y = -50;
 			isDestroyed = true;
 		}
 	}

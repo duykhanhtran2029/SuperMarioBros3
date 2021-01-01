@@ -62,7 +62,7 @@ void CSwitch::SetState(int state)
 			if (dynamic_cast<CBreakableBrick*>(objs[i]) && !objs[i]->isDestroyed)
 			{
 				objs[i]->SetIsDestroyed(true);
-				CCoin* item = new CCoin();
+				CCoin* item = new CCoin(COIN_TYPE_TRANSFORM);
 
 				CAnimationSets* animation_sets = CAnimationSets::GetInstance();
 				LPANIMATION_SET tmp_ani_set = animation_sets->Get(COIN_ANI_SET_ID);

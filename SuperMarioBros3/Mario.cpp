@@ -38,7 +38,9 @@ void CMario::CalcPotentialCollisions(
 	for (UINT i = 0; i < coObjects->size(); i++)
 	{
 		LPGAMEOBJECT object = coObjects->at(i);
-		if (dynamic_cast<CCoin*>(object) || dynamic_cast<CLeaf*>(object) || dynamic_cast<CMushRoom*>(object) || dynamic_cast<CPiece*>(object))
+		if (dynamic_cast<CCoin*>(object) || dynamic_cast<CLeaf*>(object) 
+			|| dynamic_cast<CMushRoom*>(object) || dynamic_cast<CPiece*>(object)
+			|| dynamic_cast<CFireBullet*>(object))
 			continue;
 		else
 		{
@@ -257,10 +259,17 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 					{
 						if (goomba->GetState() != GOOMBA_STATE_DIE)
 						{
-							if (goomba->tag != GOOMBA_RED_FLY)
+							if (goomba->tag != GOOMBA_RED)
 							{
 								goomba->SetState(GOOMBA_STATE_DIE);
 									vy = -MARIO_JUMP_DEFLECT_SPEED;
+							}
+							else
+							{
+								goomba->SetTag(GOOMBA_RED_NORMAL);
+								goomba->SetState(GOOMBA_STATE_WALKING);
+								//goomba->SetPosition(goomba->x, goomba->y);
+								vy = -MARIO_JUMP_DEFLECT_SPEED;
 							}
 						}
 					}
@@ -269,7 +278,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 						if (isTurningTail)
 						{
 							goomba->SetDirection(nx);
-							goomba->SetState(GOOMBA_STATE_DIE_BY_KICK);
+							goomba->SetState(GOOMBA_STATE_DIE_BY_TAIL);
 						}
 						else if (untouchable == 0)
 						{
@@ -278,11 +287,18 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 								if (level > MARIO_LEVEL_SMALL)
 								{
 									level = MARIO_LEVEL_SMALL;
+									x = x0;
+									y = y0;
 									StartUntouchable();
 								}
 								else
 									SetState(MARIO_STATE_DIE);
 							}
+						}
+						else
+						{
+							x = x0;
+							y = y0;
 						}
 					}
 			}
@@ -384,6 +400,14 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 				if (e->ny > 0)
 					e->obj->SetState(QUESTIONBRICK_STATE_HIT);
 			}
+			if (dynamic_cast<CBreakableBrick*>(e->obj))
+			{
+				if (e->ny > 0)
+				{
+					CBreakableBrick* object = dynamic_cast<CBreakableBrick*>(e->obj);
+					object->Break();
+				}
+			}
 			if (dynamic_cast<CBlock*>(e->obj))
 			{
 				//DebugOut(L"Tag: %d\n", tag);
@@ -395,11 +419,6 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 				{
 					y = y0 + dy;
 				}
-			}
-			if (dynamic_cast<CFireBullet*>(e->obj))
-			{
-				x = x0 + dx;
-				y = y0 + dy;
 			}
 			if (dynamic_cast<CPortal *>(e->obj))
 			{
@@ -577,7 +596,7 @@ void CMario::Render()
 		}
 		else if (level == MARIO_LEVEL_BIG)
 		{
-			if (isSitting)
+			if (state == MARIO_STATE_SITTING)
 			{
 				RenderSitting(ani,
 					MARIO_ANI_BIG_SITTING_RIGHT,
@@ -642,7 +661,7 @@ void CMario::Render()
 		}
 		else if (level == MARIO_LEVEL_TAIL)
 		{
-			if (isSitting)
+			if (state == MARIO_STATE_SITTING)
 			{
 				RenderSitting(ani,
 					MARIO_ANI_TAIL_SITTING_RIGHT,
@@ -728,7 +747,7 @@ void CMario::Render()
 		}
 		else if (level == MARIO_LEVEL_FIRE)
 		{
-			if (isSitting)
+			if (state == MARIO_STATE_SITTING)
 			{
 				RenderSitting(ani,
 					MARIO_ANI_FIRE_SITTING_RIGHT,
@@ -869,40 +888,40 @@ void CMario::GetBoundingBox(float &left, float &top, float &right, float &bottom
 	left = x;
 	top = y; 
 	deltaX = 0;
-	if (isTransforming && level == MARIO_LEVEL_SMALL)
+
+	if (level != MARIO_LEVEL_SMALL)
 	{
-		right = left + MARIO_BIG_BBOX_WIDTH;
-		bottom = top + MARIO_BIG_BBOX_HEIGHT;
+		if (level == MARIO_LEVEL_BIG)
+		{
+			right = left + MARIO_BIG_BBOX_WIDTH;
+			bottom = top + MARIO_BIG_BBOX_HEIGHT;
+		}
+		else if (level == MARIO_LEVEL_TAIL)
+		{
+			right = left + MARIO_TAIL_BBOX_WIDTH;
+			bottom = top + MARIO_BIG_BBOX_HEIGHT;
+		}
+		else if (level == MARIO_LEVEL_FIRE)
+		{
+			right = left + MARIO_FIRE_BBOX_WIDTH;
+			bottom = top + MARIO_BIG_BBOX_HEIGHT;
+		}
+		if (state == MARIO_STATE_SITTING)
+		{
+			bottom -= MARIO_BIG_BBOX_HEIGHT - MARIO_BIG_BBOX_SITTING_HEIGHT;
+		}
 	}
 	else
 	{
-		if (level != MARIO_LEVEL_SMALL)
+		if (isTransforming)
 		{
-			if (level == MARIO_LEVEL_BIG)
-			{
-				right = left + MARIO_BIG_BBOX_WIDTH;
-				bottom = top + MARIO_BIG_BBOX_HEIGHT;
-			}
-			else if (level == MARIO_LEVEL_TAIL)
-			{
-				right = left + MARIO_TAIL_BBOX_WIDTH;
-				bottom = top + MARIO_BIG_BBOX_HEIGHT;
-			}
-			else if (level == MARIO_LEVEL_FIRE)
-			{
-				right = left + MARIO_FIRE_BBOX_WIDTH;
-				bottom = top + MARIO_BIG_BBOX_HEIGHT;
-			}
-			if (state == MARIO_STATE_SITTING)
-			{
-				//top -= 9;
-				bottom -= 9;
-			}
+			right = left + MARIO_BIG_BBOX_WIDTH;
+			bottom = top + MARIO_BIG_BBOX_HEIGHT;
 		}
 		else
 		{
-			right = x + MARIO_SMALL_BBOX_WIDTH;
-			bottom = y + MARIO_SMALL_BBOX_HEIGHT;
+			right = left + MARIO_SMALL_BBOX_WIDTH;
+			bottom = top + MARIO_SMALL_BBOX_HEIGHT;
 		}
 	}
 }

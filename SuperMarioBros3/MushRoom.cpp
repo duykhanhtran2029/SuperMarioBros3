@@ -31,7 +31,7 @@ void CMushRoom::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				}
 				isAppear = false;
 				isDestroyed = true;
-				x = y = -50;
+				//x = y = -50;
 			}
 			else
 			{

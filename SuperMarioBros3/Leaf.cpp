@@ -28,7 +28,7 @@ void CLeaf::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				lmario->SetLevel(MARIO_LEVEL_TAIL);
 				isAppear = false;
 				isDestroyed = true;
-				x = y = -50;
+				//x = y = -50;
 			}
 
 		}
@@ -42,7 +42,7 @@ void CLeaf::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		{
 			isAppear = false;
 			isDestroyed = true;
-			x = y = -50;
+			//x = y = -50;
 		}
 	}
 	if (state == LEAF_STATE_UP)

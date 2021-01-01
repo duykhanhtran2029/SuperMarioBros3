@@ -143,7 +143,7 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	//DebugOut(L"--> %s\n",ToWSTR(line).c_str());
 
 	if (tokens.size() < 3) return; // skip invalid lines - an object set must have at least id, x, y
-	int tag = 0, tag1 = 0, tag2 = 0;
+	int tag = 0, option_tag_1 = 0, option_tag_2 = 0;
 	int object_type = atoi(tokens[0].c_str());
 	float x = atof(tokens[1].c_str());
 	float y = atof(tokens[2].c_str());
@@ -152,12 +152,14 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	if (tokens.size() >= 5)
 		tag = atof(tokens[4].c_str());
 	if (tokens.size() >= 6)
-		tag1 = atof(tokens[5].c_str());
+		option_tag_1 = atof(tokens[5].c_str());
 	if (tokens.size() >= 7)
-		tag2 = atof(tokens[6].c_str());
-	CAnimationSets* animation_sets = CAnimationSets::GetInstance();
+		option_tag_2 = atof(tokens[6].c_str());
 
+
+	CAnimationSets* animation_sets = CAnimationSets::GetInstance();
 	CGameObject* obj = NULL;
+
 	switch (object_type)
 	{
 	case OBJECT_TYPE_MARIO:
@@ -179,7 +181,7 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 		obj->SetTag(tag);
 		break;
 	case OBJECT_TYPE_QUESTIONBRICK:
-		obj = new CQuestionBrick(tag,tag1);
+		obj = new CQuestionBrick(tag, option_tag_1);
 		break;
 	case OBJECT_TYPE_BREAKABLEBRICK:
 		obj = new CBreakableBrick();
@@ -213,13 +215,14 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	obj->SetPosition(x, y);
 
 	LPANIMATION_SET ani_set = animation_sets->Get(ani_set_id);
-
 	obj->SetAnimationSet(ani_set);
+
 	if (object_type == OBJECT_TYPE_FIRE_BULLET && player != NULL)
 	{
 		CFireBullet* f = dynamic_cast<CFireBullet*>(obj);
 		player->AddBullets(f);
 	}
+
 	objects.push_back(obj);
 }
 void CPlayScene::_ParseSection_TILEMAP_DATA(string line)
@@ -308,23 +311,34 @@ void CPlayScene::Update(DWORD dt)
 	vector<LPGAMEOBJECT> coObjects;
 	for (size_t i = 1; i < objects.size(); i++)
 	{
-		if(!objects[i]->isDestroyed)
+		if (!objects[i]->isDestroyed)
 			coObjects.push_back(objects[i]);
+		else
+		{
+			LPGAMEOBJECT tmp = objects[i];
+			objects.erase(objects.begin() + i);
+			delete tmp;
+			i--;
+		}
+			
 	}
 
 	for (size_t i = 0; i < objects.size(); i++)
-	{
-		if (!objects[i]->isDestroyed)
-			objects[i]->Update(dt, &coObjects);
-	}
+		objects[i]->Update(dt, &coObjects);
 
 	// skip the rest if scene was already unloaded (Mario::Update might trigger PlayScene::Unload)
 	if (player == NULL) return;
 
 
 	//get map and screen information
-	float cx, cy, sw, sh, mw, mh, mx, my;
+	float cx, cy;
 	player->GetPosition(cx, cy);
+	SetCam(cx, cy);
+
+}
+void CPlayScene::SetCam(float cx, float cy)
+{
+	float sw, sh, mw, mh, mx, my;
 	CGame* game = CGame::GetInstance();
 	sw = game->GetScreenWidth();
 	sh = game->GetScreenHeight();
@@ -339,21 +353,23 @@ void CPlayScene::Update(DWORD dt)
 		cx = 0;
 	else if (cx + sw / 2 > mw)
 		cx = mw - sw + 1;
+
+
 	if (cy - sh / 2 <= 0)//Top Edge
 		cy = 0;
 	else if (cy + sh / 2 >= mh)//Bottom Edge
 		cy = mh - sh;
 	else cy -= sh / 2;
+
+
 	CGame::GetInstance()->SetCamPos(ceil(cx), ceil(cy));
 	current_map->SetCamPos(cx, cy);
 }
-
 void CPlayScene::Render()
 {
 	current_map->Render();
 	for (int i = 0; i < objects.size(); i++)
-		if (!objects[i]->isDestroyed)
-			objects[i]->Render();
+		objects[i]->Render();
 }
 
 /*
@@ -465,7 +481,7 @@ void CPlayScenceKeyHandler::KeyState(BYTE* states)
 		mario->SetState(MARIO_STATE_WALKING_RIGHT);
 	else if (game->IsKeyDown(DIK_LEFT))
 		mario->SetState(MARIO_STATE_WALKING_LEFT);
-	else if (game->IsKeyDown(DIK_DOWN) && mario->isReadyToSit)
+	else if (game->IsKeyDown(DIK_DOWN) && mario->isReadyToSit && mario->level != MARIO_LEVEL_SMALL)
 		mario->SetState(MARIO_STATE_SITTING);
 	else mario->SetState(MARIO_STATE_IDLE);
 }
