@@ -4,8 +4,7 @@
 #include "Block.h"
 #include "PlayScence.h"
 
-CMario* mmario;
-CPlayScene* mscence;
+
 void CMushRoom::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
 	if (isDestroyed)
@@ -15,7 +14,8 @@ void CMushRoom::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	{
 		float mLeft, mTop, mRight, mBottom;
 		float oLeft, oTop, oRight, oBottom;
-		mscence = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
+		CMario* mmario = {};
+		CPlayScene* mscence = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
 		if(mscence != NULL)
 			mmario = ((CPlayScene*)mscence)->GetPlayer();
 		if (mmario != NULL)
@@ -27,10 +27,11 @@ void CMushRoom::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					mmario->SetLevel(MARIO_LEVEL_BIG);
 				if (tag == MUSHROOM_TYPE_GREEN)
 				{
-					//set extra later
+					mmario->AddLife();
 				}
 				isAppear = false;
 				isDestroyed = true;
+				mmario->AddScore(1000);
 				//x = y = -50;
 			}
 			else
@@ -150,6 +151,8 @@ void CMushRoom::GetBoundingBox(float& l, float& t, float& r, float& b)
 void CMushRoom::SetState(int state)
 {
 	CGameObject::SetState(state);
+	CMario* mmario;
+	CPlayScene* mscence;
 	switch (state)
 	{
 	case MUSHROOM_STATE_IDLE:

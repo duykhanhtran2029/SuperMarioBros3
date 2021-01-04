@@ -8,14 +8,17 @@
 #include "Goomba.h"
 #include "Koopas.h"
 #include "Map.h"
+#include "Font.h"
+#include "HUD.h"
 
 class CPlayScene : public CScene
 {
 protected:
 	CMario* player = NULL;					// A play scene has to have player, right? 
 	CMap* current_map = NULL;
+	CFont* fonts = NULL;
+	HUD* hud = NULL;
 	vector<LPGAMEOBJECT> objects;
-	
 
 	void _ParseSection_TEXTURES(string line);
 	void _ParseSection_SPRITES(string line);
@@ -37,6 +40,7 @@ public:
 
 	CMario* GetPlayer() { return player; }
 	CMap* GetMap() { return current_map; }
+	CFont* GetFont() { return fonts; }
 	//friend class CPlayScenceKeyHandler;
 };
 

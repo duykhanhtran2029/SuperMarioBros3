@@ -312,6 +312,9 @@ void CPlayScene::Load()
 	CTextures::GetInstance()->Add(ID_TEX_BBOX, L"Resources\\Textures\\bbox.png", D3DCOLOR_XRGB(255, 255, 255));
 
 	DebugOut(L"[INFO] Done loading scene resources %s\n", sceneFilePath);
+	fonts = new CFont();
+	hud = new HUD();
+	objects.push_back(hud);
 }
 
 void CPlayScene::Update(DWORD dt)
@@ -344,7 +347,6 @@ void CPlayScene::Update(DWORD dt)
 	float cx, cy;
 	player->GetPosition(cx, cy);
 	SetCam(cx, cy);
-
 }
 void CPlayScene::SetCam(float cx, float cy)
 {
@@ -365,6 +367,7 @@ void CPlayScene::SetCam(float cx, float cy)
 		cx = mw - sw + 1;
 
 
+	//cy = mh - sh;
 	if (cy - sh / 2 <= 0)//Top Edge
 		cy = 0;
 	else if (cy + sh / 2 >= mh)//Bottom Edge
@@ -374,6 +377,7 @@ void CPlayScene::SetCam(float cx, float cy)
 
 	CGame::GetInstance()->SetCamPos(ceil(cx), ceil(cy));
 	current_map->SetCamPos(cx, cy);
+	hud->SetPosition(ceil(cx), ceil(cy + sh - HUD_HEIGHT));
 }
 void CPlayScene::Render()
 {

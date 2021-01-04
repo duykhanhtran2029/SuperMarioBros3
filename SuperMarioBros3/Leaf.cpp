@@ -4,9 +4,6 @@
 #include "PlayScence.h"
 #include "Map.h"
 
-CMario* lmario;
-CPlayScene* lscence;
-CMap* lmap;
 void CLeaf::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
 	if (isDestroyed)
@@ -17,7 +14,9 @@ void CLeaf::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	if (state == LEAF_STATE_FALLING)
 	{
 		float mLeft, mTop, mRight, mBottom;
-		lscence = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
+		CMap* lmap = NULL;
+		CMario* lmario = {};
+		CPlayScene* lscence = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
 		if (lscence != NULL)
 			lmario = ((CPlayScene*)lscence)->GetPlayer();
 		if (lmario != NULL)
@@ -28,7 +27,7 @@ void CLeaf::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				lmario->SetLevel(MARIO_LEVEL_TAIL);
 				isAppear = false;
 				isDestroyed = true;
-				//x = y = -50;
+				lmario->AddScore(1000);
 			}
 
 		}

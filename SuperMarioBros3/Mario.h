@@ -236,15 +236,15 @@
 #define MARIO_BIG_BBOX_WIDTH			15
 #define MARIO_BIG_BBOX_HEIGHT			27
 #define MARIO_BIG_BBOX_SITTING_HEIGHT	18
-
 #define MARIO_SMALL_BBOX_WIDTH  13
 #define MARIO_SMALL_BBOX_HEIGHT 15
-
 #define MARIO_TAIL_BBOX_WIDTH  21
-
 #define MARIO_FIRE_BBOX_WIDTH  15
 
 #define MARIO_FIRE_BULLETS  2
+
+#define MARIO	0
+#define LUIGI	1
 
 class CMario : public CGameObject
 {
@@ -264,8 +264,15 @@ class CMario : public CGameObject
 	float start_x;			// initial position of Mario at scene
 	float start_y;
 	int iBullet = 0;
+	
+public:
 	int RunningStacks = 0;
-public: 
+	int money = 0;
+	int life = 4;
+	int score = 0;
+	//card later
+
+
 	vector <CFireBullet*> Bullets;
 	int level;
 	int prelevel;
@@ -412,4 +419,7 @@ public:
 			SetLevel(MARIO_LEVEL_SMALL);	
 		StartUntouchable();
 	}
+	void AddScore(int s = 100) { this->score += s; }
+	void AddLife(int l = 1) { this->life += l; }
+	void AddMoney(int m = 1) { this->money += m; }
 };

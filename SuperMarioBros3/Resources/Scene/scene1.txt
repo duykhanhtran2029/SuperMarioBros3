@@ -9,8 +9,10 @@
 30	Resources\Tilemap\world1-1_bank.png	255	255	255
 40	Resources\Textures\enemies1.1.png	0	255	255
 50	Resources\Textures\enemies-2.png	0	128	128
+60	Resources\Textures\HUD.png	0	224	142
+80	Resources\Textures\fonts.png	0	224	142
 100	Resources\Textures\mario-left.png	255	255	255
-110	Resources\Textures\mario-right.png	255	255	255	
+110	Resources\Textures\mario-right.png	255	255	255
 [TILEMAP DATA]
 Resources\Tilemap\world1-1.txt
 # id	left	top	right	bottom	texture_id
@@ -21,6 +23,101 @@ Resources\Tilemap\world1-1.txt
 # State: 0 = Walk; 1 = Max Speed; 2 = Jump; 3 = Brake; 4 = Sitdown; 5 = Hold; 6 = Fly, 7 = Kick 
 # Direction: 0 = Right; 1 = Left, null = Idle
 # Serial: Optional
+# ====	HUD ====
+99999	10	0	272	32	60
+# ---- icon MARIO ---- 
+50003	15	160	33	169	80
+ ---- icon Lugi ---- 
+50004	15	170	33	179	80
+ ---- PowerMelter filled arrow ---- 
+50005	63	161	72	170	80
+ ---- powerMelter filled iconP ---- 
+50006	72	161	88	170	80
+ ---- powerMelter empty arrow ---- 
+50007	90	161	99	170	80
+ ---- powerMelter empty icon ---- 
+50008	99	161	116	170	80
+ ---- empty card ---- 
+50009	160	158	183	186	80
+ ---- mushroom card ---- 
+50010	184	160	208	186	80
+ ---- fireflower card ---- 
+50011	208	160	232	186	80
+ ---- startman card ---- 
+50012	232	160	256	186	80
+# ==== FONT ====
+#font - 0
+50013	76	30	86	40	80
+#font - 1
+50014	86	30	96	40	80
+#font - 2
+50015	96	30	106	40	80
+#font - 3
+50016	106	30	116	40	80
+#font - 4
+50017	116	30	126	40	80
+#font - 5
+50018	126	30	136	40	80
+#font - 6
+50019	136	30	146	40	80
+#font - 7
+50020	146	30	156	40	80
+#font - 8
+50021	156	30	166	40	80
+#font - 9
+50022	166	30	176	40	80
+#font - A
+50023	176	30	186	40	80
+#font - B
+50024	186	30	196	40	80
+#font - C
+50025	76	40	86	50	80
+#font - D
+50026	86	40	96	50	80
+#font - E
+50027	96	40	106	50	80
+#font - F
+50028	106	40	116	50	80
+#font - G
+50029	116	40	126	50	80
+#font - H
+50030	126	40	136	50	80
+#font - I
+50031	136	40	146	50	80
+#font - J
+50032	146	40	156	50	80
+#font - K
+50033	156	40	166	50	80
+#font - L
+50034	166	40	176	50	80
+#font - M
+50035	176	40	186	50	80
+#font - N
+50036	186	40	196	50	80
+#font - O
+50037	76	50	86	60	80
+#font - P
+50038	86	50	96	60	80
+#font - Q
+50039	96	50	106	60	80
+#font - R
+50040	106	50	116	60	80
+#font - S
+50041	116	50	126	60	80
+#font - T
+50042	126	50	136	60	80
+#font - U
+50043	136	50	146	60	80
+#font - V
+50044	146	50	156	60	80
+#font - W
+50045	156	50	166	60	80
+#font - X
+50046	166	50	176	60	80
+#font - Y
+50047	176	50	186	60	80
+#font - Z
+50048	186	50	196	60	80
 # die 
 10909	215	120	231	135	0
 #  ==== Small Mario ==== 
@@ -355,10 +452,10 @@ Resources\Tilemap\world1-1.txt
 90011	0	64	16	80	30
 90012	16	64	32	80	30
 # ==== Pipe ==== 
-50021	160	0	176	16	30
-50022	0	16	16	32	30
-50023	32	16	48	32	30
-50024	48	16	64	32	30	
+20221	160	0	176	16	30
+20222	0	16	16	32	30
+20223	32	16	48	32	30
+20224	48	16	64	32	30	
 # ==== Coin ====
 30000	300	99	316	115	20
 30001	318	99	334	115	20
@@ -770,10 +867,10 @@ Resources\Tilemap\world1-1.txt
 631	90011	100
 632	90012	100
 #  ==== Pipe ==== 
-611	50021	100
-612	50022	100
-613	50023	100
-614	50024	100
+611	20221	100
+612	20222	100
+613	20223	100
+614	20224	100
 # ==== Coin ====
 300	30000	100	30001	100	30002	100	30001	100
 # ==== Leaf ====
@@ -937,7 +1034,7 @@ Resources\Tilemap\world1-1.txt
 # type	x	y	ani_set_id	tag	tag1	tag2	
 # type: 0 = Mario , 1 = Brick, 2 = Goomba, 3 = Koopas, 4 = Block
 # MARIO
-0	1800	384	1
+0	0	384	1
 9	0	-1	9
 9	0	-1	9
 9	0	-1	9

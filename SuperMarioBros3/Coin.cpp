@@ -19,14 +19,13 @@ void CCoin::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		return;
 	CGameObject::Update(dt);
 	y += dy;
+	CMario* coinmario = {};
+	CPlayScene* coinscence = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
+	if (coinscence != NULL)
+		coinmario = ((CPlayScene*)coinscence)->GetPlayer();
 	if (state == COIN_STATE_IDLE)
 	{
-		CMario* coinmario = {};
-		CPlayScene* coinscence = NULL;
 		float mLeft, mTop, mRight, mBottom;
-		coinscence = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
-		if (coinscence != NULL)
-			coinmario = ((CPlayScene*)coinscence)->GetPlayer();
 		if (coinmario != NULL)
 		{
 			coinmario->GetBoundingBox(mLeft, mTop, mRight, mBottom);
@@ -34,6 +33,8 @@ void CCoin::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			{
 				isAppear = false;
 				isDestroyed = true;
+				coinmario->AddScore(); 
+				coinmario->AddMoney();
 			}
 
 		}
@@ -67,6 +68,8 @@ void CCoin::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			isAppear = false;
 			SetState(COIN_STATE_IDLE);
 			isDestroyed = true;
+			coinmario->AddScore();
+			coinmario->AddMoney();
 		}
 	}
 }

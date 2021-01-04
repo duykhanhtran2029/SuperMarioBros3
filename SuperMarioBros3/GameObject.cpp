@@ -8,6 +8,7 @@
 #include "GameObject.h"
 #include "Sprites.h"
 #include "Piece.h"
+#include "HUD.h"
 
 
 CGameObject::CGameObject()
@@ -134,7 +135,7 @@ void CGameObject::RenderBoundingBox(int alpha)
 	rect.right = (int)r - (int)l;
 	rect.bottom = (int)b - (int)t;
 
-	CGame::GetInstance()->Draw(x + deltaX, y + deltaY, bbox, rect.left, rect.top, rect.right, rect.bottom, alpha);
+	CGame::GetInstance()->Draw(x, y - HUD_HEIGHT, bbox, rect.left, rect.top, rect.right, rect.bottom, alpha);
 }
 bool CGameObject::isColliding(float friend_left, float friend_top, float friend_right, float friend_bottom)
 {

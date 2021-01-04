@@ -33,6 +33,11 @@ CMario::CMario(float x, float y) : CGameObject()
 	start_y = y; 
 	this->x = x; 
 	this->y = y; 
+
+	RunningStacks = 0;
+	money = 0;
+	life = 4;
+	score = 0;
 }
 void CMario::CalcPotentialCollisions(
 	vector<LPGAMEOBJECT>* coObjects,
@@ -264,6 +269,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 					// jump on top >> kill Goomba and deflect a bit 
 					if (e->ny < 0)
 					{
+						AddScore();
 						if (goomba->GetState() != GOOMBA_STATE_DIE)
 						{
 							if (goomba->tag != GOOMBA_RED)
@@ -284,6 +290,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 					{
 						if (isTurningTail)
 						{
+							AddScore();
 							goomba->SetDirection(nx);
 							goomba->SetState(GOOMBA_STATE_DIE_BY_TAIL);
 						}
@@ -309,6 +316,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 				CKoopas* koopas = dynamic_cast<CKoopas*>(e->obj);
 				if (e->ny < 0)
 				{
+					AddScore();
 					vy = -1.5f * MARIO_JUMP_DEFLECT_SPEED;
 					if (koopas->GetState() != KOOPAS_STATE_IN_SHELL && koopas->GetState() != KOOPAS_STATE_SHELL_UP)
 						koopas->SetState(KOOPAS_STATE_IN_SHELL);
@@ -346,7 +354,10 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 			if (dynamic_cast<CPiranhaPlant*>(e->obj) || dynamic_cast<CFirePiranhaPlant*>(e->obj))
 			{
 				if (isTurningTail && e->nx != 0)
+				{
 					e->obj->SetState(PIRANHAPLANT_STATE_DEATH);
+					AddScore();
+				}
 				else
 				{
 					x = x0;
@@ -885,7 +896,6 @@ void CMario::GetBoundingBox(float &left, float &top, float &right, float &bottom
 {
 	left = x;
 	top = y; 
-	deltaX = 0;
 
 	if (level != MARIO_LEVEL_SMALL)
 	{

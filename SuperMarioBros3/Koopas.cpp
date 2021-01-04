@@ -282,7 +282,7 @@ void CKoopas::Render()
 			ani = KOOPAS_ANI_SHAKE_UP;
 	}
 	animation_set->at(ani)->Render(x, y);
-	RenderBoundingBox(255);
+	RenderBoundingBox();
 }
 
 void CKoopas::SetState(int state)
