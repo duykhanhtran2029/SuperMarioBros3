@@ -398,4 +398,18 @@ public:
 	void StartUntouchable() { untouchable = 1; untouchable_start = GetTickCount64(); }
 	void Reset();
 	virtual void GetBoundingBox(float &left, float &top, float &right, float &bottom);
+
+	void Attacked()
+	{
+		if (level == MARIO_LEVEL_SMALL)
+		{
+			SetState(MARIO_STATE_DIE);
+			return;
+		}
+		if (level == MARIO_LEVEL_TAIL || level == MARIO_LEVEL_FIRE)
+			SetLevel(MARIO_LEVEL_BIG);
+		else if (level == MARIO_LEVEL_BIG)
+			SetLevel(MARIO_LEVEL_SMALL);	
+		StartUntouchable();
+	}
 };

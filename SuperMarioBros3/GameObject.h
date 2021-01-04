@@ -57,11 +57,11 @@ public:
 
 	float ax, ay; //acceleration
 
-	float deltaX = 0;
-	float deltaY = 0;
+	//float deltaX = 0;
+	//float deltaY = 0;
 
-	int DebugAlpha = 0;
-	int DebugTag = 0;
+	//int DebugAlpha = 0;
+	//int DebugTag = 0;
 
 	int nx;	 
 
@@ -84,10 +84,10 @@ public:
 	void SetSpeed(float vx, float vy) { this->vx = vx, this->vy = vy; }
 	void SetDirection(int nx) { this->nx = nx; }
 	void SetTag(int tag) { this->tag = tag; }
-	void SetDelta(float mx, float my) { deltaX = mx; deltaY = my; }
-	
-	void SetDebugAlpha(int Da) { DebugAlpha = Da; }
-	void SetDebugTag(int tag) { DebugTag = tag; }
+	//void SetDelta(float mx, float my) { deltaX = mx; deltaY = my; }
+	//
+	//void SetDebugAlpha(int Da) { DebugAlpha = Da; }
+	//void SetDebugTag(int tag) { DebugTag = tag; }
 
 	void RenderBoundingBox(int alpha = 0);
 	bool isColliding(float friend_left, float friend_top, float friend_right, float friend_bottom);

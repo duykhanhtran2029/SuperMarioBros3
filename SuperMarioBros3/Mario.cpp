@@ -17,6 +17,9 @@
 #include "QuestionBrick.h"
 #include "BreakableBrick.h"
 #include "FireBullet.h"
+#include "PlantBullet.h"
+#include "PiranhaPlant.h"
+#include "FirePiranhaPlant.h"
 
 CMario::CMario(float x, float y) : CGameObject()
 {
@@ -38,9 +41,13 @@ void CMario::CalcPotentialCollisions(
 	for (UINT i = 0; i < coObjects->size(); i++)
 	{
 		LPGAMEOBJECT object = coObjects->at(i);
+		if (dynamic_cast<CKoopas*>(object) && object->state == KOOPAS_STATE_IN_SHELL && isHolding)
+			continue;
 		if (dynamic_cast<CCoin*>(object) || dynamic_cast<CLeaf*>(object) 
 			|| dynamic_cast<CMushRoom*>(object) || dynamic_cast<CPiece*>(object)
-			|| dynamic_cast<CFireBullet*>(object))
+			|| dynamic_cast<CFireBullet*>(object) || dynamic_cast<CPlantBullet*>(object)
+			|| ((dynamic_cast<CPiranhaPlant*>(object) || dynamic_cast<CFirePiranhaPlant*>(object)) 
+				&& object->state == PIRANHAPLANT_STATE_INACTIVE))
 			continue;
 		else
 		{
@@ -55,7 +62,7 @@ void CMario::CalcPotentialCollisions(
 }
 void CMario::TimingFlag()
 {
-	if (GetTickCount64() - running_start > MARIO_RUNNING_STACK_TIME && isRunning)
+	if (GetTickCount64() - running_start > MARIO_RUNNING_STACK_TIME && isRunning && vx != 0)
 	{
 		running_start = GetTickCount64();
 		RunningStacks++;
@@ -284,15 +291,9 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 						{
 							if (goomba->GetState() != GOOMBA_STATE_DIE)
 							{
-								if (level > MARIO_LEVEL_SMALL)
-								{
-									level = MARIO_LEVEL_SMALL;
-									x = x0;
-									y = y0;
-									StartUntouchable();
-								}
-								else
-									SetState(MARIO_STATE_DIE);
+								x = x0;
+								y = y0;
+								Attacked();
 							}
 						}
 						else
@@ -308,25 +309,16 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 				CKoopas* koopas = dynamic_cast<CKoopas*>(e->obj);
 				if (e->ny < 0)
 				{
-					
-					if (koopas->GetState() != KOOPAS_STATE_IN_SHELL)
-					{
+					vy = -1.5f * MARIO_JUMP_DEFLECT_SPEED;
+					if (koopas->GetState() != KOOPAS_STATE_IN_SHELL && koopas->GetState() != KOOPAS_STATE_SHELL_UP)
 						koopas->SetState(KOOPAS_STATE_IN_SHELL);
-						vy = -1.5f * MARIO_JUMP_DEFLECT_SPEED;
-					}
 					else
-					{
-						vy = -1.5f * MARIO_JUMP_DEFLECT_SPEED;
 						koopas->SetState(KOOPAS_STATE_SPINNING);
-					}
 				}
 				else if (e->nx != 0 || e-> ny > 0)
 				{
-					DebugOut(L"is Turning Tail: %d\n", isTurningTail);
 					if (isTurningTail)
-					{
 						koopas->SetState(KOOPAS_STATE_SHELL_UP);
-					}
 					else if (koopas->GetState() == KOOPAS_STATE_IN_SHELL || koopas->GetState() == KOOPAS_STATE_SHELL_UP)
 					{
 						if (isReadyToHold)
@@ -344,20 +336,24 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 					else if (untouchable == 0 && isKicking == false)
 					{
 						if (koopas->GetState() != KOOPAS_STATE_IN_SHELL || koopas->GetState() != KOOPAS_STATE_SHELL_UP)
-						{
-							if (level != MARIO_LEVEL_SMALL)
-							{
-								level = MARIO_LEVEL_SMALL;
-								StartUntouchable();
-							}
-							else
-								SetState(MARIO_STATE_DIE);
-						}
+							Attacked();
 
 					}
 
 				}
 
+			}
+			if (dynamic_cast<CPiranhaPlant*>(e->obj) || dynamic_cast<CFirePiranhaPlant*>(e->obj))
+			{
+				if (isTurningTail && e->nx != 0)
+					e->obj->SetState(PIRANHAPLANT_STATE_DEATH);
+				else
+				{
+					x = x0;
+					y = y0;
+					if (untouchable == 0)
+						Attacked();
+				}			
 			}
 			if (dynamic_cast<CBrick*>(e->obj)) 
 			{
@@ -478,6 +474,7 @@ void CMario::BasicRenderLogicsForAllLevel(int& ani, int ani_jump_down_right, int
 				ani = ani_kicking_right;
 			else if (vx < 0)
 				ani = ani_kicking_left;
+			//DebugOut(L"[KICK]\n");
 		}	
 	}
 	if (isShooting)
@@ -858,7 +855,8 @@ void CMario::SetState(int state)
 			vx = 0;
 			ax = 0;
 		}
-		//DebugOut(L"ax:	%f, vx:	%f\n", ax, vx);
+		if (isRunning)
+			StopRunning();
 		break;
 	case MARIO_STATE_SITTING:
 		if (level != MARIO_LEVEL_SMALL)

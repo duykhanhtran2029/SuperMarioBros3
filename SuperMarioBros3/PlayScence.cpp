@@ -10,6 +10,8 @@
 #include "Define.h"
 #include "Coin.h"
 #include "Brick.h"
+#include "PiranhaPlant.h"
+#include "FirePiranhaPlant.h"
 #include "QuestionBrick.h"
 #include "BreakableBrick.h"
 
@@ -26,25 +28,27 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath) :
 	See scene1.txt, scene2.txt for detail format specification
 */
 
-#define SCENE_SECTION_UNKNOWN -1
-#define SCENE_SECTION_TEXTURES 2
-#define SCENE_SECTION_SPRITES 3
-#define SCENE_SECTION_ANIMATIONS 4
+#define SCENE_SECTION_UNKNOWN		   -1
+#define SCENE_SECTION_TEXTURES			2
+#define SCENE_SECTION_SPRITES			3
+#define SCENE_SECTION_ANIMATIONS		4
 #define SCENE_SECTION_ANIMATION_SETS	5
-#define SCENE_SECTION_OBJECTS	6
-#define SCENE_SECTION_TILEMAP_DATA	7
+#define SCENE_SECTION_OBJECTS			6
+#define SCENE_SECTION_TILEMAP_DATA		7
 
-#define OBJECT_TYPE_MARIO	0
-#define OBJECT_TYPE_BRICK	1
-#define OBJECT_TYPE_QUESTIONBRICK	142
-#define OBJECT_TYPE_BREAKABLEBRICK	112
-#define OBJECT_TYPE_GOOMBA	2
-#define OBJECT_TYPE_KOOPAS	3
-#define OBJECT_TYPE_BLOCK	4
-#define OBJECT_TYPE_COIN	6
-#define OBJECT_TYPE_LEAF	36
-#define OBJECT_TYPE_MUSHROOM	37
-#define OBJECT_TYPE_FIRE_BULLET	9
+#define OBJECT_TYPE_MARIO				0
+#define OBJECT_TYPE_BRICK				1
+#define OBJECT_TYPE_GOOMBA				2
+#define OBJECT_TYPE_KOOPAS				3
+#define OBJECT_TYPE_BLOCK				4
+#define OBJECT_TYPE_COIN				6
+#define OBJECT_TYPE_PIRANHAPLANT		7
+#define OBJECT_TYPE_FIRE_BULLET			9
+#define OBJECT_TYPE_MUSHROOM			37
+#define OBJECT_TYPE_LEAF				36
+#define OBJECT_TYPE_FIREPIRANHAPLANT	70
+#define OBJECT_TYPE_QUESTIONBRICK		142
+#define OBJECT_TYPE_BREAKABLEBRICK		112
 
 #define OBJECT_TYPE_PORTAL	50
 
@@ -192,7 +196,14 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 		break;
 	case OBJECT_TYPE_BLOCK:
 		obj = new CBlock();
-		obj->SetTag(tag);
+		break;
+	case OBJECT_TYPE_PIRANHAPLANT:
+		obj = new CPiranhaPlant();
+		((CPiranhaPlant*)obj)->SetLimitY(y);
+		break;
+	case OBJECT_TYPE_FIREPIRANHAPLANT:
+		obj = new CFirePiranhaPlant(tag);
+		((CFirePiranhaPlant*)obj)->SetLimitY(y);
 		break;
 	case OBJECT_TYPE_COIN:
 		obj = new CCoin(tag);
@@ -247,7 +258,6 @@ void CPlayScene::_ParseSection_TILEMAP_DATA(string line)
 	current_map = new CMap(ID, rowMap, columnMap, rowTile, columnTile, totalTiles);
 	current_map->ExtractTileFromTileSet();
 	current_map->SetTileMapData(TileMapData);
-	DebugOut(L"[DETAILS] rowmap: %d	%d	%d	%d	%d\n", rowMap, columnMap, columnTile, rowTile, totalTiles);
 }
 void CPlayScene::Load()
 {
@@ -453,7 +463,7 @@ void CPlayScenceKeyHandler::OnKeyUp(int KeyCode)
 		mario->StopRunning();
 		if (mario->isHolding)
 		{
-			mario->StartKicking();
+			mario->SetIsHolding(false);
 		}
 		break;
 	}
@@ -468,7 +478,7 @@ void CPlayScenceKeyHandler::KeyState(BYTE* states)
 	if (game->IsKeyDown(DIK_A))
 	{
 		mario->SetIsReadyToHold(true);
-		if(!mario->isRunning)
+		if(!mario->isRunning && mario->vx != 0)
 			mario->StartRunning();
 	}
 	if (game->IsKeyDown(DIK_S) && mario->isReadyToJump)

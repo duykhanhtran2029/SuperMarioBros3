@@ -1,0 +1,135 @@
+#include "FirePiranhaPlant.h"
+#include "Brick.h"
+#include "Utils.h"
+#include "PlantBullet.h"
+#include "Mario.h"
+#include "PlayScence.h"
+#include "Scence.h"
+CFirePiranhaPlant::CFirePiranhaPlant(int tag)
+{
+	this->tag = tag;
+	SetState(PIRANHAPLANT_STATE_INACTIVE);
+}
+void CFirePiranhaPlant::GetDirect() {
+	CMario* mario = ((CPlayScene*)CGame::GetInstance()->GetCurrentScene())->GetPlayer();
+	int mHeight;
+	if (mario->level == MARIO_LEVEL_SMALL)
+		mHeight = MARIO_SMALL_BBOX_HEIGHT;
+	else
+		mHeight = MARIO_BIG_BBOX_HEIGHT;
+
+	if (mario->y + mHeight < limitY + BBHeight)
+		Up = true;
+	else
+		Up = false;
+	if (mario->x <= x)
+		Right = false;
+	else
+		Right = true;
+};
+void CFirePiranhaPlant::Shoot()
+{
+	CPlayScene* scence = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
+	CAnimationSets* animation_sets = CAnimationSets::GetInstance();
+	LPANIMATION_SET tmp_ani_set = animation_sets->Get(BULLET_ANI_SET_ID);
+	CPlantBullet* bullet = new CPlantBullet(x,y,Up,Right);
+	bullet->SetAnimationSet(tmp_ani_set);
+	scence->PushBack(bullet);
+}
+void CFirePiranhaPlant::Update(DWORD dt,
+	vector<LPGAMEOBJECT>* coObjects)
+{
+	CGameObject::Update(dt, coObjects);
+	y += dy;
+	GetDirect();
+	if (y <= limitY && vy < 0)
+	{
+		y = limitY;
+		vy = 0;
+		StartAim();
+	}
+	if (y >= limitY + BBHeight && vy > 0)
+	{
+		y = limitY + BBHeight;
+		SetState(PIRANHAPLANT_STATE_INACTIVE);
+		StartDelay();
+	}
+	if (GetTickCount64() - aim_start >= PIRANHAPLANT_AIM_TIME && aim_start != 0)
+	{
+		aim_start = 0;
+		SetState(PIRANHAPLANT_STATE_SHOOTING);
+		StartDelay();
+	}
+	if (GetTickCount64() - delay_start >= PIRANHAPLANT_DELAY_TIME && delay_start != 0)
+	{
+		delay_start = 0;
+		if (y == limitY)
+			vy = PIRANHAPLANT_DARTING_SPEED;
+	}
+	vector<LPCOLLISIONEVENT> coEvents;
+	vector<LPCOLLISIONEVENT> coEventsResult;
+
+	coEvents.clear();
+	for (UINT i = 0; i < coEvents.size(); i++) delete coEvents[i];
+
+	CMario* mario = ((CPlayScene*)CGame::GetInstance()->GetCurrentScene())->GetPlayer();
+	int mWidth = MARIO_SMALL_BBOX_WIDTH;
+	if (mario->level == MARIO_LEVEL_BIG)
+		mWidth = MARIO_BIG_BBOX_WIDTH;
+	if (mario->level == MARIO_LEVEL_TAIL)
+		mWidth = MARIO_TAIL_BBOX_WIDTH;
+	if (mario->level == MARIO_LEVEL_FIRE)
+		mWidth = MARIO_FIRE_BBOX_WIDTH;
+
+	if ((mario->x + (float)mWidth + PIRANHAPLANT_ACTIVE_RANGE <= x
+		|| mario->x >= x + PIRANHAPLANT_BBOX_WIDTH + PIRANHAPLANT_ACTIVE_RANGE)
+		&& state == PIRANHAPLANT_STATE_INACTIVE && delay_start == 0)
+		SetState(PIRANHAPLANT_STATE_DARTING);
+}
+void CFirePiranhaPlant::Render()
+{
+	int ani = PIRANHAPLANT_ANI_DEATH;
+	if (state != PIRANHAPLANT_STATE_DEATH)
+	{
+		if (Up)
+			if (Right)
+				ani = PIRANHAPLANT_ANI_RIGHT_UP;
+			else
+				ani = PIRANHAPLANT_ANI_LEFT_UP;
+		else
+			if (Right)
+				ani = PIRANHAPLANT_ANI_RIGHT_DOWN;
+			else
+				ani = PIRANHAPLANT_ANI_LEFT_DOWN;
+	}
+	animation_set->at(ani)->Render(x, y);
+	RenderBoundingBox(0);
+}
+void CFirePiranhaPlant::SetState(int _state)
+{
+	CGameObject::SetState(_state);
+	switch (_state)
+	{
+	case PIRANHAPLANT_STATE_DARTING:
+		vy = -PIRANHAPLANT_DARTING_SPEED;
+		break;
+	case PIRANHAPLANT_STATE_SHOOTING:
+		vy = 0;
+		Shoot();
+		break;
+	case PIRANHAPLANT_STATE_DEATH:
+		vy = 0;
+		break;
+	case PIRANHAPLANT_STATE_INACTIVE:
+		vy = 0;
+		break;
+	}
+}
+void CFirePiranhaPlant::GetBoundingBox(float& left, float& top,
+	float& right, float& bottom)
+{
+	left = x;
+	top = y;
+	right = x + PIRANHAPLANT_BBOX_WIDTH;
+	bottom = y + BBHeight;
+}
