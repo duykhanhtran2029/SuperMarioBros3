@@ -9,7 +9,7 @@
 30	Resources\Tilemap\world1-1_bank.png	255	255	255
 40	Resources\Textures\enemies1.1.png	0	255	255
 50	Resources\Textures\enemies-2.png	0	128	128
-60	Resources\Textures\HUD.png	0	224	142
+60	Resources\Textures\HUD.png	0	255	255
 80	Resources\Textures\fonts.png	0	224	142
 100	Resources\Textures\mario-left.png	255	255	255
 110	Resources\Textures\mario-right.png	255	255	255
@@ -118,9 +118,28 @@ Resources\Tilemap\world1-1.txt
 50047	176	50	186	60	80
 #font - Z
 50048	186	50	196	60	80
+#==========EFFECT POINT===================
+#100
+50049	61	89	72	97	80
+#200
+50050	75	89	87	97	80
+#400
+50051	90	89	102	97	80
+#800
+50052	105	89	117	97	80
+#1000
+50053	120	89	135	97	80
+#2000
+50054	138	89	154	97	80
+#4000
+50055	157	89	173	97	80
+#8000
+50056	176	89	192	97	80
+#1UP
+50057	195	89	211	97	80
+#  ==== Small Mario ==== 
 # die 
 10909	215	120	231	135	0
-#  ==== Small Mario ==== 
 # --Right--
 # idle right
 10001	247	0	259	15	0

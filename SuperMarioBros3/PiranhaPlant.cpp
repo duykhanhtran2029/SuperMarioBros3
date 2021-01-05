@@ -2,8 +2,8 @@
 #include "Brick.h"
 #include "Utils.h"
 #include "Mario.h"
-#include "PlayScence.h"
-#include "Scence.h"
+#include "PlayScene.h"
+#include "Scene.h"
 void CPiranhaPlant::GetBoundingBox(float& left, float& top,
 	float& right, float& bottom)
 {

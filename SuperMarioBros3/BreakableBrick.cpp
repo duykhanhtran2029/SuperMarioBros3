@@ -1,9 +1,9 @@
 #include "BreakableBrick.h"
-#include "PlayScence.h"
+#include "PlayScene.h"
 #include "MushRoom.h"
 
 CMario* bbmario;
-CPlayScene* bbscence;
+CPlayScene* bbscene;
 void CBreakableBrick::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
 	CGameObject::Update(dt);
@@ -11,9 +11,9 @@ void CBreakableBrick::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		return;
 	float mLeft, mTop, mRight, mBottom;
 	float oLeft, oTop, oRight, oBottom;
-	bbscence = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
-	if (bbscence != NULL)
-		bbmario = ((CPlayScene*)bbscence)->GetPlayer();
+	bbscene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
+	if (bbscene != NULL)
+		bbmario = ((CPlayScene*)bbscene)->GetPlayer();
 	if (bbmario != NULL)
 	{
 		bbmario->GetBoundingBox(mLeft, mTop, mRight, mBottom);
@@ -50,10 +50,10 @@ void CBreakableBrick::Break()
 	downright->SetPosition(x + PIECE_BBOX_WIDTH, y + PIECE_BBOX_HEIGHT);
 	downright->SetAnimationSet(tmp_ani_set);
 
-	bbscence->PushBack(upleft);
-	bbscence->PushBack(upright);
-	bbscence->PushBack(downleft);
-	bbscence->PushBack(downright);
+	bbscene->PushBack(upleft);
+	bbscene->PushBack(upright);
+	bbscene->PushBack(downleft);
+	bbscene->PushBack(downright);
 
 	isDestroyed = true;
 }

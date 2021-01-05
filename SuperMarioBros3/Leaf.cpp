@@ -1,7 +1,7 @@
 #include "Leaf.h"
 #include "Utils.h"
 #include "Mario.h"
-#include "PlayScence.h"
+#include "PlayScene.h"
 #include "Map.h"
 
 void CLeaf::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
@@ -16,9 +16,9 @@ void CLeaf::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		float mLeft, mTop, mRight, mBottom;
 		CMap* lmap = NULL;
 		CMario* lmario = {};
-		CPlayScene* lscence = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
-		if (lscence != NULL)
-			lmario = ((CPlayScene*)lscence)->GetPlayer();
+		CPlayScene* lscene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
+		if (lscene != NULL)
+			lmario = ((CPlayScene*)lscene)->GetPlayer();
 		if (lmario != NULL)
 		{
 			lmario->GetBoundingBox(mLeft, mTop, mRight, mBottom);
@@ -27,7 +27,7 @@ void CLeaf::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				lmario->SetLevel(MARIO_LEVEL_TAIL);
 				isAppear = false;
 				isDestroyed = true;
-				lmario->AddScore(1000);
+				lmario->AddScore(x, y,1000);
 			}
 
 		}
@@ -37,7 +37,7 @@ void CLeaf::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			vx = -vx;
 			start_timing = GetTickCount64();
 		}
-		if (y >= lscence->GetMap()->GetMapHeight())
+		if (y >= lscene->GetMap()->GetMapHeight())
 		{
 			isAppear = false;
 			isDestroyed = true;

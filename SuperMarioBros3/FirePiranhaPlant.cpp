@@ -3,8 +3,8 @@
 #include "Utils.h"
 #include "PlantBullet.h"
 #include "Mario.h"
-#include "PlayScence.h"
-#include "Scence.h"
+#include "PlayScene.h"
+#include "Scene.h"
 CFirePiranhaPlant::CFirePiranhaPlant(int tag)
 {
 	this->tag = tag;
@@ -29,12 +29,12 @@ void CFirePiranhaPlant::GetDirect() {
 };
 void CFirePiranhaPlant::Shoot()
 {
-	CPlayScene* scence = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
+	CPlayScene* scene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
 	CAnimationSets* animation_sets = CAnimationSets::GetInstance();
 	LPANIMATION_SET tmp_ani_set = animation_sets->Get(BULLET_ANI_SET_ID);
 	CPlantBullet* bullet = new CPlantBullet(x,y,Up,Right);
 	bullet->SetAnimationSet(tmp_ani_set);
-	scence->PushBack(bullet);
+	scene->PushBack(bullet);
 }
 void CFirePiranhaPlant::Update(DWORD dt,
 	vector<LPGAMEOBJECT>* coObjects)

@@ -4,7 +4,8 @@
 
 #include "Mario.h"
 #include "Game.h"
-
+#include "PlayScene.h"
+#include "Score.h"
 #include "Goomba.h"
 #include "Brick.h"
 #include "Block.h"
@@ -51,8 +52,8 @@ void CMario::CalcPotentialCollisions(
 		if (dynamic_cast<CCoin*>(object) || dynamic_cast<CLeaf*>(object) 
 			|| dynamic_cast<CMushRoom*>(object) || dynamic_cast<CPiece*>(object)
 			|| dynamic_cast<CFireBullet*>(object) || dynamic_cast<CPlantBullet*>(object)
-			|| ((dynamic_cast<CPiranhaPlant*>(object) || dynamic_cast<CFirePiranhaPlant*>(object)) 
-				&& object->state == PIRANHAPLANT_STATE_INACTIVE))
+			|| ((dynamic_cast<CPiranhaPlant*>(object) || dynamic_cast<CFirePiranhaPlant*>(object))&& object->state == PIRANHAPLANT_STATE_INACTIVE)
+			|| dynamic_cast<CScore*>(object))
 			continue;
 		else
 		{
@@ -269,7 +270,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 					// jump on top >> kill Goomba and deflect a bit 
 					if (e->ny < 0)
 					{
-						AddScore();
+						AddScore(goomba->x, goomba->y, 100, true);
 						if (goomba->GetState() != GOOMBA_STATE_DIE)
 						{
 							if (goomba->tag != GOOMBA_RED)
@@ -290,7 +291,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 					{
 						if (isTurningTail)
 						{
-							AddScore();
+							AddScore(goomba->x, goomba->y,100,true);
 							goomba->SetDirection(nx);
 							goomba->SetState(GOOMBA_STATE_DIE_BY_TAIL);
 						}
@@ -316,7 +317,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 				CKoopas* koopas = dynamic_cast<CKoopas*>(e->obj);
 				if (e->ny < 0)
 				{
-					AddScore();
+					AddScore(koopas->x, koopas->y, 100, true);
 					vy = -1.5f * MARIO_JUMP_DEFLECT_SPEED;
 					if (koopas->GetState() != KOOPAS_STATE_IN_SHELL && koopas->GetState() != KOOPAS_STATE_SHELL_UP)
 						koopas->SetState(KOOPAS_STATE_IN_SHELL);
@@ -356,7 +357,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 				if (isTurningTail && e->nx != 0)
 				{
 					e->obj->SetState(PIRANHAPLANT_STATE_DEATH);
-					AddScore();
+					AddScore(e->obj->x, e->obj->y, 100, true);
 				}
 				else
 				{
@@ -966,5 +967,25 @@ void CMario::SetLevel(int l)
 		}
 		StartTransforming();
 	}
+}
+void CMario::AddScore(int ox, int oy, int s, bool isEnemy)
+{
+	if (isEnemy)
+	{
+		if (GetTickCount64() - last_kill <= MARIO_KILLSTREAK_TIME)
+		{
+			kill_streak++;
+			if (kill_streak > 3)
+				kill_streak = 3;
+		}
+		else
+			kill_streak = 0;
+		last_kill = GetTickCount64();
+	}
+	s = pow(2, kill_streak) * s;
+	this->score += s;
+	CScore* cscore = new CScore(s);
+	cscore->SetPosition(ox, oy);
+	((CPlayScene*)CGame::GetInstance()->GetCurrentScene())->PushBack(cscore);
 }
 

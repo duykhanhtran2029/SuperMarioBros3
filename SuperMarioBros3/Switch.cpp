@@ -1,7 +1,7 @@
 #include "Switch.h"
 #include "BreakableBrick.h"
 #include "Mario.h"
-#include "PlayScence.h"
+#include "PlayScene.h"
 
 void CSwitch::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
@@ -55,8 +55,8 @@ void CSwitch::SetState(int state)
 	case SWITCH_STATE_PRESSED:
 		//add handle later
 		y += SWITCH_BBOX_HEIGHT - SWITCH_BBOX_PRESSED_HEIGHT;
-		CPlayScene* swscence = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
-		vector<LPGAMEOBJECT> objs = swscence->GetObjects();
+		CPlayScene* swscene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
+		vector<LPGAMEOBJECT> objs = swscene->GetObjects();
 		for (UINT i = 0; i < objs.size(); i++)
 		{
 			if (dynamic_cast<CBreakableBrick*>(objs[i]) && !objs[i]->isDestroyed)
@@ -69,7 +69,7 @@ void CSwitch::SetState(int state)
 
 				item->SetAnimationSet(tmp_ani_set);
 				item->SetPosition(objs[i]->x, objs[i]->y);
-				swscence->PushBack(item);
+				swscene->PushBack(item);
 			}
 		}
 		break;

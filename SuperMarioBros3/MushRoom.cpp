@@ -2,7 +2,7 @@
 #include "Utils.h"
 #include "Mario.h"
 #include "Block.h"
-#include "PlayScence.h"
+#include "PlayScene.h"
 
 
 void CMushRoom::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
@@ -15,9 +15,9 @@ void CMushRoom::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		float mLeft, mTop, mRight, mBottom;
 		float oLeft, oTop, oRight, oBottom;
 		CMario* mmario = {};
-		CPlayScene* mscence = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
-		if(mscence != NULL)
-			mmario = ((CPlayScene*)mscence)->GetPlayer();
+		CPlayScene* mscene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
+		if(mscene != NULL)
+			mmario = ((CPlayScene*)mscene)->GetPlayer();
 		if (mmario != NULL)
 		{
 			mmario->GetBoundingBox(mLeft, mTop, mRight, mBottom);
@@ -28,10 +28,13 @@ void CMushRoom::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				if (tag == MUSHROOM_TYPE_GREEN)
 				{
 					mmario->AddLife();
+					mmario->AddScore(x, y,1);
 				}
+				else
+					mmario->AddScore(x, y,1000);
 				isAppear = false;
 				isDestroyed = true;
-				mmario->AddScore(1000);
+				
 				//x = y = -50;
 			}
 			else
@@ -152,7 +155,7 @@ void CMushRoom::SetState(int state)
 {
 	CGameObject::SetState(state);
 	CMario* mmario;
-	CPlayScene* mscence;
+	CPlayScene* mscene;
 	switch (state)
 	{
 	case MUSHROOM_STATE_IDLE:
@@ -163,8 +166,8 @@ void CMushRoom::SetState(int state)
 		start_y = y;
 		break;
 	case MUSHROOM_STATE_WALK:
-		mscence = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
-		mmario = ((CPlayScene*)mscence)->GetPlayer();
+		mscene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
+		mmario = ((CPlayScene*)mscene)->GetPlayer();
 		vy = MUSHROOM_GRAVITY;
 		vx = mmario->nx* MUSHROOM_SPEED;
 		break;

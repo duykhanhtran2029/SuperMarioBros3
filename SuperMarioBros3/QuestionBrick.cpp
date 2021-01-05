@@ -1,10 +1,10 @@
 #include "QuestionBrick.h"
-#include "PlayScence.h"
+#include "PlayScene.h"
 #include "MushRoom.h"
 #include "Switch.h"
 #include "Leaf.h"
 CMario* qbmario;
-CPlayScene* qbscence;
+CPlayScene* qbscene;
 CQuestionBrick::CQuestionBrick(int tag, int type)
 {
 	state = QUESTIONBRICK_STATE_IDLE;
@@ -18,9 +18,9 @@ void CQuestionBrick::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	{
 		float mLeft, mTop, mRight, mBottom;
 		float oLeft, oTop, oRight, oBottom;
-		qbscence = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
-		if (qbscence != NULL)
-			qbmario = ((CPlayScene*)qbscence)->GetPlayer();
+		qbscene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
+		if (qbscene != NULL)
+			qbmario = ((CPlayScene*)qbscene)->GetPlayer();
 		if (qbmario != NULL)
 		{
 			qbmario->GetBoundingBox(mLeft, mTop, mRight, mBottom);
@@ -102,8 +102,8 @@ void CQuestionBrick::SetState(int state = BRICK_STATE_IDLE)
 			}
 			if (tag == ITEM_CUSTOM)
 			{
-				qbscence = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
-				qbmario = ((CPlayScene*)qbscence)->GetPlayer();
+				qbscene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
+				qbmario = ((CPlayScene*)qbscene)->GetPlayer();
 				if (qbmario->level == MARIO_LEVEL_SMALL)
 				{
 					CreateItem(ITEM_MUSHROOM_RED);
@@ -171,8 +171,8 @@ void CQuestionBrick::CreateItem(int itemtype)
 		item->SetAnimationSet(tmp_ani_set);
 		item->SetPosition(-50, 100);
 
-		qbscence = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
-		qbscence->PushBack(item);
+		qbscene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
+		qbscene->PushBack(item);
 	}
 	if (itemtype == ITEM_LEAF)
 	{
@@ -184,8 +184,8 @@ void CQuestionBrick::CreateItem(int itemtype)
 		item->SetAnimationSet(tmp_ani_set);
 		item->SetPosition(-50, 100);
 
-		qbscence = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
-		qbscence->PushBack(item);
+		qbscene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
+		qbscene->PushBack(item);
 	}
 	if (itemtype == ITEM_MUSHROOM_RED || itemtype == ITEM_MUSHROOM_GREEN)
 	{
@@ -197,8 +197,8 @@ void CQuestionBrick::CreateItem(int itemtype)
 		item->SetAnimationSet(tmp_ani_set);
 		item->SetPosition(-50, 100);
 
-		qbscence = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
-		qbscence->PushBack(item);
+		qbscene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
+		qbscene->PushBack(item);
 	}
 	if (itemtype == ITEM_SWITCH)
 	{
@@ -210,7 +210,7 @@ void CQuestionBrick::CreateItem(int itemtype)
 		item->SetAnimationSet(tmp_ani_set);
 		item->SetPosition(-50, 100);
 
-		qbscence = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
-		qbscence->PushBack(item);
+		qbscene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
+		qbscene->PushBack(item);
 	}
 }

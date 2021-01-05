@@ -1,7 +1,7 @@
 #pragma once
 #include "Game.h"
 #include "Textures.h"
-#include "Scence.h"
+#include "Scene.h"
 #include "GameObject.h"
 #include "Brick.h"
 #include "Mario.h"
@@ -41,14 +41,14 @@ public:
 	CMario* GetPlayer() { return player; }
 	CMap* GetMap() { return current_map; }
 	CFont* GetFont() { return fonts; }
-	//friend class CPlayScenceKeyHandler;
+	//friend class CPlaySceneKeyHandler;
 };
 
-class CPlayScenceKeyHandler : public CScenceKeyHandler
+class CPlaySceneKeyHandler : public CSceneKeyHandler
 {
 public:
 	virtual void KeyState(BYTE* states);
 	virtual void OnKeyDown(int KeyCode);
 	virtual void OnKeyUp(int KeyCode);
-	CPlayScenceKeyHandler(CScene* s) :CScenceKeyHandler(s) {};
+	CPlaySceneKeyHandler(CScene* s) :CSceneKeyHandler(s) {};
 };

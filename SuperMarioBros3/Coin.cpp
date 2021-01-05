@@ -1,6 +1,6 @@
 #include "Coin.h"
 #include "Utils.h"
-#include "PlayScence.h"
+#include "PlayScene.h"
 #include "BreakableBrick.h"
 
 CCoin::CCoin(int tag) : CGameObject() {
@@ -20,9 +20,9 @@ void CCoin::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	CGameObject::Update(dt);
 	y += dy;
 	CMario* coinmario = {};
-	CPlayScene* coinscence = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
-	if (coinscence != NULL)
-		coinmario = ((CPlayScene*)coinscence)->GetPlayer();
+	CPlayScene* coinscene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
+	if (coinscene != NULL)
+		coinmario = ((CPlayScene*)coinscene)->GetPlayer();
 	if (state == COIN_STATE_IDLE)
 	{
 		float mLeft, mTop, mRight, mBottom;
@@ -33,7 +33,7 @@ void CCoin::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			{
 				isAppear = false;
 				isDestroyed = true;
-				coinmario->AddScore(); 
+				coinmario->AddScore(x,y); 
 				coinmario->AddMoney();
 			}
 
@@ -48,7 +48,7 @@ void CCoin::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 
 				item->SetAnimationSet(tmp_ani_set);
 				item->SetPosition(x, y);
-				coinscence->PushBack(item);
+				coinscene->PushBack(item);
 				isDestroyed = true;
 			}
 		}
@@ -68,7 +68,7 @@ void CCoin::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			isAppear = false;
 			SetState(COIN_STATE_IDLE);
 			isDestroyed = true;
-			coinmario->AddScore();
+			coinmario->AddScore(x,y);
 			coinmario->AddMoney();
 		}
 	}

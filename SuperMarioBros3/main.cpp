@@ -5,7 +5,7 @@
 
 	This sample illustrates how to:
 
-		1/ Implement a scence manager 
+		1/ Implement a scene manager 
 		2/ Load scene from "database", add/edit/remove scene without changing code 
 		3/ Dynamically move between scenes without hardcode logic 
 		
@@ -24,7 +24,7 @@
 #include "Brick.h"
 #include "Goomba.h"
 
-#include "PlayScence.h"
+#include "PlayScene.h"
 
 CGame *game;
 

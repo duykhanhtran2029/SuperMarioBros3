@@ -10,7 +10,7 @@
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
 
-#include "Scence.h"
+#include "Scene.h"
 
 using namespace std;
 

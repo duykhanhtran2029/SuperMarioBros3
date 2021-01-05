@@ -1,6 +1,6 @@
 #include "PlantBullet.h"
 #include "Mario.h"
-#include "PlayScence.h"
+#include "PlayScene.h"
 #include "Map.h"
 CPlantBullet::CPlantBullet(float bx, float by, bool Up, bool Right)
 {

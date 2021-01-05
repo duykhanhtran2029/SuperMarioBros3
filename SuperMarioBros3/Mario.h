@@ -3,6 +3,7 @@
 #include "FireBullet.h"
 #include "Utils.h"
 
+
 #define MARIO_WALKING_SPEED_START	0.001f 
 #define MARIO_WALKING_SPEED_MAX		0.15f
 #define MARIO_RUNNING_SPEED_MAX		0.20f
@@ -32,6 +33,7 @@
 #define MARIO_RELOAD_BULLET_TIME	500
 #define MARIO_TAIL_FLYING_TIME		500
 #define MARIO_TRANSFORMING_TIME		500
+#define MARIO_KILLSTREAK_TIME		1000
 
 #define MARIO_RUNNING_STACKS		7
 #define MARIO_WALKING_FAST_STACKS	4
@@ -260,11 +262,12 @@ class CMario : public CGameObject
 	DWORD running_stop;
 	DWORD tailflying_start;
 	DWORD transforming_start;
+	DWORD last_kill = 0;
 
 	float start_x;			// initial position of Mario at scene
 	float start_y;
 	int iBullet = 0;
-	
+	int kill_streak = 0;
 public:
 	int RunningStacks = 0;
 	int money = 0;
@@ -419,7 +422,7 @@ public:
 			SetLevel(MARIO_LEVEL_SMALL);	
 		StartUntouchable();
 	}
-	void AddScore(int s = 100) { this->score += s; }
 	void AddLife(int l = 1) { this->life += l; }
 	void AddMoney(int m = 1) { this->money += m; }
+	void AddScore(int ox, int oy, int s = 100, bool isEnemy = false);
 };

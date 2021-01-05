@@ -1,14 +1,14 @@
 ﻿#include "HUD.h"
 #include"Game.h"
 #include"Textures.h"
-#include"PlayScence.h"
+#include"PlayScene.h"
 HUD::HUD()
 {
 	CGame* game = CGame::GetInstance();
 	CSprites* sprite = CSprites::GetInstance();
-	CPlayScene* scence = (CPlayScene*)game->GetCurrentScene();
+	CPlayScene* scene = (CPlayScene*)game->GetCurrentScene();
 	PSprite = sprite->sprites[SPRIT_P_ID];
-	mario = scence->GetPlayer();
+	mario = scene->GetPlayer();
 	if(mario->tag == MARIO)
 		playerSprite = CSprites::GetInstance()->sprites[SPRIT_ICONMARIO_ID];
 	else
@@ -20,8 +20,8 @@ HUD::HUD()
 void HUD::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
 	CGame* game = CGame::GetInstance();
-	CPlayScene* scence = (CPlayScene*)game->GetCurrentScene();
-	CFont* fonts = scence->GetFont();
+	CPlayScene* scene = (CPlayScene*)game->GetCurrentScene();
+	CFont* fonts = scene->GetFont();
 
 	nlife = mario->life;
 	runningStacks = mario->RunningStacks;

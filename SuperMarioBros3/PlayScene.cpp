@@ -1,7 +1,7 @@
 #include <iostream>
 #include <fstream>
 
-#include "PlayScence.h"
+#include "PlayScene.h"
 #include "Utils.h"
 #include "Textures.h"
 #include "Sprites.h"
@@ -20,7 +20,7 @@ using namespace std;
 CPlayScene::CPlayScene(int id, LPCWSTR filePath) :
 	CScene(id, filePath)
 {
-	key_handler = new CPlayScenceKeyHandler(this);
+	key_handler = new CPlaySceneKeyHandler(this);
 }
 
 /*
@@ -399,11 +399,11 @@ void CPlayScene::Unload()
 
 	DebugOut(L"[INFO] Scene %s unloaded! \n", sceneFilePath);
 }
-void CPlayScenceKeyHandler::OnKeyDown(int KeyCode)
+void CPlaySceneKeyHandler::OnKeyDown(int KeyCode)
 {
 	//DebugOut(L"[INFO] KeyDown: %d\n", KeyCode);
 
-	CMario* mario = ((CPlayScene*)scence)->GetPlayer();
+	CMario* mario = ((CPlayScene*)scene)->GetPlayer();
 	switch (KeyCode)
 	{
 	case DIK_1:
@@ -446,9 +446,9 @@ void CPlayScenceKeyHandler::OnKeyDown(int KeyCode)
 		break;
 	}
 }
-void CPlayScenceKeyHandler::OnKeyUp(int KeyCode)
+void CPlaySceneKeyHandler::OnKeyUp(int KeyCode)
 {
-	CMario* mario = ((CPlayScene*)scence)->GetPlayer();
+	CMario* mario = ((CPlayScene*)scene)->GetPlayer();
 	switch (KeyCode)
 	{
 	case DIK_S:
@@ -472,10 +472,10 @@ void CPlayScenceKeyHandler::OnKeyUp(int KeyCode)
 		break;
 	}
 }
-void CPlayScenceKeyHandler::KeyState(BYTE* states)
+void CPlaySceneKeyHandler::KeyState(BYTE* states)
 {
 	CGame* game = CGame::GetInstance();
-	CMario* mario = ((CPlayScene*)scence)->GetPlayer();
+	CMario* mario = ((CPlayScene*)scene)->GetPlayer();
 
 	// disable control key when Mario die 
 	if (mario->GetState() == MARIO_STATE_DIE) return;
