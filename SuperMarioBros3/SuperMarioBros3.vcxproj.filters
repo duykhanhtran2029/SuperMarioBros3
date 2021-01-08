@@ -80,14 +80,26 @@
     <ClCompile Include="Font.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Scene.cpp">
+    <ClCompile Include="Score.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PlayScene.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Score.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="Scene.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="BackUp.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="WorldMapObject.cpp">
+      <Filter>Map Objects\WorldMap</Filter>
+    </ClCompile>
+    <ClCompile Include="WorldScene.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="WorldPlayer.cpp">
+      <Filter>Map Objects\WorldMap</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -101,9 +113,6 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="GameObject.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="KeyEventHandler.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="Sprites.h">
@@ -175,14 +184,29 @@
     <ClInclude Include="Font.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="PlayScene.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Scene.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="Score.h">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayScene.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="KeyEventHandler.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="BackUp.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="WorldMapObject.h">
+      <Filter>Map Objects\WorldMap</Filter>
+    </ClInclude>
+    <ClInclude Include="WorldScene.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="WorldPlayer.h">
+      <Filter>Map Objects\WorldMap</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -212,6 +236,12 @@
     </Filter>
     <Filter Include="Map Objects\Items">
       <UniqueIdentifier>{d7e6b4dc-fb51-42c5-8123-44b390902290}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene">
+      <UniqueIdentifier>{5837106f-aa76-40bd-8b6e-07ecf45276bd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Map Objects\WorldMap">
+      <UniqueIdentifier>{991fe34a-27d9-49b4-860f-723a066036f5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

@@ -8,7 +8,6 @@
 #include "Goomba.h"
 #include "Koopas.h"
 #include "Map.h"
-#include "Font.h"
 #include "HUD.h"
 
 class CPlayScene : public CScene
@@ -16,7 +15,6 @@ class CPlayScene : public CScene
 protected:
 	CMario* player = NULL;					// A play scene has to have player, right? 
 	CMap* current_map = NULL;
-	CFont* fonts = NULL;
 	HUD* hud = NULL;
 	vector<LPGAMEOBJECT> objects;
 
@@ -40,7 +38,17 @@ public:
 
 	CMario* GetPlayer() { return player; }
 	CMap* GetMap() { return current_map; }
-	CFont* GetFont() { return fonts; }
+	HUD* GetHUD() { return hud; }
+	void SetPlayer(CMario* m) { player = m; }
+	void PutPlayer(CMario* m)
+	{
+		if (dynamic_cast<CMario*> (objects[0]))
+		{
+			//CMario* temp = (CMario*)objects[0];
+			objects[0] = m;
+			//delete temp;
+		}
+	}
 	//friend class CPlaySceneKeyHandler;
 };
 

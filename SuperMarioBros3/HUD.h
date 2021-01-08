@@ -13,6 +13,9 @@
 #define SPRIT_FILLARROW_ID					50005
 #define SPRIT_P_ID							50006
 
+#define PLAYSCENE_HUD	0
+#define WORLDSCENE_HUD	1
+
 class HUD: public CGameObject
 {
 	CMario* mario = NULL;
@@ -40,10 +43,33 @@ class HUD: public CGameObject
 	int idTakenCard;
 	int isGameDone = false;
 	vector<int> cards;
+
+	int type_hud;
 public:
-	HUD();
+	HUD(int type_hud = 0);
+	void SetHUD(HUD* hud);
 	virtual void Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects = NULL);
 	virtual void Render();
 	virtual void GetBoundingBox(float& left, float& top, float& right, float& bottom) {};
+	void Clear(){
+		for (size_t i = 0; i < cardSprite.size(); i++)
+			delete cardSprite[i];
+		cardSprite.clear();
+		for (size_t i = 0; i < lifeSprite.size(); i++)
+			delete lifeSprite[i];
+		lifeSprite.clear();
+		for (size_t i = 0; i < moneySprite.size(); i++)
+			delete moneySprite[i];
+		moneySprite.clear();
+		for (size_t i = 0; i < scoreSprite.size(); i++)
+			delete scoreSprite[i];
+		scoreSprite.clear();
+		for (size_t i = 0; i < remainTimeSprites.size(); i++)
+			delete remainTimeSprites[i];
+		remainTimeSprites.clear();
+		for (size_t i = 0; i < powerMelterSprite.size(); i++)
+			delete powerMelterSprite[i];
+		powerMelterSprite.clear();
+	}
 };
 

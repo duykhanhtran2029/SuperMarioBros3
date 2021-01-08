@@ -122,6 +122,28 @@ void CMario::TimingFlag()
 			y += (MARIO_BIG_BBOX_HEIGHT - MARIO_SMALL_BBOX_HEIGHT - 1);
 		isTransforming = false;
 	}
+	if (GetTickCount64() - pipedown_start > MARIO_PIPE_TIME && pipedown_start > 0)
+	{
+		pipedown_start = 0;
+		lostControl = false;
+		if(!isInPipe)
+			CGame::GetInstance()->SwitchExtraScene(portal->GetSceneId(), portal->start_x, portal->start_y);
+		else
+		{
+			lostControl = false;
+		}
+	}
+	if (GetTickCount64() - pipeup_start > MARIO_PIPE_TIME && pipeup_start > 0)
+	{
+		pipeup_start = 0;
+		lostControl = false;
+		if(!isInPipe)
+			CGame::GetInstance()->SwitchBackScene(portal->GetSceneId(), portal->start_x, portal->start_y);
+		else
+		{
+			lostControl = false;
+		}
+	}
 }
 void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 {
@@ -161,15 +183,15 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 					vx = nx * MARIO_SPEED_MAX;
 	}
 
-	//if (vy <= -MARIO_JUMP_SPEED_MAX )
-	//{
-	//	vy = -MARIO_JUMP_SPEED_MAX;
-	//	if (level == MARIO_LEVEL_TAIL && isTailFlying)
-	//		ay = -MARIO_GRAVITY;
-	//	else
-	//		ay = MARIO_GRAVITY;
-	//	isReadyToJump = false;
-	//}
+	if (vy <= -MARIO_JUMP_SPEED_MAX && !lostControl)
+	{
+		vy = -MARIO_JUMP_SPEED_MAX;
+		if (level == MARIO_LEVEL_TAIL && isTailFlying)
+			ay = -MARIO_GRAVITY;
+		else
+			ay = MARIO_GRAVITY;
+		isReadyToJump = false;
+	}
 	TimingFlag();
 
 	if (state == MARIO_STATE_SITTING) {
@@ -191,92 +213,94 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 		CalcPotentialCollisions(coObjects, coEvents);
 
 	// No collision occured, proceed normally
-	if (coEvents.size()==0)
-	{	
-		if (x + dx >= ((CPlayScene*)game->GetCurrentScene())->GetMap()->GetMapWidth() - 16)//Right edge
-			x = ((CPlayScene*)game->GetCurrentScene())->GetMap()->GetMapWidth() - 16;
-		else if (x + dx <= 0)//Left edge
-			x = 0;
-		else
-			x += dx;
-		y += dy;
-	}
-	else
+	if (!lostControl)
 	{
-		float min_tx, min_ty;
-		int nx = 0, ny = 0;
-		float rdx = 0; 
-		float rdy = 0;
-		
-		// TODO: This is a very ugly designed function!!!!
-		FilterCollision(coEvents, coEventsResult, min_tx, min_ty, nx, ny, rdx, rdy);
-
-		// how to push back Mario if collides with a moving objects, what if Mario is pushed this way into another object?
-		//if (rdx != 0 && rdx!=dx)
-		//	x += nx*abs(rdx); 
-		float x0 = x, y0 = y;
-		x = x0 + min_tx * dx + nx * 0.4f;
-		y = y0 + min_ty * dy + ny * 0.4f;
-		//
-		// Collision logic with other objects
-		//
-		float oLeft, oTop, oRight, oBottom;
-		float mLeft, mTop, mRight, mBottom;
-		for (UINT i = 0; i < coEventsResult.size(); i++)
+		if (coEvents.size() == 0)
 		{
-			LPCOLLISIONEVENT e = coEventsResult[i];
-			if (e->obj != NULL)
-				if (e->obj->isDestroyed == true)
-				{
-					x = x0 + dx;
-					y = y0 + dy;					
-					continue;
-				}
-			if (e->ny != 0 && !(dynamic_cast<CBlock*>(e->obj) && ny >= 0))
+			if (x + dx >= ((CPlayScene*)game->GetCurrentScene())->GetMap()->GetMapWidth() - 16)//Right edge
+				x = ((CPlayScene*)game->GetCurrentScene())->GetMap()->GetMapWidth() - 16;
+			else if (x + dx <= 0)//Left edge
+				x = 0;
+			else
+				x += dx;
+			y += dy;
+		}
+		else
+		{
+			float min_tx, min_ty;
+			int nx = 0, ny = 0;
+			float rdx = 0;
+			float rdy = 0;
+
+			// TODO: This is a very ugly designed function!!!!
+			FilterCollision(coEvents, coEventsResult, min_tx, min_ty, nx, ny, rdx, rdy);
+
+			// how to push back Mario if collides with a moving objects, what if Mario is pushed this way into another object?
+			//if (rdx != 0 && rdx!=dx)
+			//	x += nx*abs(rdx); 
+			float x0 = x, y0 = y;
+			x = x0 + min_tx * dx + nx * 0.4f;
+			y = y0 + min_ty * dy + ny * 0.4f;
+			//
+			// Collision logic with other objects
+			//
+			float oLeft, oTop, oRight, oBottom;
+			float mLeft, mTop, mRight, mBottom;
+			for (UINT i = 0; i < coEventsResult.size(); i++)
 			{
-				isOnGround = true;
-				isJumping = false;
-				isChangeDirection = false;
-				isReadyToSit = true;
-				isFlying = false;
-				vy = 0;
-			}
-			GetBoundingBox(mLeft, mTop, mRight, mBottom);
-			e->obj->GetBoundingBox(oLeft, oTop, oRight, oBottom);
-			if (dynamic_cast<CSwitch*>(e->obj))
-			{
-				CSwitch* sw = dynamic_cast<CSwitch*>(e->obj);
-				if (e->ny > 0)
+				LPCOLLISIONEVENT e = coEventsResult[i];
+				if (e->obj != NULL)
+					if (e->obj->isDestroyed == true)
+					{
+						x = x0 + dx;
+						y = y0 + dy;
+						continue;
+					}
+				if (e->ny != 0 && !(dynamic_cast<CBlock*>(e->obj) && ny >= 0))
 				{
-					//vy = -MARIO_JUMP_SPEED_MAX;
-					ay = MARIO_GRAVITY;
-					isReadyToJump = false;
-				}
-				else if (e->ny < 0)
-				{
+					isOnGround = true;
+					isJumping = false;
+					isChangeDirection = false;
+					isReadyToSit = true;
+					isFlying = false;
 					vy = 0;
-					if(sw->state != SWITCH_STATE_PRESSED)
-						sw->SetState(SWITCH_STATE_PRESSED);
 				}
-				if (e->nx != 0)
+				GetBoundingBox(mLeft, mTop, mRight, mBottom);
+				e->obj->GetBoundingBox(oLeft, oTop, oRight, oBottom);
+				if (dynamic_cast<CSwitch*>(e->obj))
 				{
-					if (ceil(mBottom) != oTop)
-						vx = 0;
+					CSwitch* sw = dynamic_cast<CSwitch*>(e->obj);
+					if (e->ny > 0)
+					{
+						//vy = -MARIO_JUMP_SPEED_MAX;
+						ay = MARIO_GRAVITY;
+						isReadyToJump = false;
+					}
+					else if (e->ny < 0)
+					{
+						vy = 0;
+						if (sw->state != SWITCH_STATE_PRESSED)
+							sw->SetState(SWITCH_STATE_PRESSED);
+					}
+					if (e->nx != 0)
+					{
+						if (ceil(mBottom) != oTop)
+							vx = 0;
+					}
 				}
-			}
-			if (dynamic_cast<CGoomba*>(e->obj)) // if e->obj is Goomba 
-			{
-				CGoomba* goomba = dynamic_cast<CGoomba*>(e->obj);
+				if (dynamic_cast<CGoomba*>(e->obj)) // if e->obj is Goomba 
+				{
+					CGoomba* goomba = dynamic_cast<CGoomba*>(e->obj);
 					// jump on top >> kill Goomba and deflect a bit 
 					if (e->ny < 0)
 					{
-						AddScore(goomba->x, goomba->y, 100, true);
 						if (goomba->GetState() != GOOMBA_STATE_DIE)
 						{
+							AddScore(goomba->x, goomba->y, 100, true);
 							if (goomba->tag != GOOMBA_RED)
 							{
 								goomba->SetState(GOOMBA_STATE_DIE);
-									vy = -MARIO_JUMP_DEFLECT_SPEED;
+								vy = -MARIO_JUMP_DEFLECT_SPEED;
 							}
 							else
 							{
@@ -291,9 +315,12 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 					{
 						if (isTurningTail)
 						{
-							AddScore(goomba->x, goomba->y,100,true);
-							goomba->SetDirection(nx);
-							goomba->SetState(GOOMBA_STATE_DIE_BY_TAIL);
+							if (goomba->GetState() != GOOMBA_STATE_DIE)
+							{
+								AddScore(goomba->x, goomba->y, 100, true);
+								goomba->SetDirection(nx);
+								goomba->SetState(GOOMBA_STATE_DIE_BY_TAIL);
+							}
 						}
 						else if (untouchable == 0)
 						{
@@ -310,130 +337,159 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 							y = y0;
 						}
 					}
-			}
-			if (dynamic_cast<CKoopas*>(e->obj)) // if e->obj is Koopas 
-			{
-				//DebugOut(L"nx: %f\n", e->nx);
-				CKoopas* koopas = dynamic_cast<CKoopas*>(e->obj);
-				if (e->ny < 0)
-				{
-					AddScore(koopas->x, koopas->y, 100, true);
-					vy = -1.5f * MARIO_JUMP_DEFLECT_SPEED;
-					if (koopas->GetState() != KOOPAS_STATE_IN_SHELL && koopas->GetState() != KOOPAS_STATE_SHELL_UP)
-						koopas->SetState(KOOPAS_STATE_IN_SHELL);
-					else
-						koopas->SetState(KOOPAS_STATE_SPINNING);
 				}
-				else if (e->nx != 0 || e-> ny > 0)
+				if (dynamic_cast<CKoopas*>(e->obj)) // if e->obj is Koopas 
 				{
-					if (isTurningTail)
-						koopas->SetState(KOOPAS_STATE_SHELL_UP);
-					else if (koopas->GetState() == KOOPAS_STATE_IN_SHELL || koopas->GetState() == KOOPAS_STATE_SHELL_UP)
+					//DebugOut(L"nx: %f\n", e->nx);
+					CKoopas* koopas = dynamic_cast<CKoopas*>(e->obj);
+					if (e->ny < 0)
 					{
-						if (isReadyToHold)
-						{
-							koopas->SetIsBeingHeld(true);
-							isHolding = true;
-						}
+						AddScore(koopas->x, koopas->y, 100, true);
+						vy = -1.5f * MARIO_JUMP_DEFLECT_SPEED;
+						if (koopas->GetState() != KOOPAS_STATE_IN_SHELL && koopas->GetState() != KOOPAS_STATE_SHELL_UP)
+							koopas->SetState(KOOPAS_STATE_IN_SHELL);
 						else
-						{
-							StartKicking();
-							koopas->nx = this->nx;
 							koopas->SetState(KOOPAS_STATE_SPINNING);
+					}
+					else if (e->nx != 0 || e->ny > 0)
+					{
+						if (isTurningTail)
+							koopas->SetState(KOOPAS_STATE_SHELL_UP);
+						else if (koopas->GetState() == KOOPAS_STATE_IN_SHELL || koopas->GetState() == KOOPAS_STATE_SHELL_UP)
+						{
+							if (isReadyToHold)
+							{
+								koopas->SetIsBeingHeld(true);
+								isHolding = true;
+							}
+							else
+							{
+								StartKicking();
+								koopas->nx = this->nx;
+								koopas->SetState(KOOPAS_STATE_SPINNING);
+							}
+						}
+						else if (untouchable == 0 && isKicking == false)
+						{
+							if (koopas->GetState() != KOOPAS_STATE_IN_SHELL || koopas->GetState() != KOOPAS_STATE_SHELL_UP)
+								Attacked();
+
+						}
+
+					}
+
+				}
+				if (dynamic_cast<CPiranhaPlant*>(e->obj) || dynamic_cast<CFirePiranhaPlant*>(e->obj))
+				{
+					if (isTurningTail && e->nx != 0)
+					{
+						e->obj->SetState(PIRANHAPLANT_STATE_DEATH);
+						AddScore(e->obj->x, e->obj->y, 100, true);
+					}
+					else
+					{
+						x = x0;
+						y = y0;
+						if (untouchable == 0)
+							Attacked();
+					}
+				}
+				if (dynamic_cast<CBrick*>(e->obj))
+				{
+					CBrick* object = dynamic_cast<CBrick*>(e->obj);
+					//object->SetDebugAlpha(255);
+					if (object->tag == PLATFORM)
+					{
+						if (e->ny != 0)
+						{
+							vy = 0;
+						}
+						if (e->nx != 0)
+						{
+							if (ceil(mBottom) != oTop)
+								vx = 0;
 						}
 					}
-					else if (untouchable == 0 && isKicking == false)
+					else
 					{
-						if (koopas->GetState() != KOOPAS_STATE_IN_SHELL || koopas->GetState() != KOOPAS_STATE_SHELL_UP)
-							Attacked();
-
-					}
-
-				}
-
-			}
-			if (dynamic_cast<CPiranhaPlant*>(e->obj) || dynamic_cast<CFirePiranhaPlant*>(e->obj))
-			{
-				if (isTurningTail && e->nx != 0)
-				{
-					e->obj->SetState(PIRANHAPLANT_STATE_DEATH);
-					AddScore(e->obj->x, e->obj->y, 100, true);
-				}
-				else
-				{
-					x = x0;
-					y = y0;
-					if (untouchable == 0)
-						Attacked();
-				}			
-			}
-			if (dynamic_cast<CBrick*>(e->obj)) 
-			{
-				CBrick* object = dynamic_cast<CBrick*>(e->obj);
-				//object->SetDebugAlpha(255);
-				if (object->tag == PLATFORM)
-				{
-					if (e->ny != 0)
-					{
-						vy = 0;
-					}
-					if (e->nx != 0)
-					{
-						if (ceil(mBottom) != oTop)
-							vx = 0;
+						//if (e->ny > 0) ay = MARIO_GRAVITY;
+						//else if (e->ny < 0)
+						//	vy = -vy;
+						if (e->ny > 0)
+						{
+							//vy = -MARIO_JUMP_SPEED_MAX;
+							ay = MARIO_GRAVITY;
+							isReadyToJump = false;
+						}
+						else if (e->ny < 0)
+							vy = 0;
+						if (e->nx != 0)
+						{
+							if (ceil(mBottom) != oTop)
+								vx = 0;
+						}
 					}
 				}
-				else
+				if (dynamic_cast<CQuestionBrick*>(e->obj))
 				{
-					//if (e->ny > 0) ay = MARIO_GRAVITY;
-					//else if (e->ny < 0)
-					//	vy = -vy;
+					if (e->ny > 0)
+						e->obj->SetState(QUESTIONBRICK_STATE_HIT);
+				}
+				if (dynamic_cast<CBreakableBrick*>(e->obj))
+				{
 					if (e->ny > 0)
 					{
-						//vy = -MARIO_JUMP_SPEED_MAX;
-						ay = MARIO_GRAVITY;
-						isReadyToJump = false;
+						CBreakableBrick* object = dynamic_cast<CBreakableBrick*>(e->obj);
+						object->Break();
 					}
-					else if (e->ny < 0)
+				}
+				if (dynamic_cast<CBlock*>(e->obj))
+				{
+					//DebugOut(L"Tag: %d\n", tag);
+					CBlock* block = dynamic_cast<CBlock*>(e->obj);
+					x = x0 + dx;
+					if (ny < 0)
 						vy = 0;
-					if (e->nx != 0)
+					else
 					{
-						if (ceil(mBottom) != oTop)
-							vx = 0;
+						y = y0 + dy;
 					}
-				}					
-			}
-			if (dynamic_cast<CQuestionBrick*>(e->obj))
-			{
-				if (e->ny > 0)
-					e->obj->SetState(QUESTIONBRICK_STATE_HIT);
-			}
-			if (dynamic_cast<CBreakableBrick*>(e->obj))
-			{
-				if (e->ny > 0)
-				{
-					CBreakableBrick* object = dynamic_cast<CBreakableBrick*>(e->obj);
-					object->Break();
 				}
-			}
-			if (dynamic_cast<CBlock*>(e->obj))
-			{
-				//DebugOut(L"Tag: %d\n", tag);
-				CBlock* block = dynamic_cast<CBlock*>(e->obj);
-				x = x0 + dx;
-				if (ny < 0)
-					vy = 0;
-				else
+				if (dynamic_cast<CPortal*>(e->obj))
 				{
-					y = y0 + dy;
+					if (oLeft <= mLeft && oRight >= mRight)
+					{
+						CPortal* p = dynamic_cast<CPortal*>(e->obj);
+						if (p->tag == TOEXTRASCENE)
+						{
+							portal = p;
+							StartPipeDown();
+							//CGame::GetInstance()->SwitchExtraScene(p->GetSceneId(), p->start_x, p->start_y);
+						}
+						if (p->tag == BACKTOPLAYSCENE)
+						{
+							portal = p;
+							StartPipeUp();
+							//CGame::GetInstance()->SwitchBackScene(p->GetSceneId(), p->start_x, p->start_y);
+						}
+						if (p->tag == TOPLAYSCENE)
+							CGame::GetInstance()->SwitchScene(p->GetSceneId());
+					}
+					else
+					{
+						x = x0 + min_tx * dx + nx * 0.4f;
+						y = y0 + min_ty * dy + ny * 0.4f;
+					}
 				}
-			}
-			if (dynamic_cast<CPortal *>(e->obj))
-			{
-				CPortal *p = dynamic_cast<CPortal *>(e->obj);
-				CGame::GetInstance()->SwitchScene(p->GetSceneId());
 			}
 		}
+	}
+	else
+	{
+		if(pipedown_start > 0)
+			y += MARIO_GRAVITY * dt * 12;
+		else if (pipeup_start > 0)
+			y += -MARIO_GRAVITY * dt * 12;
 	}
 	// clean up collision events
 	for (UINT i = 0; i < coEvents.size(); i++)
@@ -445,7 +501,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 	{
 		isOnGround = false;
 	}
-	//DebugOut(L"dy: %f\ty: %f\n",dy, y);
+	//DebugOut(L"[MARIO] x: %f\ty: %f\n", x, y);
 }
 void CMario::BasicRenderLogicsForAllLevel(int& ani, int ani_jump_down_right, int ani_jump_down_left,
 	int ani_idle_right, int ani_idle_left,
@@ -982,6 +1038,8 @@ void CMario::AddScore(int ox, int oy, int s, bool isEnemy)
 			kill_streak = 0;
 		last_kill = GetTickCount64();
 	}
+	else
+		kill_streak = 0;
 	s = pow(2, kill_streak) * s;
 	this->score += s;
 	CScore* cscore = new CScore(s);

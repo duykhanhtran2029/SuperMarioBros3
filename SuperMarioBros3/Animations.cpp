@@ -13,12 +13,12 @@ void CAnimation::Add(int spriteId, DWORD time)
 
 	if (sprite == NULL)
 	{
-		DebugOut(L"[ERROR] Sprite ID %d cannot be found!\n", spriteId);
+		DebugOut(L"[ERROR] Animation ID %d cannot be found!\n", spriteId);
 	}
 
 	LPANIMATION_FRAME frame = new CAnimationFrame(sprite, t);
 	frames.push_back(frame);
-	//DebugOut(L"[INFO] Sprite ID %d loaded!\n", spriteId);
+	DebugOut(L"[INFO] Animation ID %d added!\n", spriteId);
 }
 
 // NOTE: sometimes Animation object is NULL ??? HOW ??? 
@@ -37,7 +37,8 @@ void CAnimation::Render(float x, float y, int alpha)
 		{
 			currentFrame++;
 			lastFrameTime = now;
-			if (currentFrame == frames.size()) currentFrame = 0;
+			if (currentFrame == frames.size()) 
+				currentFrame = 0;
 		}
 	}
 
@@ -72,7 +73,6 @@ void CAnimations::Clear()
 		LPANIMATION ani = x.second;
 		delete ani;
 	}
-
 	animations.clear();
 }
 
@@ -99,4 +99,5 @@ LPANIMATION_SET CAnimationSets::Get(unsigned int id)
 void CAnimationSets::Add(int id, LPANIMATION_SET ani_set)
 {
 	animation_sets[id] = ani_set;
+	DebugOut(L"[INFO] AnimationSet ID %d added!\n", id);
 }

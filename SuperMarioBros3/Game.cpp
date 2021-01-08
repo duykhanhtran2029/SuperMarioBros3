@@ -5,6 +5,7 @@
 #include "Utils.h"
 
 #include "PlayScene.h"
+#include "WorldScene.h"
 
 CGame * CGame::__instance = NULL;
 
@@ -336,9 +337,18 @@ void CGame::_ParseSection_SCENES(string line)
 	if (tokens.size() < 2) return;
 	int id = atoi(tokens[0].c_str());
 	LPCWSTR path = ToLPCWSTR(tokens[1]);
+	int type = atoi(tokens[2].c_str());
 
-	LPSCENE scene = new CPlayScene(id, path);
-	scenes[id] = scene;
+	if (type == PLAYSCENE)
+	{
+		LPSCENE playscene = new CPlayScene(id, path);
+		scenes[id] = playscene;
+	}
+	if (type == WORLDSCENE)
+	{
+		LPSCENE worldscene = new CWorldScene(id, path);
+		scenes[id] = worldscene;
+	}
 }
 
 /*
@@ -383,15 +393,54 @@ void CGame::Load(LPCWSTR gameFile)
 void CGame::SwitchScene(int scene_id)
 {
 	DebugOut(L"[INFO] Switching to scene %d\n", scene_id);
+	pre_scene = current_scene;
 
 	scenes[current_scene]->Unload();;
 
 	CTextures::GetInstance()->Clear();
 	CSprites::GetInstance()->Clear();
 	CAnimations::GetInstance()->Clear();
+	CAnimationSets::GetInstance()->Clear();
+
+	//delete tmptxt;
+	//delete tmpspt;
+	//delete tmpani; 
 
 	current_scene = scene_id;
 	LPSCENE s = scenes[scene_id];
 	CGame::GetInstance()->SetKeyHandler(s->GetKeyEventHandler());
-	s->Load();	
+	s->Load();
+}
+void CGame::SwitchBackScene(int scene_id, float start_x, float start_y)
+{
+	DebugOut(L"[INFO] Switching to scene %d\n", scene_id);
+	pre_scene = current_scene;
+	current_scene = scene_id;
+	LPSCENE s = scenes[scene_id];
+	CGame::GetInstance()->SetKeyHandler(s->GetKeyEventHandler());
+
+	CMario* omario = ((CPlayScene*)scenes[pre_scene])->GetPlayer();
+	omario->SetPosition(start_x, 380);
+	omario->SetSpeed(0,0);
+	omario->SetState(MARIO_STATE_IDLE);
+	((CPlayScene*)s)->PutPlayer(omario);
+	((CPlayScene*)s)->GetHUD()->SetHUD(((CPlayScene*)scenes[pre_scene])->GetHUD());
+	((CPlayScene*)s)->GetPlayer()->StartPipeUp(true);
+}
+void CGame::SwitchExtraScene(int scene_id, float start_x, float start_y)
+{
+	DebugOut(L"[INFO] Switching to scene %d\n", scene_id);
+	pre_scene = current_scene;
+	current_scene = scene_id;
+	LPSCENE s = scenes[scene_id];
+	CGame::GetInstance()->SetKeyHandler(scenes[pre_scene]->GetKeyEventHandler());
+	CMario* omario = ((CPlayScene*)scenes[pre_scene])->GetPlayer();
+	omario->SetPosition(start_x, start_y);
+	omario->SetSpeed(0, 0);
+	omario->SetState(MARIO_STATE_IDLE);
+	((CPlayScene*)s)->SetPlayer(omario);
+	((CPlayScene*)s)->PushBack(omario);
+	s->Load();
+	((CPlayScene*)s)->GetHUD()->SetHUD(((CPlayScene*)scenes[pre_scene])->GetHUD());
+	((CPlayScene*)s)->GetPlayer()->StartPipeDown(true);
 }

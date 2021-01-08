@@ -3,9 +3,9 @@
 0	Resources\Textures\mario.png	255	255	255
 1	Resources\Textures\mar.png	68	145	190
 2	Resources\Textures\mar2.png	68	145	190
+10	Resources\Textures\enemies.png	3	26	110
 20	Resources\Textures\misc.png	176	224	248
 21	Resources\Textures\misc2.png	166	185	255
-10	Resources\Textures\enemies.png	3	26	110
 30	Resources\Tilemap\world1-1_bank.png	255	255	255
 40	Resources\Textures\enemies1.1.png	0	255	255
 50	Resources\Textures\enemies-2.png	0	128	128
@@ -1053,6 +1053,7 @@ Resources\Tilemap\world1-1.txt
 # type	x	y	ani_set_id	tag	tag1	tag2	
 # type: 0 = Mario , 1 = Brick, 2 = Goomba, 3 = Koopas, 4 = Block
 # MARIO
+#0	2202	256	1
 0	0	384	1
 9	0	-1	9
 9	0	-1	9
@@ -1456,12 +1457,11 @@ Resources\Tilemap\world1-1.txt
 6	1840	128	6	6
 # === Goomba === 
 # --- Yellow ---
-#2	224	360	2	1
-#2	528	340	2	0
+2	224	360	2	1
 # --- Red ---
 # === Koopas === 
-#3	1344	140	3	0
 3	528	340	3	1
 # --- SCENE PORTAL ----
-# type	l	t	ani_set_id	r	b	scene_id
-#50	300	98	0	316	150	2
+# type	l	t	ani_set_id	r	b	scene_id	TypeOfScene start_x start_y
+50	2260	111	0	2284	112	2	1	132	10
+#50	100	380	0	116	384	4	0	132	10

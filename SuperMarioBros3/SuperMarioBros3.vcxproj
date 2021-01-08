@@ -126,6 +126,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Animations.cpp" />
+    <ClCompile Include="BackUp.cpp" />
     <ClCompile Include="Block.cpp" />
     <ClCompile Include="BreakableBrick.cpp" />
     <ClCompile Include="Brick.cpp" />
@@ -155,9 +156,13 @@
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="Sprites.cpp" />
     <ClCompile Include="Textures.cpp" />
+    <ClCompile Include="WorldMapObject.cpp" />
+    <ClCompile Include="WorldPlayer.cpp" />
+    <ClCompile Include="WorldScene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Animations.h" />
+    <ClInclude Include="BackUp.h" />
     <ClInclude Include="Block.h" />
     <ClInclude Include="BreakableBrick.h" />
     <ClInclude Include="Brick.h" />
@@ -188,6 +193,9 @@
     <ClInclude Include="Scene.h" />
     <ClInclude Include="Sprites.h" />
     <ClInclude Include="Textures.h" />
+    <ClInclude Include="WorldMapObject.h" />
+    <ClInclude Include="WorldPlayer.h" />
+    <ClInclude Include="WorldScene.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Resources\Scene\scene1.txt" />

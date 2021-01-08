@@ -2,6 +2,7 @@
 #include "GameObject.h"
 #include "FireBullet.h"
 #include "Utils.h"
+#include "Portal.h"
 
 
 #define MARIO_WALKING_SPEED_START	0.001f 
@@ -34,6 +35,8 @@
 #define MARIO_TAIL_FLYING_TIME		500
 #define MARIO_TRANSFORMING_TIME		500
 #define MARIO_KILLSTREAK_TIME		1000
+#define MARIO_PIPE_TIME				1000
+
 
 #define MARIO_RUNNING_STACKS		7
 #define MARIO_WALKING_FAST_STACKS	4
@@ -262,6 +265,8 @@ class CMario : public CGameObject
 	DWORD running_stop;
 	DWORD tailflying_start;
 	DWORD transforming_start;
+	DWORD pipedown_start = 0;
+	DWORD pipeup_start = 0;
 	DWORD last_kill = 0;
 
 	float start_x;			// initial position of Mario at scene
@@ -269,12 +274,14 @@ class CMario : public CGameObject
 	int iBullet = 0;
 	int kill_streak = 0;
 public:
+	bool lostControl = false;
 	int RunningStacks = 0;
 	int money = 0;
 	int life = 4;
 	int score = 0;
 	//card later
 
+	CPortal* portal = NULL;
 
 	vector <CFireBullet*> Bullets;
 	int level;
@@ -282,6 +289,7 @@ public:
 	int untouchable;
 	//state
 	bool isOnGround = false;
+	bool isInPipe = false;
 
 	//sit
 	bool isReadyToSit = true;
@@ -399,6 +407,20 @@ public:
 		isTailFlying = true;
 	}
 	void StartTransforming() { transforming_start = GetTickCount64(); isTransforming = true; }
+	void StartPipeDown(bool isIP = false) 
+	{
+		pipedown_start = GetTickCount64(); 
+		lostControl = true; 
+		isInPipe = isIP; 
+		vy = MARIO_GRAVITY;
+	}
+	void StartPipeUp(bool isIP = false) 
+	{ 
+		pipeup_start = GetTickCount64(); 
+		lostControl = true; 
+		isInPipe = isIP;
+		vy = -MARIO_GRAVITY;
+	}
 	void CalcPotentialCollisions(
 		vector<LPGAMEOBJECT>* coObjects,
 		vector<LPCOLLISIONEVENT>& coEvents);

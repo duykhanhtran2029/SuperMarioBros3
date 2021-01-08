@@ -24,8 +24,8 @@ typedef CAnimationFrame *LPANIMATION_FRAME;
 class CAnimation
 {
 	DWORD lastFrameTime;
-	int currentFrame;
-	int defaultTime;
+	DWORD currentFrame;
+	DWORD defaultTime;
 	vector<LPANIMATION_FRAME> frames;
 public:
 	CAnimation(int defaultTime = 100) { this->defaultTime = defaultTime; lastFrameTime = -1; currentFrame = -1; }
@@ -67,6 +67,14 @@ public:
 	void Add(int id, LPANIMATION_SET ani);
 	LPANIMATION_SET Get(unsigned int id);
 	unordered_map<int, LPANIMATION_SET> animation_sets;
-
+	void Clear()
+	{
+		for (auto x : animation_sets)
+		{
+			LPANIMATION_SET anis = x.second;
+			delete anis;
+		}
+		animation_sets.clear();
+	}
 	static CAnimationSets * GetInstance();
 };
