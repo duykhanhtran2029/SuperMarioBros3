@@ -6,8 +6,10 @@
 #define OBJECT_TYPE_STOP				2
 #define OBJECT_TYPE_PORTAL				3
 #define OBJECT_TYPE_BUSH				4
+#define OBJECT_TYPE_HAMMER				5
 
-#define OBJECT_BBOX_WIDTH	8
+#define HAMMER_LIMIT_X		176
+#define OBJECT_BBOX_WIDTH	4
 class CWorldMapObject :
     public CGameObject
 {

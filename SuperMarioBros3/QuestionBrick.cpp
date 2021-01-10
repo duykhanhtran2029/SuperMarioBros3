@@ -3,8 +3,7 @@
 #include "MushRoom.h"
 #include "Switch.h"
 #include "Leaf.h"
-CMario* qbmario;
-CPlayScene* qbscene;
+
 CQuestionBrick::CQuestionBrick(int tag, int type)
 {
 	state = QUESTIONBRICK_STATE_IDLE;
@@ -16,19 +15,18 @@ void CQuestionBrick::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	CGameObject::Update(dt);
 	if (state == QUESTIONBRICK_STATE_IDLE)
 	{
+		CPlayScene* scene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
+		CMario* mario = {};
 		float mLeft, mTop, mRight, mBottom;
 		float oLeft, oTop, oRight, oBottom;
-		qbscene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
-		if (qbscene != NULL)
-			qbmario = ((CPlayScene*)qbscene)->GetPlayer();
-		if (qbmario != NULL)
+		if (scene != NULL)
+			mario = ((CPlayScene*)scene)->GetPlayer();
+		if (mario != NULL && mario->isTurningTail)
 		{
-			qbmario->GetBoundingBox(mLeft, mTop, mRight, mBottom);
+			mario->getTail()->GetBoundingBox(mLeft, mTop, mRight, mBottom);
 			GetBoundingBox(oLeft, oTop, oRight, oBottom);
-			if (isColliding(floor(mLeft), mTop, ceil(mRight), mBottom) && qbmario->level == MARIO_LEVEL_TAIL && qbmario->isTurningTail && oBottom > ceil(mTop) + MARIO_BIG_BBOX_HEIGHT - BRICK_BBOX_HEIGHT)
-			{
+			if (isColliding(floor(mLeft), mTop, ceil(mRight), mBottom))
 				SetState(QUESTIONBRICK_STATE_HIT);
-			}
 
 		}
 
@@ -58,6 +56,10 @@ void CQuestionBrick::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 }
 void CQuestionBrick::SetState(int state = BRICK_STATE_IDLE)
 {
+	CPlayScene* scene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
+	CMario* mario = {};
+	if (scene != NULL)
+		mario = ((CPlayScene*)scene)->GetPlayer();
 	switch (state)
 	{
 	case QUESTIONBRICK_STATE_HIT:
@@ -102,36 +104,37 @@ void CQuestionBrick::SetState(int state = BRICK_STATE_IDLE)
 			}
 			if (tag == ITEM_CUSTOM)
 			{
-				qbscene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
-				qbmario = ((CPlayScene*)qbscene)->GetPlayer();
-				if (qbmario->level == MARIO_LEVEL_SMALL)
+				if (mario != NULL)
 				{
-					CreateItem(ITEM_MUSHROOM_RED);
-					item->tag = MUSHROOM_TYPE_RED;
-					CMushRoom* obj = dynamic_cast<CMushRoom*>(item);
-					obj->isAppear = true;
-					obj->SetPosition(x, y);
-					obj->SetState(MUSHROOM_STATE_UP);
-				}
-				if (qbmario->level == MARIO_LEVEL_BIG)
-				{
-					CreateItem(ITEM_LEAF);
-					CLeaf* obj = dynamic_cast<CLeaf*>(item);
-					obj->isAppear = true;
-					obj->SetPosition(x, y);
-					obj->SetState(LEAF_STATE_UP);
-				}
-				if (qbmario->level == MARIO_LEVEL_TAIL || qbmario->level == MARIO_LEVEL_FIRE)
-				{
-					CreateItem(ITEM_MUSHROOM_GREEN);
-					item->tag = MUSHROOM_TYPE_GREEN;
+					if (mario->level == MARIO_LEVEL_SMALL)
+					{
+						CreateItem(ITEM_MUSHROOM_RED);
+						item->tag = MUSHROOM_TYPE_RED;
+						CMushRoom* obj = dynamic_cast<CMushRoom*>(item);
+						obj->isAppear = true;
+						obj->SetPosition(x, y);
+						obj->SetState(MUSHROOM_STATE_UP);
+					}
+					if (mario->level == MARIO_LEVEL_BIG)
+					{
+						CreateItem(ITEM_LEAF);
+						CLeaf* obj = dynamic_cast<CLeaf*>(item);
+						obj->isAppear = true;
+						obj->SetPosition(x, y);
+						obj->SetState(LEAF_STATE_UP);
+					}
+					if (mario->level == MARIO_LEVEL_TAIL || mario->level == MARIO_LEVEL_FIRE)
+					{
+						CreateItem(ITEM_MUSHROOM_GREEN);
+						item->tag = MUSHROOM_TYPE_GREEN;
 
-					CMushRoom* obj = dynamic_cast<CMushRoom*>(item);
-					obj->isAppear = true;
-					obj->SetPosition(x, y);
-					obj->SetState(MUSHROOM_STATE_UP);
+						CMushRoom* obj = dynamic_cast<CMushRoom*>(item);
+						obj->isAppear = true;
+						obj->SetPosition(x, y);
+						obj->SetState(MUSHROOM_STATE_UP);
+					}
 				}
-				}
+			}
 			if (tag == ITEM_SWITCH)
 			{
 				CreateItem(ITEM_SWITCH);
@@ -161,6 +164,7 @@ void CQuestionBrick::Render()
 }
 void CQuestionBrick::CreateItem(int itemtype)
 {
+	CPlayScene* scene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
 	if (itemtype == ITEM_COIN)
 	{
 		item = new CCoin(COIN_TYPE_INBRICK);
@@ -171,8 +175,8 @@ void CQuestionBrick::CreateItem(int itemtype)
 		item->SetAnimationSet(tmp_ani_set);
 		item->SetPosition(-50, 100);
 
-		qbscene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
-		qbscene->PushBack(item);
+		scene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
+		scene->PushBack(item);
 	}
 	if (itemtype == ITEM_LEAF)
 	{
@@ -184,8 +188,8 @@ void CQuestionBrick::CreateItem(int itemtype)
 		item->SetAnimationSet(tmp_ani_set);
 		item->SetPosition(-50, 100);
 
-		qbscene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
-		qbscene->PushBack(item);
+		scene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
+		scene->PushBack(item);
 	}
 	if (itemtype == ITEM_MUSHROOM_RED || itemtype == ITEM_MUSHROOM_GREEN)
 	{
@@ -197,8 +201,8 @@ void CQuestionBrick::CreateItem(int itemtype)
 		item->SetAnimationSet(tmp_ani_set);
 		item->SetPosition(-50, 100);
 
-		qbscene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
-		qbscene->PushBack(item);
+		scene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
+		scene->PushBack(item);
 	}
 	if (itemtype == ITEM_SWITCH)
 	{
@@ -210,7 +214,7 @@ void CQuestionBrick::CreateItem(int itemtype)
 		item->SetAnimationSet(tmp_ani_set);
 		item->SetPosition(-50, 100);
 
-		qbscene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
-		qbscene->PushBack(item);
+		scene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
+		scene->PushBack(item);
 	}
 }

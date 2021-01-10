@@ -101,6 +101,9 @@
     <ClCompile Include="WorldPlayer.cpp">
       <Filter>Map Objects\WorldMap</Filter>
     </ClCompile>
+    <ClCompile Include="Tail.cpp">
+      <Filter>Mario</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Map.h">
@@ -207,6 +210,9 @@
     </ClInclude>
     <ClInclude Include="WorldPlayer.h">
       <Filter>Map Objects\WorldMap</Filter>
+    </ClInclude>
+    <ClInclude Include="Tail.h">
+      <Filter>Mario</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

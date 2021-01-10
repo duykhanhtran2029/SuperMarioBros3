@@ -174,6 +174,8 @@ void CWorldScene::_ParseSection_OBJECTS(string line)
 		{
 			obj = new CWorldMapObject();
 			obj->SetTag(tag);
+			if (tag == OBJECT_TYPE_HAMMER)
+				obj->SetSpeed(MARIO_WALKING_SPEED_MIN/2, 0);
 		}
 		break;
 	default:

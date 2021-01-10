@@ -85,6 +85,8 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	// 
 	// Simple fall down
 
+	
+
 	vector<LPCOLLISIONEVENT> coEvents;
 	vector<LPCOLLISIONEVENT> coEventsResult;
 
@@ -93,6 +95,23 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	if (state != GOOMBA_STATE_DIE_BY_TAIL)
 		CalcPotentialCollisions(coObjects, coEvents);
 
+	float mLeft, mTop, mRight, mBottom;
+	float oLeft, oTop, oRight, oBottom;
+	CMario* mario = ((CPlayScene*)CGame::GetInstance()->GetCurrentScene())->GetPlayer();
+	if (mario != NULL)
+	{
+		if (mario->isTurningTail)
+		{
+			mario->getTail()->GetBoundingBox(mLeft, mTop, mRight, mBottom);
+			GetBoundingBox(oLeft, oTop, oRight, oBottom);
+			if (isColliding(floor(mLeft), mTop, ceil(mRight), mBottom))
+			{
+				mario->AddScore(x, y, 100, true);
+				SetDirection(mario->nx);
+				SetState(GOOMBA_STATE_DIE_BY_TAIL);
+			}
+		}
+	}
 	// No collision occured, proceed normally
 	if (coEvents.size() == 0)
 	{
@@ -124,8 +143,6 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		for (UINT i = 0; i < coEventsResult.size(); i++)
 		{
 			LPCOLLISIONEVENT e = coEventsResult[i];
-			float oLeft, oTop, oRight, oBottom;
-			float mLeft, mTop, mRight, mBottom;
 			if(e->obj != NULL)
 				if (e->obj->isDestroyed == true)
 					continue;
@@ -188,7 +205,6 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			{
 				SetState(GOOMBA_STATE_DIE);
 			}
-
 		}
 	}
 	if (vx < 0 && x < 0) {
@@ -215,7 +231,7 @@ void CGoomba::Render()
 		if (state == GOOMBA_STATE_DIE)
 			ani = GOOMBA_RED_ANI_DIE;
 		if (state == GOOMBA_STATE_DIE_BY_TAIL)
-			ani = GOOMBA_RED_ANI_WALKING;
+			ani = GOOMBA_RED_ANI_DIE;
 		if (vy != 0)
 			ani = GOOMBA_RED_ANI_JUMPING;
 		break;

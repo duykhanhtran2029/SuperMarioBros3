@@ -343,12 +343,17 @@ void CPlayScene::Update(DWORD dt)
 		}
 			
 	}
-
-	for (size_t i = 0; i < objects.size(); i++)
-		objects[i]->Update(dt, &coObjects);
-	hud->Update(dt, &coObjects);
 	// skip the rest if scene was already unloaded (Mario::Update might trigger PlayScene::Unload)
 	if (player == NULL) return;
+	//stop the world when player is transforming/lost control
+	if (player->isTransforming || player->lostControl) 
+		player->Update(0, &coObjects);
+	else
+	{
+		for (size_t i = 0; i < objects.size(); i++)
+			objects[i]->Update(dt, &coObjects);
+		hud->Update(dt, &coObjects);
+	}
 
 
 	//get map and screen information
@@ -365,35 +370,32 @@ void CPlayScene::SetCam(float cx, float cy)
 	mw = current_map->GetMapWidth();
 	mh = current_map->GetMapHeight();
 
+	//Update CamY when Flying
+	if (player->isFlying)
+		isTurnOnCamY = true;
+	if (cy > mh - sh && !player->isFlying)
+		isTurnOnCamY = false;
+
 	// Update camera to follow mario
-	if (cx >= sw / 2 //Left Edge
-		&& cx + sw / 2 <= mw) //Right Edge
-		cx -= sw / 2;
-	else if (cx < sw / 2)
+	cx -= sw / 2;
+	// CamX
+	if (cx <= 0)//Left Edge
 		cx = 0;
-	else if (cx + sw / 2 > mw)
-		cx = mw - sw + 1;
+	if (cx >= mw - sw)//Right Edge
+		cx = mw - sw;
 
-	/*if (player->isFlying)
-	{
-		if (cy - sh / 2 <= 0)//Top Edge
-			cy = -HUD_HEIGHT;
-		else if (cy + sh / 2 >= mh)//Bottom Edge
-			cy = mh - sh;
-		else
-			cy -= sh / 2;
-	}
-	else
-		cy = mh - sh;*/
-
-	if (cy - sh / 2 <= 0)//Top Edge
-		cy = - HUD_HEIGHT;
-	else if (cy + sh / 2 >= mh)//Bottom Edge
-		cy = mh - sh;
-	else
+	// CamY
+	if (isTurnOnCamY)
 		cy -= sh / 2;
-	//DebugOut(L"[MARIO] cx: %f \t cy: %f \t sh: %f \t mh: %f\n", cx, cy,sh,mh);
-	CGame::GetInstance()->SetCamPos(ceil(cx), ceil(cy));
+	else
+		cy = mh - sh;
+
+	if (cy <= -HUD_HEIGHT)//Top Edge
+		cy = -HUD_HEIGHT;
+	if (cy + sh >= mh)//Bottom Edge
+		cy = mh - sh;
+
+	game->SetCamPos(ceil(cx), ceil(cy));
 	current_map->SetCamPos(cx, cy);
 	hud->SetPosition(ceil(cx), ceil(cy + sh - HUD_HEIGHT));
 }
@@ -514,7 +516,7 @@ void CPlaySceneKeyHandler::KeyState(BYTE* states)
 		if (game->IsKeyDown(DIK_A))
 		{
 			mario->SetIsReadyToHold(true);
-			if (!mario->isRunning && mario->vx != 0)
+			if (!mario->isRunning && mario->vx != 0 && mario->isReadyToRun)
 				mario->StartRunning();
 		}
 		if (game->IsKeyDown(DIK_S) && mario->isReadyToJump)

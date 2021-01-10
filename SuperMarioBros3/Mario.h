@@ -1,8 +1,9 @@
-#pragma once
+﻿#pragma once
 #include "GameObject.h"
 #include "FireBullet.h"
 #include "Utils.h"
 #include "Portal.h"
+#include "Tail.h"
 
 
 #define MARIO_WALKING_SPEED_START	0.001f 
@@ -25,12 +26,14 @@
 #define MARIO_BULLET_MAX			20
 
 #define MARIO_UNTOUCHABLE_TIME		5000
-#define MARIO_TURNING_TAIL_TIME		200
+#define MARIO_TURNING_TAIL_TIME		350
+#define MARIO_TURNING_STATE_TIME	70
 #define MARIO_SHOOTING_TIME			150
 #define MARIO_KICKING_TIME			200	
 #define MARIO_FLAPPING_TIME			200	
 #define MARIO_RUNNING_STACK_TIME	250
-#define MARIO_SLOW_STACK_TIME		500
+#define MARIO_SLOW_TIME				1000
+#define MARIO_SLOW_STACK_TIME		250
 #define MARIO_RELOAD_BULLET_TIME	500
 #define MARIO_TAIL_FLYING_TIME		500
 #define MARIO_TRANSFORMING_TIME		500
@@ -40,6 +43,7 @@
 
 #define MARIO_RUNNING_STACKS		7
 #define MARIO_WALKING_FAST_STACKS	4
+#define MARIO_TURNING_STACKS		5
 
 #define MARIO_STATE_IDLE			0
 #define MARIO_STATE_WALKING_RIGHT	100
@@ -238,13 +242,11 @@
 #define	MARIO_LEVEL_TAIL	3
 #define	MARIO_LEVEL_FIRE	4
 
-#define MARIO_BIG_BBOX_WIDTH			15
+#define MARIO_BIG_BBOX_WIDTH			16
 #define MARIO_BIG_BBOX_HEIGHT			27
 #define MARIO_BIG_BBOX_SITTING_HEIGHT	18
-#define MARIO_SMALL_BBOX_WIDTH  13
-#define MARIO_SMALL_BBOX_HEIGHT 15
-#define MARIO_TAIL_BBOX_WIDTH  21
-#define MARIO_FIRE_BBOX_WIDTH  15
+#define MARIO_SMALL_BBOX_WIDTH			13
+#define MARIO_SMALL_BBOX_HEIGHT			15
 
 #define MARIO_FIRE_BULLETS  2
 
@@ -258,11 +260,13 @@ class CMario : public CGameObject
 	DWORD shooting_start;
 	DWORD delay_start;
 	DWORD turning_start;
+	DWORD turning_state_start;
 	DWORD flapping_start;
 	DWORD running_start;
 	DWORD reloading_start;
 	DWORD lastshoot;
 	DWORD running_stop;
+	DWORD slow_start = 0;
 	DWORD tailflying_start;
 	DWORD transforming_start;
 	DWORD pipedown_start = 0;
@@ -273,7 +277,11 @@ class CMario : public CGameObject
 	float start_y;
 	int iBullet = 0;
 	int kill_streak = 0;
+
+	//Vũ khí bí mật
+	CTail* tail;
 public:
+	int turning_state = 0;
 	bool lostControl = false;
 	int RunningStacks = 0;
 	int money = 0;
@@ -320,6 +328,7 @@ public:
 
 	//run
 	bool isRunning = false;
+	bool isReadyToRun = true;
 	//fly
 	bool isFlying = false;
 	//trasnforming
@@ -364,6 +373,7 @@ public:
 	void StartKicking() { kicking_start = GetTickCount64(); isKicking = true; }
 	void StartRunning() { running_start = GetTickCount64(); isRunning = true; }
 	void StopRunning() { running_stop = GetTickCount64(); isRunning = false; }
+	void StartSlowDown() { slow_start = GetTickCount64(); isReadyToRun = false; }
 	void StartShooting(float bx, float by)
 	{ 
 		DWORD tmpShoot = GetTickCount64();	
@@ -395,7 +405,7 @@ public:
 			ShootTimes++;
 		}
 	}
-	void StartTurning() { turning_start = GetTickCount64(); isTurningTail = true; }
+	void StartTurning() { turning_start = GetTickCount64(); isTurningTail = true; turning_state_start = GetTickCount64(); turning_state = 1; }
 	void StartFlapping() 
 	{ 
 			flapping_start = GetTickCount64(); 
@@ -447,4 +457,5 @@ public:
 	void AddLife(int l = 1) { this->life += l; }
 	void AddMoney(int m = 1) { this->money += m; }
 	void AddScore(int ox, int oy, int s = 100, bool isEnemy = false);
+	CTail* getTail() { return tail; }
 };

@@ -40,18 +40,28 @@ void CPiranhaPlant::Update(DWORD dt,vector<LPGAMEOBJECT>* coObjects)
 	for (UINT i = 0; i < coEvents.size(); i++) delete coEvents[i];
 
 	CMario* mario = ((CPlayScene*)CGame::GetInstance()->GetCurrentScene())->GetPlayer();
-	int mWidth = MARIO_SMALL_BBOX_WIDTH;
-	if (mario->level == MARIO_LEVEL_BIG)
-		mWidth = MARIO_BIG_BBOX_WIDTH;
-	if (mario->level == MARIO_LEVEL_TAIL)
-		mWidth = MARIO_TAIL_BBOX_WIDTH;
-	if (mario->level == MARIO_LEVEL_FIRE)
-		mWidth = MARIO_FIRE_BBOX_WIDTH;
+	if (mario != NULL)
+	{
+		float mLeft, mTop, mRight, mBottom;
+		float oLeft, oTop, oRight, oBottom;
 
-	if ((mario->x + (float)mWidth + PIRANHAPLANT_ACTIVE_RANGE <= x 
-		|| mario->x >= x + PIRANHAPLANT_BBOX_WIDTH + PIRANHAPLANT_ACTIVE_RANGE)
-		&& state == PIRANHAPLANT_STATE_INACTIVE && biting_start == 0)
-		SetState(PIRANHAPLANT_STATE_DARTING);
+		int mWidth = MARIO_SMALL_BBOX_WIDTH;
+		if (mario->level != MARIO_LEVEL_SMALL)
+			mWidth = MARIO_BIG_BBOX_WIDTH;
+
+		if ((mario->x + (float)mWidth + PIRANHAPLANT_ACTIVE_RANGE <= x
+			|| mario->x >= x + PIRANHAPLANT_BBOX_WIDTH + PIRANHAPLANT_ACTIVE_RANGE)
+			&& state == PIRANHAPLANT_STATE_INACTIVE && biting_start == 0)
+			SetState(PIRANHAPLANT_STATE_DARTING);
+
+		if (mario->isTurningTail)
+		{
+			mario->getTail()->GetBoundingBox(mLeft, mTop, mRight, mBottom);
+			GetBoundingBox(oLeft, oTop, oRight, oBottom);
+			if (isColliding(floor(mLeft), mTop, ceil(mRight), mBottom))
+				SetState(PIRANHAPLANT_STATE_DEATH);
+		}
+	}
 }
 void CPiranhaPlant::Render()
 {

@@ -73,19 +73,31 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	// turn off collision when goomba kicked 
 	//if (state != KOOPAS_STATE_SHELL_UP)
 		CalcPotentialCollisions(coObjects, coEvents);
-
-	if (!mario->isHolding)
+		
+	float mLeft, mTop, mRight, mBottom;
+	float oLeft, oTop, oRight, oBottom;
+	if (mario != NULL)
 	{
-		float mLeft, mTop, mRight, mBottom;
-		mario->GetBoundingBox(mLeft, mTop, mRight, mBottom);
-		isBeingHeld = false;
-		if (isColliding(mLeft, mTop, mRight, mBottom))
+		if (mario->isTurningTail)
 		{
-			if (state == KOOPAS_STATE_IN_SHELL)
+			mario->getTail()->GetBoundingBox(mLeft, mTop, mRight, mBottom);
+			GetBoundingBox(oLeft, oTop, oRight, oBottom);
+			if (isColliding(floor(mLeft), mTop, ceil(mRight), mBottom))
+				SetState(KOOPAS_STATE_SHELL_UP);
+		}
+		if (!mario->isHolding && !mario->isTurningTail)
+		{
+			float mLeft, mTop, mRight, mBottom;
+			mario->GetBoundingBox(mLeft, mTop, mRight, mBottom);
+			isBeingHeld = false;
+			if (isColliding(mLeft, mTop, mRight, mBottom))
 			{
-				this->nx = mario->nx;
-				this->SetState(KOOPAS_STATE_SPINNING);
-				mario->StartKicking();
+				if (state == KOOPAS_STATE_IN_SHELL)
+				{
+					this->nx = mario->nx;
+					this->SetState(KOOPAS_STATE_SPINNING);
+					mario->StartKicking();
+				}
 			}
 		}
 	}
@@ -108,13 +120,6 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			else
 				x = mario->x + tmp * (KOOPAS_BBOX_WIDTH);
 			y -=(MARIO_BIG_BBOX_HEIGHT - MARIO_SMALL_BBOX_HEIGHT);
-		}
-		else if (mario->level == MARIO_LEVEL_TAIL)
-		{
-			if(tmp > 0)
-				x = mario->x + tmp * (MARIO_TAIL_BBOX_WIDTH);
-			else
-				x = mario->x + tmp * (KOOPAS_BBOX_WIDTH);
 		}
 	}
 	// No collision occured, proceed normally
@@ -153,9 +158,7 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 
 		if (state == KOOPAS_STATE_SHELL_UP)
 			vx = 0;
-		// Collision logic with the others Koopas
-		float oLeft, oTop, oRight, oBottom;
-		float mLeft, mTop, mRight, mBottom;
+		// Collision logic with others
 		for (UINT i = 0; i < coEventsResult.size(); i++)
 		{
 			LPCOLLISIONEVENT e = coEventsResult[i];
@@ -205,8 +208,6 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					if (ceil(mBottom) != oTop)
 						vx = -vx;
 				}
-				else
-					x += dx;
 			}
 			if (dynamic_cast<CQuestionBrick*>(e->obj) && state == KOOPAS_STATE_SPINNING)
 			{

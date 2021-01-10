@@ -20,7 +20,7 @@ void CWorldPlayer::CalcPotentialCollisions(vector<LPGAMEOBJECT>* coObjects, vect
 {
 	for (UINT i = 0; i < coObjects->size(); i++)
 	{
-		if (coObjects->at(i)->tag == OBJECT_TYPE_BUSH)
+		if (coObjects->at(i)->tag == OBJECT_TYPE_BUSH || coObjects->at(i)->tag == OBJECT_TYPE_HAMMER)
 			continue;
 		else
 		{

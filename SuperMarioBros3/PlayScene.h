@@ -25,6 +25,8 @@ protected:
 	void _ParseSection_OBJECTS(string line);
 	void _ParseSection_TILEMAP_DATA(string line);
 
+	bool isTurnOnCamY = false;
+	//DWORD lastDt = 0;
 
 public:
 	CPlayScene(int id, LPCWSTR filePath);
@@ -36,9 +38,9 @@ public:
 	void PushBack(CGameObject* obj) { objects.push_back(obj); }
 	vector<LPGAMEOBJECT> GetObjects() { return objects; }
 
-	CMario* GetPlayer() { return player; }
 	CMap* GetMap() { return current_map; }
 	HUD* GetHUD() { return hud; }
+	CMario* GetPlayer() { return player; }
 	void SetPlayer(CMario* m) { player = m; }
 	void PutPlayer(CMario* m)
 	{

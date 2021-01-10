@@ -10,14 +10,21 @@ CWorldMapObject::CWorldMapObject(int sceneId)
 }
 void CWorldMapObject::Render()
 {
-	animation_set->at(0)->Render(x, y);
-	RenderBoundingBox();
+	if (tag == OBJECT_TYPE_HAMMER && vx < 0)
+		animation_set->at(1)->Render(x, y);
+	else
+		animation_set->at(0)->Render(x, y);
+	RenderBoundingBox(0);
 }
 void CWorldMapObject::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
 	CGameObject::Update(dt);
 	x += dx;
 	y += dy;
+	if (tag == OBJECT_TYPE_HAMMER && x >= HAMMER_LIMIT_X)
+		vx = -vx;
+	if (tag == OBJECT_TYPE_HAMMER && x <= HAMMER_LIMIT_X - OBJECT_BBOX_WIDTH*4)
+		vx = -vx;
 }
 void CWorldMapObject::GetBoundingBox(float& left, float& top, float& right, float& bottom)
 {
@@ -25,8 +32,8 @@ void CWorldMapObject::GetBoundingBox(float& left, float& top, float& right, floa
 	{
 		left = x + 2;
 		top = y + 2;
-		right = left + OBJECT_BBOX_WIDTH - 4;
-		bottom = top + OBJECT_BBOX_WIDTH - 4;
+		right = left + OBJECT_BBOX_WIDTH;
+		bottom = top + OBJECT_BBOX_WIDTH;
 	}
 }
 

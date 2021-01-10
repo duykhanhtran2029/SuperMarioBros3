@@ -2,23 +2,19 @@
 #include "PlayScene.h"
 #include "MushRoom.h"
 
-CMario* bbmario;
-CPlayScene* bbscene;
 void CBreakableBrick::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
 	CGameObject::Update(dt);
 	if (isDestroyed)
 		return;
-	float mLeft, mTop, mRight, mBottom;
-	float oLeft, oTop, oRight, oBottom;
-	bbscene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
-	if (bbscene != NULL)
-		bbmario = ((CPlayScene*)bbscene)->GetPlayer();
-	if (bbmario != NULL)
+	CMario* mario = ((CPlayScene*)CGame::GetInstance()->GetCurrentScene())->GetPlayer();
+	if (mario != NULL && mario->isTurningTail)
 	{
-		bbmario->GetBoundingBox(mLeft, mTop, mRight, mBottom);
+		float mLeft, mTop, mRight, mBottom;
+		float oLeft, oTop, oRight, oBottom;
+		mario->getTail()->GetBoundingBox(mLeft, mTop, mRight, mBottom);
 		GetBoundingBox(oLeft, oTop, oRight, oBottom);
-		if (isColliding(floor(mLeft), mTop, ceil(mRight), mBottom) && bbmario->level == MARIO_LEVEL_TAIL && bbmario->isTurningTail && oBottom > ceil(mTop) + MARIO_BIG_BBOX_HEIGHT - BRICK_BBOX_HEIGHT)
+		if (isColliding(floor(mLeft), mTop, ceil(mRight), mBottom))
 			Break();
 	}
 }
@@ -31,6 +27,7 @@ void CBreakableBrick::Render()
 }
 void CBreakableBrick::Break()
 {
+	CPlayScene* scene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
 	CAnimationSets* animation_sets = CAnimationSets::GetInstance();
 	LPANIMATION_SET tmp_ani_set = animation_sets->Get(PIECE_ANI_SET_ID);
 
@@ -50,10 +47,10 @@ void CBreakableBrick::Break()
 	downright->SetPosition(x + PIECE_BBOX_WIDTH, y + PIECE_BBOX_HEIGHT);
 	downright->SetAnimationSet(tmp_ani_set);
 
-	bbscene->PushBack(upleft);
-	bbscene->PushBack(upright);
-	bbscene->PushBack(downleft);
-	bbscene->PushBack(downright);
+	scene->PushBack(upleft);
+	scene->PushBack(upright);
+	scene->PushBack(downleft);
+	scene->PushBack(downright);
 
 	isDestroyed = true;
 }
