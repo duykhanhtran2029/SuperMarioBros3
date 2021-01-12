@@ -33,13 +33,14 @@ void CCoin::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			{
 				isAppear = false;
 				isDestroyed = true;
-				coinmario->AddScore(x,y); 
+				coinmario->AddScore(x,y,100,false,false); 
 				coinmario->AddMoney();
 			}
 
 		}
 		if (tag == COIN_TYPE_TRANSFORM)
 		{
+			//transfer to brick
 			if (GetTickCount64() - exist_start >= COIN_EXIST_TIME)
 			{
 				CBreakableBrick* item = new CBreakableBrick();

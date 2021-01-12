@@ -104,6 +104,15 @@
     <ClCompile Include="Tail.cpp">
       <Filter>Mario</Filter>
     </ClCompile>
+    <ClCompile Include="IntroScene.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="IntroGround.cpp">
+      <Filter>Map Objects\Bricks</Filter>
+    </ClCompile>
+    <ClCompile Include="IntroObject.cpp">
+      <Filter>Map Objects</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Map.h">
@@ -213,6 +222,15 @@
     </ClInclude>
     <ClInclude Include="Tail.h">
       <Filter>Mario</Filter>
+    </ClInclude>
+    <ClInclude Include="IntroScene.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="IntroGround.h">
+      <Filter>Map Objects\Bricks</Filter>
+    </ClInclude>
+    <ClInclude Include="IntroObject.h">
+      <Filter>Map Objects</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

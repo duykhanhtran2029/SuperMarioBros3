@@ -3,6 +3,8 @@
 #include "Block.h"
 #include "QuestionBrick.h"
 #include "BreakableBrick.h"
+#include "IntroScene.h"
+#include "IntroObject.h"
 CKoopas::CKoopas()
 {
 	nx = -1;
@@ -16,6 +18,14 @@ void CKoopas::CalcPotentialCollisions(vector<LPGAMEOBJECT>* coObjects, vector<LP
 {
 	for (UINT i = 0; i < coObjects->size(); i++)
 	{
+		if (dynamic_cast<CIntroObject*>(coObjects->at(i)))
+			continue;
+		if (dynamic_cast<CMario*>(coObjects->at(i)))
+		{
+			CMario* tmp = dynamic_cast<CMario*>(coObjects->at(i));
+			if(tmp->isAtIntroScene && tmp->level == MARIO_LEVEL_SMALL)
+				continue;
+		}
 		LPCOLLISIONEVENT e = SweptAABBEx(coObjects->at(i));
 
 		if (e->t > 0 && e->t <= 1.0f)
@@ -43,36 +53,47 @@ void CKoopas::GetBoundingBox(float& left, float& top, float& right, float& botto
 
 void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
+	//DebugOut(L"vx %f\n", vx);
 	CGameObject::Update(dt, coObjects);
-	CMario* mario = ((CPlayScene*)CGame::GetInstance()->GetCurrentScene())->GetPlayer();
-	if (GetTickCount64() - shell_start >= KOOPAS_SHELL_TIME && shell_start != 0 && state != KOOPAS_STATE_SPINNING)
+	CMario* mario = {};
+	if (!dynamic_cast<CIntroScene*> (CGame::GetInstance()->GetCurrentScene()))
+		mario = ((CPlayScene*)CGame::GetInstance()->GetCurrentScene())->GetPlayer();
+	else
 	{
-		shell_start = 0;
-		StartReviving();
+		if (((CIntroScene*)CGame::GetInstance()->GetCurrentScene())->holder == NULL)
+			mario = ((CIntroScene*)CGame::GetInstance()->GetCurrentScene())->GetPlayer();
+		else
+			mario = ((CIntroScene*)CGame::GetInstance()->GetCurrentScene())->holder;
 	}
-	if (GetTickCount64() - reviving_start >= KOOPAS_REVIVE_TIME && reviving_start != 0 && state != KOOPAS_STATE_SPINNING)
+	if (!mario->isAtIntroScene)
 	{
-		reviving_start = 0;
-		y -= (KOOPAS_BBOX_HEIGHT - KOOPAS_BBOX_SHELL_HEIGHT) + 1.0f;
-		if (isBeingHeld)
+		if (GetTickCount64() - shell_start >= KOOPAS_SHELL_TIME && shell_start != 0 && state != KOOPAS_STATE_SPINNING)
 		{
-			isBeingHeld = false;
-			mario->SetIsHolding(false);
+			shell_start = 0;
+			StartReviving();
 		}
-		SetState(KOOPAS_STATE_WALKING);
+		if (GetTickCount64() - reviving_start >= KOOPAS_REVIVE_TIME && reviving_start != 0 && state != KOOPAS_STATE_SPINNING)
+		{
+			reviving_start = 0;
+			y -= (KOOPAS_BBOX_HEIGHT - KOOPAS_BBOX_SHELL_HEIGHT) + 1.0f;
+			if (isBeingHeld)
+			{
+				isBeingHeld = false;
+				mario->SetIsHolding(false);
+			}
+			SetState(KOOPAS_STATE_WALKING);
+		}
 	}
 	// Simple fall down
-	if (!isBeingHeld)
+	if (!isBeingHeld && !mario->isAtIntroScene)
 		vy += KOOPAS_GRAVITY * dt;
 
 	vector<LPCOLLISIONEVENT> coEvents;
 	vector<LPCOLLISIONEVENT> coEventsResult;
 
 	coEvents.clear();
-	bool isNoCollision = false;
-	// turn off collision when goomba kicked 
-	//if (state != KOOPAS_STATE_SHELL_UP)
-		CalcPotentialCollisions(coObjects, coEvents);
+
+	CalcPotentialCollisions(coObjects, coEvents);
 		
 	float mLeft, mTop, mRight, mBottom;
 	float oLeft, oTop, oRight, oBottom;
@@ -100,26 +121,26 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				}
 			}
 		}
-	}
-	if (isBeingHeld)
-	{
-		y = mario->y + KOOPAS_BBOX_SHELL_HEIGHT/2;
-		float tmp = mario -> vx;
-		if (tmp < 0)
-			tmp = -1;
-		if (tmp > 0)
-			tmp = 1;
-		if (tmp == 0)
-			tmp = mario->nx;
-
-		x = mario->x + tmp * (MARIO_BIG_BBOX_WIDTH);
-		if (mario->level == MARIO_LEVEL_SMALL)
+		if (isBeingHeld)
 		{
+			y = mario->y + KOOPAS_BBOX_SHELL_HEIGHT / 2;
+			float tmp = mario->vx;
+			if (tmp < 0)
+				tmp = -1;
 			if (tmp > 0)
-				x = mario->x + tmp * (MARIO_SMALL_BBOX_WIDTH);
-			else
-				x = mario->x + tmp * (KOOPAS_BBOX_WIDTH);
-			y -=(MARIO_BIG_BBOX_HEIGHT - MARIO_SMALL_BBOX_HEIGHT);
+				tmp = 1;
+			if (tmp == 0)
+				tmp = mario->nx;
+
+			x = mario->x + tmp * (MARIO_BIG_BBOX_WIDTH);
+			if (mario->level == MARIO_LEVEL_SMALL)
+			{
+				if (tmp > 0)
+					x = mario->x + tmp * (MARIO_SMALL_BBOX_WIDTH);
+				else
+					x = mario->x + tmp * (KOOPAS_BBOX_WIDTH);
+				y -= (MARIO_BIG_BBOX_HEIGHT - MARIO_SMALL_BBOX_HEIGHT);
+			}
 		}
 	}
 	// No collision occured, proceed normally
@@ -153,7 +174,10 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		x = x0 + min_tx * dx + nx * 0.4f;
 		y = y0 + min_ty * dy + ny * 0.4f;
 
-		if (ny != 0) vy = 0;
+		if (ny != 0 && !mario->isAtIntroScene) 
+			vy = 0;
+
+		
 		//if (nx != 0) vx = 0;
 
 		if (state == KOOPAS_STATE_SHELL_UP)
@@ -193,20 +217,28 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			}
 			if (dynamic_cast<CBrick*>(e->obj))
 			{
-				CBrick* object = dynamic_cast<CBrick*>(e->obj);
-				//object->SetDebugAlpha(255);
-				object->GetBoundingBox(oLeft, oTop, oRight, oBottom);
-				CanPullBack = true;
-				lastStanding_Y = y;
-				if (e->ny != 0) vy = 0;
-				if (e->ny < 0 && (tag == KOOPAS_GREEN_PARA || tag == KOOPAS_RED_PARA))
+				if (mario->isAtIntroScene)
 				{
-					vy = -KOOPAS_JUMP_SPEED;
+					if(!((CIntroScene*)CGame::GetInstance()->GetCurrentScene())->isCustomSpeed)
+						SetState(KOOPAS_STATE_IN_SHELL);
 				}
-				if (e->nx != 0)
+				else
 				{
-					if (ceil(mBottom) != oTop)
-						vx = -vx;
+					CBrick* object = dynamic_cast<CBrick*>(e->obj);
+					//object->SetDebugAlpha(255);
+					object->GetBoundingBox(oLeft, oTop, oRight, oBottom);
+					CanPullBack = true;
+					lastStanding_Y = y;
+					if (e->ny != 0) vy = 0;
+					if (e->ny < 0 && (tag == KOOPAS_GREEN_PARA || tag == KOOPAS_RED_PARA))
+					{
+						vy = -KOOPAS_JUMP_SPEED;
+					}
+					if (e->nx != 0)
+					{
+						if (ceil(mBottom) != oTop)
+							vx = -vx;
+					}
 				}
 			}
 			if (dynamic_cast<CQuestionBrick*>(e->obj) && state == KOOPAS_STATE_SPINNING)
@@ -243,7 +275,6 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 
 	// clean up collision events
 	for (UINT i = 0; i < coEvents.size(); i++) delete coEvents[i];
-
 }
 
 void CKoopas::Render()
@@ -289,7 +320,6 @@ void CKoopas::Render()
 void CKoopas::SetState(int state)
 {
 	CGameObject::SetState(state);
-	CMario* mario = ((CPlayScene*)CGame::GetInstance()->GetCurrentScene())->GetPlayer();
 	switch (state)
 	{
 	case KOOPAS_STATE_SHELL_UP:

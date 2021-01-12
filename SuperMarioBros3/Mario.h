@@ -17,7 +17,8 @@
 #define MARIO_ACCELERATION_JUMP		0.0005f
 #define MARIO_JUMP_SPEED_MAX		0.28f
 #define MARIO_JUMP_SPEED_MIN		0.18f
-#define MARIO_JUMP_DEFLECT_SPEED	0.28f
+#define MARIO_JUMP_DEFLECT_SPEED	0.3f
+#define MARIO_JUMP_DEFLECT_INTRO	0.35f
 #define MARIO_GRAVITY				0.002f
 #define MARIO_DIE_DEFLECT_SPEED		0.5f
 
@@ -273,16 +274,19 @@ class CMario : public CGameObject
 	DWORD pipeup_start = 0;
 	DWORD last_kill = 0;
 
-	float start_x;			// initial position of Mario at scene
-	float start_y;
 	int iBullet = 0;
 	int kill_streak = 0;
 
 	//Vũ khí bí mật
 	CTail* tail;
 public:
-	int turning_state = 0;
+	float start_x;			// initial position of Mario at scene
+	float start_y;
+
+	bool isAtIntroScene = false;
 	bool lostControl = false;
+	int turning_state = 0;
+
 	int RunningStacks = 0;
 	int money = 0;
 	int life = 4;
@@ -307,6 +311,7 @@ public:
 	bool isReadyToJump = true;
 	bool isJumping = false;
 	bool isChangeDirection = false;
+	bool isDeflect = false;
 
 	//using tail
 	bool isTurningTail = false;
@@ -335,7 +340,7 @@ public:
 	bool isTransforming = false;
 	bool transformState = false;
 
-	CMario(float x = 0.0f, float y = 0.0f);
+	CMario(float x = 0.0f, float y = 0.0f, bool iais = false);
 	virtual void Update(DWORD dt, vector<LPGAMEOBJECT> *colliable_objects = NULL);
 	virtual void Render();
 	void CMario::TimingFlag();
@@ -436,7 +441,7 @@ public:
 		vector<LPCOLLISIONEVENT>& coEvents);
 	//void RenderRunning(int& ani, int ani_run_up_right, int ani_run_up_left, int ani_run_down);
 	void SetState(int vState);
-	void SetLevel(int l);
+	void SetLevel(int l, bool transform = true);
 	void StartUntouchable() { untouchable = 1; untouchable_start = GetTickCount64(); }
 	void Reset();
 	virtual void GetBoundingBox(float &left, float &top, float &right, float &bottom);
@@ -456,6 +461,6 @@ public:
 	}
 	void AddLife(int l = 1) { this->life += l; }
 	void AddMoney(int m = 1) { this->money += m; }
-	void AddScore(int ox, int oy, int s = 100, bool isEnemy = false);
+	void AddScore(int ox, int oy, int s = 100, bool isEnemy = false, bool showScore = true);
 	CTail* getTail() { return tail; }
 };

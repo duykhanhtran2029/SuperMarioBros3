@@ -23,17 +23,9 @@ CWorldScene::CWorldScene(int id, LPCWSTR filePath) :
 	See scene1.txt, scene2.txt for detail format specification
 */
 
-#define SCENE_SECTION_UNKNOWN		   -1
-#define SCENE_SECTION_TEXTURES			2
-#define SCENE_SECTION_SPRITES			3
-#define SCENE_SECTION_ANIMATIONS		4
-#define SCENE_SECTION_ANIMATION_SETS	5
-#define SCENE_SECTION_OBJECTS			6
-#define SCENE_SECTION_TILEMAP_DATA		7
 
-#define WORLDOBJECT						10
+#define WORLDOBJECT		10
 
-#define MAX_SCENE_LINE 1024
 
 void CWorldScene::_ParseSection_TEXTURES(string line)
 {

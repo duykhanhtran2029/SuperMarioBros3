@@ -2,7 +2,6 @@
 [TEXTURES]
 0	Resources\Textures\mario.png	255	255	255
 1	Resources\Textures\mar.png	68	145	190
-2	Resources\Textures\mar2.png	68	145	190
 10	Resources\Textures\enemies.png	3	26	110
 20	Resources\Textures\misc.png	176	224	248
 21	Resources\Textures\misc2.png	166	185	255
@@ -153,6 +152,8 @@ Resources\Tilemap\world1-1.txt
 912	180	553	188	562	0
 913	180	574	188	582	0
 914	198	573	206	582	0
+# hit effect 
+10998	519	67	535	83	20
 # ==== Small Mario ==== 
 # --Right--
 # idle right
@@ -565,7 +566,7 @@ Resources\Tilemap\world1-1.txt
 41210	32	149	48	165	40
 41211	53	148	69	164	40
 41212	74	148	90	164	40
-#para right
+#para left
 43010	147	129	163	156	40
 43011	105	129	121	156	40
 # -- others --

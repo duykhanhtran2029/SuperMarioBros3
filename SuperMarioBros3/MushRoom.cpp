@@ -3,6 +3,7 @@
 #include "Mario.h"
 #include "Block.h"
 #include "PlayScene.h"
+#include "IntroScene.h"
 
 
 void CMushRoom::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
@@ -14,24 +15,25 @@ void CMushRoom::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	{
 		float mLeft, mTop, mRight, mBottom;
 		float oLeft, oTop, oRight, oBottom;
-		CMario* mmario = {};
-		CPlayScene* mscene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
-		if(mscene != NULL)
-			mmario = ((CPlayScene*)mscene)->GetPlayer();
-		if (mmario != NULL)
+		CMario* mario = {};
+		if (!dynamic_cast<CIntroScene*> (CGame::GetInstance()->GetCurrentScene()))
+			mario = ((CPlayScene*)CGame::GetInstance()->GetCurrentScene())->GetPlayer();
+		else
+			mario = ((CIntroScene*)CGame::GetInstance()->GetCurrentScene())->GetPlayer();
+		if (mario != NULL)
 		{
-			mmario->GetBoundingBox(mLeft, mTop, mRight, mBottom);
+			mario->GetBoundingBox(mLeft, mTop, mRight, mBottom);
 			if (isColliding(mLeft, mTop, mRight, mBottom))
 			{
 				if(tag == MUSHROOM_TYPE_RED)
-					mmario->SetLevel(MARIO_LEVEL_BIG);
+					mario->SetLevel(MARIO_LEVEL_BIG);
 				if (tag == MUSHROOM_TYPE_GREEN)
 				{
-					mmario->AddLife();
-					mmario->AddScore(x, y,1);
+					mario->AddLife();
+					mario->AddScore(x, y,1);
 				}
 				else
-					mmario->AddScore(x, y,1000);
+					mario->AddScore(x, y,1000);
 				isAppear = false;
 				isDestroyed = true;
 				
@@ -67,6 +69,8 @@ void CMushRoom::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					//
 					// Collision logic with other objects
 					//
+					if (mario->isAtIntroScene)
+						vx = -MUSHROOM_SPEED;
 					for (UINT i = 0; i < coEventsResult.size(); i++)
 					{
 						LPCOLLISIONEVENT e = coEventsResult[i];
@@ -110,10 +114,7 @@ void CMushRoom::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				}
 				// clean up collision events
 				for (UINT i = 0; i < coEvents.size(); i++)
-				{
-					//coEvents[i]->obj->SetDebugAlpha(coEvents[i]->obj->DebugAlpha - 50);
 					delete coEvents[i];
-				}
 			}
 
 		}
@@ -154,8 +155,7 @@ void CMushRoom::GetBoundingBox(float& l, float& t, float& r, float& b)
 void CMushRoom::SetState(int state)
 {
 	CGameObject::SetState(state);
-	CMario* mmario;
-	CPlayScene* mscene;
+	CMario* mario;
 	switch (state)
 	{
 	case MUSHROOM_STATE_IDLE:
@@ -166,10 +166,14 @@ void CMushRoom::SetState(int state)
 		start_y = y;
 		break;
 	case MUSHROOM_STATE_WALK:
-		mscene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
-		mmario = ((CPlayScene*)mscene)->GetPlayer();
+		if (!dynamic_cast<CIntroScene*> (CGame::GetInstance()->GetCurrentScene()))
+		{
+			mario = ((CPlayScene*)CGame::GetInstance()->GetCurrentScene())->GetPlayer();
+			vx = mario->nx * MUSHROOM_SPEED;
+		}
+		else
+			mario = ((CIntroScene*)CGame::GetInstance()->GetCurrentScene())->GetPlayer();
 		vy = MUSHROOM_GRAVITY;
-		vx = mmario->nx* MUSHROOM_SPEED;
 		break;
 	}
 }

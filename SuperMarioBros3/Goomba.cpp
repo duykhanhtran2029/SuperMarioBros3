@@ -1,5 +1,6 @@
 #include "Goomba.h"
 #include "Brick.h"
+#include "IntroScene.h"
 #include "Utils.h"
 #include "Block.h"
 CGoomba::CGoomba()
@@ -50,9 +51,16 @@ void CGoomba::GetBoundingBox(float& left, float& top, float& right, float& botto
 void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
 	CGameObject::Update(dt, coObjects);
+	CMario* mario = {};
+	if (!dynamic_cast<CIntroScene*> (CGame::GetInstance()->GetCurrentScene()))
+		mario = ((CPlayScene*)CGame::GetInstance()->GetCurrentScene())->GetPlayer();
+	else
+		mario = ((CIntroScene*)CGame::GetInstance()->GetCurrentScene())->GetPlayer();
 	if (GetTickCount64() - dying_start >= GOOMBA_TIME_DIYING && isDying)
 	{
 		isDestroyed = true;
+		if (dynamic_cast<CIntroScene*> (CGame::GetInstance()->GetCurrentScene()))
+			mario->SetState(MARIO_STATE_WALKING_RIGHT);
 		return;
 	}
 	if (tag == GOOMBA_RED)
@@ -97,10 +105,9 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 
 	float mLeft, mTop, mRight, mBottom;
 	float oLeft, oTop, oRight, oBottom;
-	CMario* mario = ((CPlayScene*)CGame::GetInstance()->GetCurrentScene())->GetPlayer();
-	if (mario != NULL)
+	if (mario != NULL )
 	{
-		if (mario->isTurningTail)
+		if (mario->isTurningTail && !mario->isAtIntroScene)
 		{
 			mario->getTail()->GetBoundingBox(mLeft, mTop, mRight, mBottom);
 			GetBoundingBox(oLeft, oTop, oRight, oBottom);

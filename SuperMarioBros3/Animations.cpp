@@ -1,5 +1,7 @@
 #include "Animations.h"
 #include "Utils.h"
+#include "Game.h"
+#include "IntroScene.h"
 #include "Define.h"
 
 CAnimationSets * CAnimationSets::__instance = NULL;
@@ -41,8 +43,10 @@ void CAnimation::Render(float x, float y, int alpha)
 				currentFrame = 0;
 		}
 	}
-
-	frames[currentFrame]->GetSprite()->Draw(x, y - HUD_HEIGHT, alpha);
+	if(!dynamic_cast<CIntroScene*>(CGame::GetInstance()->GetCurrentScene()))
+		frames[currentFrame]->GetSprite()->Draw(x, y - HUD_HEIGHT, alpha);
+	else
+		frames[currentFrame]->GetSprite()->Draw(x, y, alpha);
 }
 
 CAnimations * CAnimations::__instance = NULL;

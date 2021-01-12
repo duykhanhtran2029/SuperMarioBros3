@@ -10,6 +10,7 @@
 #include "Piece.h"
 #include "Score.h"
 #include "HUD.h"
+#include "IntroScene.h"
 
 
 CGameObject::CGameObject()
@@ -135,8 +136,10 @@ void CGameObject::RenderBoundingBox(int alpha)
 	rect.top = 0;
 	rect.right = (int)r - (int)l;
 	rect.bottom = (int)b - (int)t;
-
-	CGame::GetInstance()->Draw(x, y - HUD_HEIGHT, bbox, rect.left, rect.top, rect.right, rect.bottom, alpha);
+	if (!dynamic_cast<CIntroScene*>(CGame::GetInstance()->GetCurrentScene()))
+		CGame::GetInstance()->Draw(x, y - HUD_HEIGHT, bbox, rect.left, rect.top, rect.right, rect.bottom, alpha);
+	else
+		CGame::GetInstance()->Draw(x, y, bbox, rect.left, rect.top, rect.right, rect.bottom, alpha);
 }
 bool CGameObject::isColliding(float friend_left, float friend_top, float friend_right, float friend_bottom)
 {

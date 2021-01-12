@@ -2,7 +2,7 @@
 #include "Utils.h"
 #include "Mario.h"
 #include "PlayScene.h"
-#include "Map.h"
+#include "IntroScene.h"
 
 void CLeaf::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
@@ -14,20 +14,27 @@ void CLeaf::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	if (state == LEAF_STATE_FALLING)
 	{
 		float mLeft, mTop, mRight, mBottom;
-		CMap* lmap = NULL;
-		CMario* lmario = {};
-		CPlayScene* lscene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
-		if (lscene != NULL)
-			lmario = ((CPlayScene*)lscene)->GetPlayer();
-		if (lmario != NULL)
+		CMario* mario = {};
+		if (!dynamic_cast<CIntroScene*> (CGame::GetInstance()->GetCurrentScene()))
+			mario = ((CPlayScene*)CGame::GetInstance()->GetCurrentScene())->GetPlayer();
+		else
+			mario = ((CIntroScene*)CGame::GetInstance()->GetCurrentScene())->GetPlayer();
+		if (mario != NULL)
 		{
-			lmario->GetBoundingBox(mLeft, mTop, mRight, mBottom);
+			mario->GetBoundingBox(mLeft, mTop, mRight, mBottom);
 			if (isColliding(mLeft, mTop, mRight, mBottom))
 			{
-				lmario->SetLevel(MARIO_LEVEL_TAIL);
+				mario->SetLevel(MARIO_LEVEL_TAIL);
 				isAppear = false;
 				isDestroyed = true;
-				lmario->AddScore(x, y,1000);
+				if (!mario->isAtIntroScene)
+					mario->AddScore(x, y, 1000);
+				else
+				{
+					mario->SetDirection(-1);
+					mario->SetSpeed(-MARIO_WALKING_SPEED_MIN * 2, MARIO_JUMP_SPEED_MIN/2);
+					((CIntroScene*)CGame::GetInstance()->GetCurrentScene())->ReleaseGoomba();
+				}
 			}
 
 		}
@@ -37,7 +44,7 @@ void CLeaf::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			vx = -vx;
 			start_timing = GetTickCount64();
 		}
-		if (y >= lscene->GetMap()->GetMapHeight())
+		if (y > SCREEN_HEIGHT)
 		{
 			isAppear = false;
 			isDestroyed = true;
