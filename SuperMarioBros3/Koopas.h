@@ -8,7 +8,7 @@
 #define KOOPAS_WALKING_SPEED		0.03f
 #define KOOPAS_JUMP_SPEED			0.35f
 #define KOOPAS_GRAVITY				0.002f
-#define KOOPAS_DIE_DEFLECT_SPEED	0.5f
+#define KOOPAS_DIE_DEFLECT_SPEED	0.4f
 #define KOOPAS_BBOX_WIDTH			16
 #define KOOPAS_BBOX_HEIGHT			26
 #define KOOPAS_BBOX_SHELL_HEIGHT	16
@@ -51,7 +51,7 @@ public:
 	float lastStanding_Y;
 	bool CanPullBack = false;
 	void StartReviving() { reviving_start = GetTickCount64(); }
-	void StartShell() { shell_start = GetTickCount64(); }
+	void StartShell() { shell_start = GetTickCount64(); reviving_start = 0; }
 	CKoopas();
 	void SetIsBeingHeld(bool m) { isBeingHeld = m; };
 	virtual void SetState(int state);

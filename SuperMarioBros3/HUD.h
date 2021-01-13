@@ -8,27 +8,29 @@
 #define DEFAULT_TIME						300
 
 #define SPRITE_HUD_ID						99999
-#define SPRIT_ICONMARIO_ID					50003
-#define SPRIT_ICONLUIGI_ID					50004
-#define SPRIT_FILLARROW_ID					50005
-#define SPRIT_P_ID							50006
+#define SPRITE_ICONMARIO_ID					50003
+#define SPRITE_ICONLUIGI_ID					50004
+#define SPRITE_FILLARROW_ID					50005
+#define SPRITE_P_ID							50006
 
 #define PLAYSCENE_HUD	0
 #define WORLDSCENE_HUD	1
+
+#define CARD_ANI_SET_ID	58
 
 class HUD: public CGameObject
 {
 	CMario* mario = NULL;
 
-	LPSPRITE playerSprite;
+	LPSPRITE playerSprite = NULL;
 	vector<LPSPRITE> cardSprite;
 	vector<LPSPRITE> lifeSprite;
 	vector<LPSPRITE> moneySprite;
 	vector<LPSPRITE> scoreSprite;
 	vector<LPSPRITE> remainTimeSprites;
 	vector<LPSPRITE> powerMelterSprite;
-	LPSPRITE PSprite;
-	CAnimation* animationTakenCard;
+	LPSPRITE PSprite = NULL;
+	CAnimationSet* TakenCards = NULL;
 
 
 	int nlife = 0;
@@ -38,14 +40,11 @@ class HUD: public CGameObject
 	int time = 0;
 	int runningStacks = 0;
 
-	int doneScenePoint;
-	int indexTakenCard;
-	int idTakenCard;
-	int isGameDone = false;
-	vector<int> cards;
-
 	int type_hud;
 public:
+	int idTakenCard = 0;
+	int isTakingCard = false;
+	vector<int> cards;
 	HUD(int type_hud = 0);
 	void SetHUD(HUD* hud);
 	virtual void Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects = NULL);

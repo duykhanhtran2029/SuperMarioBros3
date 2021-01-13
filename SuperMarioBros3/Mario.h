@@ -291,10 +291,10 @@ public:
 	int money = 0;
 	int life = 4;
 	int score = 0;
+	vector<int> cards;
 	//card later
 
 	CPortal* portal = NULL;
-
 	vector <CFireBullet*> Bullets;
 	int level;
 	int prelevel;
@@ -339,6 +339,8 @@ public:
 	//trasnforming
 	bool isTransforming = false;
 	bool transformState = false;
+	//game done
+	bool isGameDone = false;
 
 	CMario(float x = 0.0f, float y = 0.0f, bool iais = false);
 	virtual void Update(DWORD dt, vector<LPGAMEOBJECT> *colliable_objects = NULL);

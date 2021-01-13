@@ -113,6 +113,9 @@
     <ClCompile Include="IntroObject.cpp">
       <Filter>Map Objects</Filter>
     </ClCompile>
+    <ClCompile Include="Card.cpp">
+      <Filter>Map Objects</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Map.h">
@@ -230,6 +233,9 @@
       <Filter>Map Objects\Bricks</Filter>
     </ClInclude>
     <ClInclude Include="IntroObject.h">
+      <Filter>Map Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Card.h">
       <Filter>Map Objects</Filter>
     </ClInclude>
   </ItemGroup>

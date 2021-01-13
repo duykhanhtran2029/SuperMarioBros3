@@ -104,7 +104,10 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			mario->getTail()->GetBoundingBox(mLeft, mTop, mRight, mBottom);
 			GetBoundingBox(oLeft, oTop, oRight, oBottom);
 			if (isColliding(floor(mLeft), mTop, ceil(mRight), mBottom))
+			{
 				SetState(KOOPAS_STATE_SHELL_UP);
+				mario->getTail()->ShowHitEffect();
+			}
 		}
 		if (!mario->isHolding && !mario->isTurningTail)
 		{
@@ -174,10 +177,6 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		x = x0 + min_tx * dx + nx * 0.4f;
 		y = y0 + min_ty * dy + ny * 0.4f;
 
-		if (ny != 0 && !mario->isAtIntroScene) 
-			vy = 0;
-
-		
 		//if (nx != 0) vx = 0;
 
 		if (state == KOOPAS_STATE_SHELL_UP)
@@ -258,11 +257,13 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				CanPullBack = true;
 				lastStanding_Y = y;
 				if (e->ny < 0)
-				{
 					vy = 0;
-				}
 				else
+				{
 					x = x0 + dx;
+					if(state == KOOPAS_STATE_SHELL_UP)
+						y = y0 + dy;
+				}
 				if (e->ny < 0 && (tag == KOOPAS_GREEN_PARA || tag == KOOPAS_RED_PARA))
 				{
 					vy = -KOOPAS_JUMP_SPEED;
@@ -323,11 +324,26 @@ void CKoopas::SetState(int state)
 	switch (state)
 	{
 	case KOOPAS_STATE_SHELL_UP:
+	{
+		CMario* mario = {};
+		if (!dynamic_cast<CIntroScene*> (CGame::GetInstance()->GetCurrentScene()))
+			mario = ((CPlayScene*)CGame::GetInstance()->GetCurrentScene())->GetPlayer();
+		else
+		{
+			if (((CIntroScene*)CGame::GetInstance()->GetCurrentScene())->holder == NULL)
+				mario = ((CIntroScene*)CGame::GetInstance()->GetCurrentScene())->GetPlayer();
+			else
+				mario = ((CIntroScene*)CGame::GetInstance()->GetCurrentScene())->holder;
+		}
 		vy = -KOOPAS_DIE_DEFLECT_SPEED;
-		vx = -vx;
-		nx = -nx;
+		if (x < mario->x)
+			nx = -1;
+		else
+			nx = 1;
+		vx = nx * KOOPAS_WALKING_SPEED;
 		StartShell();
 		break;
+	}
 	case KOOPAS_STATE_WALKING:
 		vx = nx*KOOPAS_WALKING_SPEED;
 		break;

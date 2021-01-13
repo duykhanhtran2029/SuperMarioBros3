@@ -18,21 +18,22 @@ HUD::HUD(int type_hud)
 		CGame* game = CGame::GetInstance();
 		CSprites* sprite = CSprites::GetInstance();
 		CPlayScene* scene = (CPlayScene*)game->GetCurrentScene();
-		PSprite = sprite->sprites[SPRIT_P_ID];
+		PSprite = sprite->sprites[SPRITE_P_ID];
 		mario = scene->GetPlayer();
 		if (mario != NULL && mario->tag == MARIO)
-			playerSprite = CSprites::GetInstance()->sprites[SPRIT_ICONMARIO_ID];
+			playerSprite = CSprites::GetInstance()->sprites[SPRITE_ICONMARIO_ID];
 		else
-			playerSprite = CSprites::GetInstance()->sprites[SPRIT_ICONLUIGI_ID];
+			playerSprite = CSprites::GetInstance()->sprites[SPRITE_ICONLUIGI_ID];
 
 		for (unsigned int i = 0; i < MARIO_RUNNING_STACKS - 1; i++)
-			powerMelterSprite.push_back((sprite->Get(SPRIT_FILLARROW_ID)));
+			powerMelterSprite.push_back((sprite->Get(SPRITE_FILLARROW_ID)));
+		TakenCards = CAnimationSets::GetInstance()->Get(CARD_ANI_SET_ID);
 	}
 	else
 	{
 		CSprites* sprite = CSprites::GetInstance();
-		PSprite = sprite->sprites[SPRIT_P_ID];
-		playerSprite = CSprites::GetInstance()->sprites[SPRIT_ICONMARIO_ID];
+		PSprite = sprite->sprites[SPRITE_P_ID];
+		playerSprite = CSprites::GetInstance()->sprites[SPRITE_ICONMARIO_ID];
 	}
 }
 void HUD::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
@@ -58,6 +59,12 @@ void HUD::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 
 	lifeSprite = fonts->StringToSprite(to_string(nlife));
 	moneySprite = fonts->StringToSprite(to_string(money));
+
+	if (isTakingCard)
+	{
+		remainTime = 0;
+		runningStacks = 0;
+	}
 }
 void HUD::Render()
 {
@@ -78,6 +85,12 @@ void HUD::Render()
 				PSprite->Draw(x + 107, y + 8);
 			else
 				powerMelterSprite[i - 1]->Draw(x + FONT_BBOX_WIDTH * (i - 1) + 60, y + 8);
+	}
+	if (isTakingCard)
+	{
+		int index = cards.size() - 1;
+		if (index >= 0)
+			TakenCards->at(idTakenCard)->Render(x + 172, y + HUD_HEIGHT + 8);
 	}
 }
 void HUD::SetHUD(HUD* hud)

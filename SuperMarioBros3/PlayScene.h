@@ -10,6 +10,14 @@
 #include "Map.h"
 #include "HUD.h"
 
+#define GAMEDONE1_SPRITE_ID		50070
+#define GAMEDONE2_SPRITE_ID		50071
+
+#define GAMEDONE1_X		2630
+#define GAMEDONE1_Y		240
+#define GAMEDONE2_X		2620
+#define GAMEDONE2_Y		270
+
 class CPlayScene : public CScene
 {
 protected:
@@ -26,9 +34,13 @@ protected:
 	void _ParseSection_TILEMAP_DATA(string line);
 
 	bool isTurnOnCamY = false;
+	LPSPRITE gamedone1 = nullptr;
+	LPSPRITE gamedone2 = nullptr;
 	//DWORD lastDt = 0;
 
 public:
+	bool isGameDone1 = false;
+	bool isGameDone2 = false;
 	CPlayScene(int id, LPCWSTR filePath);
 	virtual void Load();
 	virtual void SetCam(float cx, float cy);
@@ -37,7 +49,6 @@ public:
 	virtual void Unload();
 	void PushBack(CGameObject* obj) { objects.push_back(obj); }
 	vector<LPGAMEOBJECT> GetObjects() { return objects; }
-
 	CMap* GetMap() { return current_map; }
 	HUD* GetHUD() { return hud; }
 	CMario* GetPlayer() { return player; }

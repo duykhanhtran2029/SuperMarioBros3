@@ -23,6 +23,7 @@
 #include "PiranhaPlant.h"
 #include "FirePiranhaPlant.h"
 #include "IntroObject.h"
+#include "Card.h"
 
 CMario::CMario(float x, float y, bool isatintroscene) : CGameObject()
 {
@@ -328,6 +329,8 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 				{
 					CGoomba* goomba = dynamic_cast<CGoomba*>(e->obj);
 					// jump on top >> kill Goomba and deflect a bit 
+					if (e->ny > 0)
+						vy = 0;
 					if (e->ny < 0)
 					{
 						if (goomba->GetState() != GOOMBA_STATE_DIE)
@@ -377,6 +380,8 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 					{
 						if (level == MARIO_LEVEL_TAIL)
 						{
+							if (e->ny > 0)
+								vy = 0;
 							if (e->ny < 0)
 							{
 								koopas->SetState(KOOPAS_STATE_IN_SHELL);
@@ -424,6 +429,8 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 					}
 					else
 					{
+						if (e->ny > 0)
+							vy = 0;
 						if (e->ny < 0)
 						{
 							AddScore(koopas->x, koopas->y, 100, true);
@@ -476,6 +483,8 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 				}
 				if (dynamic_cast<CBrick*>(e->obj))
 				{
+					if (isGameDone)
+						vx = MARIO_WALKING_SPEED_MAX;
 					CBrick* object = dynamic_cast<CBrick*>(e->obj);
 					//object->SetDebugAlpha(255);
 					if (isAtIntroScene && ((CIntroScene*)game->GetCurrentScene())->Revenge)
@@ -489,9 +498,14 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 					{
 						if (object->tag == PLATFORM)
 						{
-							if (e->ny != 0)
+							if (e->ny < 0)
 							{
 								vy = 0;
+							}
+							if (e->ny > 0)
+							{
+								ay = MARIO_GRAVITY;
+								isReadyToJump = false;
 							}
 							if (e->nx != 0)
 							{
@@ -501,12 +515,8 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 						}
 						else
 						{
-							//if (e->ny > 0) ay = MARIO_GRAVITY;
-							//else if (e->ny < 0)
-							//	vy = -vy;
 							if (e->ny > 0)
 							{
-								//vy = -MARIO_JUMP_SPEED_MAX;
 								ay = MARIO_GRAVITY;
 								isReadyToJump = false;
 							}
@@ -528,10 +538,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 				if (dynamic_cast<CBreakableBrick*>(e->obj))
 				{
 					if (e->ny > 0)
-					{
-						CBreakableBrick* object = dynamic_cast<CBreakableBrick*>(e->obj);
-						object->Break();
-					}
+						((CBreakableBrick*)e->obj)->Break();
 				}
 				if (dynamic_cast<CBlock*>(e->obj))
 				{
@@ -584,6 +591,15 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 						vx = vy = 0;
 					}
 				}
+				if (dynamic_cast<CCard*>(e->obj))
+				{
+					srand(time(NULL));
+					int id = rand() % 3 + 1;
+					e->obj->vy = -CARD_SPEED;
+					e->obj->SetState(id);
+					isGameDone = true;
+					cards.push_back(id);
+				}
 			}
 		}
 	}
@@ -599,10 +615,10 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 		delete coEvents[i];
 	
 	//limit X, Y 
-	if (!dynamic_cast<CIntroScene*>(game->GetCurrentScene()))
+	float mw = ((CPlayScene*)game->GetCurrentScene())->GetMap()->GetMapWidth();
+	float mh = ((CPlayScene*)game->GetCurrentScene())->GetMap()->GetMapHeight();
+	if (!dynamic_cast<CIntroScene*>(game->GetCurrentScene()) && !isGameDone)
 	{
-		float mw = ((CPlayScene*)game->GetCurrentScene())->GetMap()->GetMapWidth();
-		float mh = ((CPlayScene*)game->GetCurrentScene())->GetMap()->GetMapHeight();
 		//limit X
 		if (x >= mw - MARIO_BIG_BBOX_WIDTH)//Right edge
 			x = mw - MARIO_BIG_BBOX_WIDTH;
@@ -613,6 +629,16 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 			y = mh;
 		if (y <= -HUD_HEIGHT)
 			y = -HUD_HEIGHT;
+	}
+	if (x >= mw)
+	{
+		((CPlayScene*)game->GetCurrentScene())->isGameDone1 = true;
+		x = mw + 1;
+	}
+	if (y >= mh + MARIO_BIG_BBOX_WIDTH * 2)
+	{
+		((CPlayScene*)game->GetCurrentScene())->isGameDone2 = true;
+		y = mh + MARIO_BIG_BBOX_WIDTH * 2;
 	}
 
 	//update tail

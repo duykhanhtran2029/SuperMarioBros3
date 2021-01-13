@@ -10,6 +10,7 @@
 50	Resources\Textures\enemies-2.png	0	128	128
 60	Resources\Textures\HUD.png	0	255	255
 80	Resources\Textures\fonts.png	0	224	142
+90	Resources\Textures\card.png	0	183	239
 100	Resources\Textures\mario-left.png	255	255	255
 110	Resources\Textures\mario-right.png	255	255	255
 [TILEMAP DATA]
@@ -136,11 +137,26 @@ Resources\Tilemap\world1-1.txt
 50056	176	89	192	97	80
 #1UP
 50057	195	89	211	97	80
+# ==== CARDS ====
+50058	298	350	314	366	90
+50059	257	373	273	389	90
+50060	316	375	329	390	90
+50061	309	121	325	137	21
+50062	277	374	293	390	90
+50063	329	375	342	391	90
+50064	258	350	274	366	90
+50065	297	373	313	389	90
+50066	343	374	357	390	90
+# ====	COURSE CLEAR ====
+50070	64	360	184	377	90
+50071	53	391	203	419	90
 # ==== MARIO ====
 # die 
 10909	416	8	432	24	110
 # transparent
 10999	180	8	196	24	110
+# hit effect 
+10998	379	19	395	35	1
 # fire bullet
 # --- Right ---
 901	240	554	248	562	0
@@ -152,8 +168,6 @@ Resources\Tilemap\world1-1.txt
 912	180	553	188	562	0
 913	180	574	188	582	0
 914	198	573	206	582	0
-# hit effect 
-10998	519	67	535	83	20
 # ==== Small Mario ==== 
 # --Right--
 # idle right
@@ -601,6 +615,17 @@ Resources\Tilemap\world1-1.txt
 71111	6	166	22	190	40
 # ani_id	sprite1_id	time1	sprite2_id	time2	...
 [ANIMATIONS]
+# ==== Cards ====
+5057	50058	100	50061	100	50064	100
+5058	50058	100
+5061	50061	100
+5064	50064	100
+5059	50059	100	50060	100
+5062	50062	100	50063	100
+5065	50065	100	50066	100
+5066	50058	100	10999	100
+5067	50061	100	10999	100
+5068	50064	100	10999	100
 # ==== Mario =========
 #Type Level State Direction
 # Type: 1 = Mario
@@ -981,6 +1006,9 @@ Resources\Tilemap\world1-1.txt
 # id	ani1	ani2	ani3
 #
 [ANIMATION_SETS]
+# Card
+57	5057	5058	5061	5064	5059	5062	5065
+58	5066	5067	5068	5058	5061	5064	
 # Mario
 1	100	1000	1060	1010	1020	1023	1030	101	1001	1061	1011	1021	1024	1031
 1	110	1100	1160	1110	1120	1123	1130	1140	111	1101	1161	1111	1121	1124	1131	1141
@@ -1053,8 +1081,8 @@ Resources\Tilemap\world1-1.txt
 # type	x	y	ani_set_id	tag	tag1	tag2	
 # type: 0 = Mario , 1 = Brick, 2 = Goomba, 3 = Koopas, 4 = Block
 # MARIO
-#0	2303	384	1
-0	0	384	1
+0	2688	384	1
+#0	0	384	1
 9	0	-1	9
 9	0	-1	9
 9	0	-1	9
@@ -1085,6 +1113,8 @@ Resources\Tilemap\world1-1.txt
 9	0	-1	9
 9	0	-1	9
 9	0	-1	9
+# === Card ===
+57	2688	336	57
 # === Brick === 
 # --- question brick ---
 142	176	352	42	0

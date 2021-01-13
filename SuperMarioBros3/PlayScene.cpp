@@ -10,6 +10,7 @@
 #include "Define.h"
 #include "Coin.h"
 #include "Brick.h"
+#include "Card.h"
 #include "PiranhaPlant.h"
 #include "FirePiranhaPlant.h"
 #include "QuestionBrick.h"
@@ -37,8 +38,9 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath) :
 #define OBJECT_TYPE_COIN				6
 #define OBJECT_TYPE_PIRANHAPLANT		7
 #define OBJECT_TYPE_FIRE_BULLET			9
-#define OBJECT_TYPE_MUSHROOM			37
 #define OBJECT_TYPE_LEAF				36
+#define OBJECT_TYPE_MUSHROOM			37
+#define OBJECT_TYPE_CARD				57
 #define OBJECT_TYPE_FIREPIRANHAPLANT	70
 #define OBJECT_TYPE_QUESTIONBRICK		142
 #define OBJECT_TYPE_BREAKABLEBRICK		112
@@ -82,6 +84,10 @@ void CPlayScene::_ParseSection_SPRITES(string line)
 	}
 
 	CSprites::GetInstance()->Add(ID, l, t, r, b, tex);
+	if (ID == GAMEDONE1_SPRITE_ID)
+		gamedone1 = CSprites::GetInstance()->Get(ID);
+	if (ID == GAMEDONE2_SPRITE_ID)
+		gamedone2 = CSprites::GetInstance()->Get(ID);
 }
 
 void CPlayScene::_ParseSection_ANIMATIONS(string line)
@@ -202,6 +208,9 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 		break;
 	case OBJECT_TYPE_FIRE_BULLET: 
 		obj = new CFireBullet(); 
+		break;
+	case OBJECT_TYPE_CARD:
+		obj = new CCard();
 		break;
 	case OBJECT_TYPE_PORTAL:
 		{	
@@ -394,6 +403,10 @@ void CPlayScene::SetCam(float cx, float cy)
 void CPlayScene::Render()
 {
 	current_map->Render();
+	if (isGameDone1)
+		gamedone1->Draw(GAMEDONE1_X, GAMEDONE1_Y);
+	if (isGameDone2)
+		gamedone2->Draw(GAMEDONE2_X, GAMEDONE2_Y);
 	for (int i = 0; i < objects.size(); i++)
 		objects[i]->Render();
 	hud->Render();
