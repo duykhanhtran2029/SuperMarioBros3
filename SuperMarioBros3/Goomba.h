@@ -3,22 +3,22 @@
 #include "algorithm"
 #include "Koopas.h"
 
-#define GOOMBA_WALKING_SPEED		0.05f
-#define GOOMBA_GRAVITY				0.075f
-#define GOOMBA_DIE_DEFLECT_SPEED	0.5f
-#define GOOMBA_JUMP_SPEED			0.035f
-#define GOOMBA_HIGHJUMP_SPEED		0.075f
+#define GOOMBA_WALKING_SPEED		0.035f
+#define GOOMBA_GRAVITY				0.002f
+#define GOOMBA_DIE_DEFLECT_SPEED	0.35f
+#define GOOMBA_JUMP_SPEED			0.125f
+#define GOOMBA_HIGHJUMP_SPEED		0.25f
 
 
-#define GOOMBA_RED_TIME_CHASING			5000
+#define GOOMBA_RED_TIME_CHASING			7000
 #define GOOMBA_RED_TIME_WALKING			500
 #define GOOMBA_RED_TIME_HIGHJUMPING		500
 #define GOOMBA_RED_TIME_JUMPING			125
-#define GOOMBA_TIME_DIYING				500	
+#define GOOMBA_TIME_DIYING				250	
 
 #define GOOMBA_RED_JUMPING_STACKS	3
 
-#define GOOMBA_RED_RANGE_CHASING	150
+#define GOOMBA_RED_RANGE_CHASING		50
 
 #define GOOMBA_NORMAL_BBOX_WIDTH		16
 #define GOOMBA_RED_BBOX_WIDTH			20
@@ -33,6 +33,7 @@
 #define GOOMBA_STATE_DIE				200
 #define GOOMBA_STATE_DIE_BY_TAIL		300
 #define GOOMBA_STATE_RED_JUMPING		400
+#define GOOMBA_STATE_RED_HIGHJUMPING	450
 #define GOOMBA_STATE_RED_WINGSWALKING	500
 
 #define GOOMBA_NORMAL_ANI_WALKING		0
@@ -50,8 +51,7 @@
 class CGoomba : public CGameObject
 {
 	DWORD dying_start = 0;
-	DWORD jumping_start = 0;
-	DWORD highjumping_start = 0;
+	DWORD chasing_start = 0;
 	DWORD walking_start = 0;
 	bool isDying = false;
 	bool isWalking = false;
@@ -65,8 +65,7 @@ public:
 	virtual void Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects);
 	virtual void Render();
 	void StartDying() { dying_start = GetTickCount64(); isDying = true;}
-	void StartJumping() { jumping_start = GetTickCount64(); isJumping = true; vy = -GOOMBA_JUMP_SPEED;}
-	void StartHighJumping() { highjumping_start = GetTickCount64(); isHighJumping = true; vy = -GOOMBA_HIGHJUMP_SPEED;}
+	void StartChasing() { chasing_start = GetTickCount64();}
 	void StartWalking() { walking_start = GetTickCount64(); isWalking = true;}
 	void CalcPotentialCollisions(vector<LPGAMEOBJECT>* coObjects, vector<LPCOLLISIONEVENT>& coEvents);
 };

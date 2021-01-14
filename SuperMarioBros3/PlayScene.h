@@ -47,6 +47,7 @@ public:
 	virtual void Update(DWORD dt);
 	virtual void Render();
 	virtual void Unload();
+	bool IsInViewPort(LPGAMEOBJECT object);
 	void PushBack(CGameObject* obj) { objects.push_back(obj); }
 	vector<LPGAMEOBJECT> GetObjects() { return objects; }
 	CMap* GetMap() { return current_map; }
@@ -61,6 +62,18 @@ public:
 			objects[0] = m;
 			//delete temp;
 		}
+	}
+	void Swap(LPGAMEOBJECT a, LPGAMEOBJECT b)
+	{
+		int ioa = 0, iob = 0;
+		for (size_t i = 1; i < objects.size(); i++)
+		{
+			if (objects[i] == a)
+				ioa = i;
+			if (objects[i] == b)
+				iob = i;
+		}
+		swap(objects[ioa], objects[iob]);
 	}
 	//friend class CPlaySceneKeyHandler;
 };

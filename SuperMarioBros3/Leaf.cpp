@@ -44,7 +44,7 @@ void CLeaf::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			vx = -vx;
 			start_timing = GetTickCount64();
 		}
-		if (y > SCREEN_HEIGHT)
+		if (y > ((CPlayScene*)CGame::GetInstance()->GetCurrentScene())->GetMap()->GetMapHeight())
 		{
 			isAppear = false;
 			isDestroyed = true;

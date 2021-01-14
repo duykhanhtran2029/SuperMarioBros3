@@ -144,6 +144,7 @@ void CQuestionBrick::SetState(int state = BRICK_STATE_IDLE)
 				obj->SetPosition(x, y);
 				obj->SetState(SWITCH_STATE_UP);
 			}
+			scene->Swap(this, this->item);
 		}
 		break;
 	}

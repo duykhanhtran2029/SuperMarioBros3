@@ -4,6 +4,7 @@
 #include "Block.h"
 #include "PlayScene.h"
 #include "IntroScene.h"
+#include "PlantBullet.h"
 
 
 void CMushRoom::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
@@ -100,7 +101,7 @@ void CMushRoom::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 						}
 						if (e->nx != 0)
 						{
-							if (!dynamic_cast<CBlock*>(e->obj))
+							if (!dynamic_cast<CBlock*>(e->obj) && !dynamic_cast<CFireBullet*>(e->obj) || !dynamic_cast<CPlantBullet*>(e->obj))
 							{
 								if (ceil(mBottom) != oTop)
 									vx = -vx;

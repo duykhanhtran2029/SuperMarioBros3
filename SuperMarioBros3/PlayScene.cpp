@@ -15,6 +15,7 @@
 #include "FirePiranhaPlant.h"
 #include "QuestionBrick.h"
 #include "BreakableBrick.h"
+#include "PlantBullet.h"
 
 using namespace std;
 
@@ -191,6 +192,7 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	case OBJECT_TYPE_KOOPAS:
 		obj = new CKoopas();
 		obj->SetTag(tag);
+		obj->SetState(KOOPAS_STATE_WALKING);
 		break;
 	case OBJECT_TYPE_BLOCK:
 		obj = new CBlock();
@@ -325,7 +327,22 @@ void CPlayScene::Load()
 	hud = new HUD();
 	DebugOut(L"[INFO] Done loading scene resources %s\n", sceneFilePath);
 }
+bool CPlayScene::IsInViewPort(LPGAMEOBJECT object)
+{
+	CGame* game = CGame::GetInstance();
+	float camX, camY;
+	float objX, objY;
 
+	camX = game->GetCamX();
+	camY = game->GetCamY();
+
+	object->GetPosition(objX, objY);
+	if (dynamic_cast<CFireBullet*> (object) || dynamic_cast<CPlantBullet*> (object))
+		return true;
+
+	return objX >= camX - object->GetWidth() && objX < camX + SCREEN_WIDTH
+		&& objY >= camY - (SCREEN_HEIGHT - game->GetScreenHeight()) && objY < camY + SCREEN_HEIGHT;
+};
 void CPlayScene::Update(DWORD dt)
 {
 	// We know that Mario is the first object in the list hence we won't add him into the colliable object list
@@ -334,7 +351,10 @@ void CPlayScene::Update(DWORD dt)
 	for (size_t i = 1; i < objects.size(); i++)
 	{
 		if (!objects[i]->isDestroyed)
-			coObjects.push_back(objects[i]);
+		{
+			//if(IsInViewPort(objects[i]))
+				coObjects.push_back(objects[i]);
+		}
 		else
 		{
 			LPGAMEOBJECT tmp = objects[i];
@@ -346,17 +366,20 @@ void CPlayScene::Update(DWORD dt)
 	}
 	// skip the rest if scene was already unloaded (Mario::Update might trigger PlayScene::Unload)
 	if (player == NULL) return;
+
 	//stop the world when player is transforming/lost control
 	if (player->isTransforming || player->lostControl) 
 		player->Update(0, &coObjects);
 	else
 	{
-		for (size_t i = 0; i < objects.size(); i++)
-			objects[i]->Update(dt, &coObjects);
+		player->Update(dt, &coObjects);
+		for (size_t i = 1; i < objects.size(); i++)
+			if(IsInViewPort(objects[i]))
+				objects[i]->Update(dt, &coObjects);
+			else
+				objects[i]->Update(0, &coObjects);
 		hud->Update(dt, &coObjects);
 	}
-
-
 	//get map and screen information
 	float cx, cy;
 	player->GetPosition(cx, cy);
@@ -370,12 +393,6 @@ void CPlayScene::SetCam(float cx, float cy)
 	sh = game->GetScreenHeight();
 	mw = current_map->GetMapWidth();
 	mh = current_map->GetMapHeight();
-
-	//Update CamY when Flying
-	if (player->isFlying)
-		isTurnOnCamY = true;
-	if (cy > mh - sh && !player->isFlying)
-		isTurnOnCamY = false;
 
 	// Update camera to follow mario
 	cx -= sw / 2;
@@ -395,6 +412,12 @@ void CPlayScene::SetCam(float cx, float cy)
 		cy = -HUD_HEIGHT;
 	if (cy + sh >= mh)//Bottom Edge
 		cy = mh - sh;
+
+	//Update CamY when Flying
+	if (player->isFlying)
+		isTurnOnCamY = true;
+	if (cy > mh - sh && !player->isFlying)
+		isTurnOnCamY = false;
 
 	game->SetCamPos(ceil(cx), ceil(cy));
 	current_map->SetCamPos(cx, cy);

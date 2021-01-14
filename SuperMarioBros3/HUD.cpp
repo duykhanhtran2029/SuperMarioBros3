@@ -18,7 +18,7 @@ HUD::HUD(int type_hud)
 		CGame* game = CGame::GetInstance();
 		CSprites* sprite = CSprites::GetInstance();
 		CPlayScene* scene = (CPlayScene*)game->GetCurrentScene();
-		PSprite = sprite->sprites[SPRITE_P_ID];
+		PAni = CAnimations::GetInstance()->Get(ANI_P_ID);
 		mario = scene->GetPlayer();
 		if (mario != NULL && mario->tag == MARIO)
 			playerSprite = CSprites::GetInstance()->sprites[SPRITE_ICONMARIO_ID];
@@ -32,7 +32,7 @@ HUD::HUD(int type_hud)
 	else
 	{
 		CSprites* sprite = CSprites::GetInstance();
-		PSprite = sprite->sprites[SPRITE_P_ID];
+		PAni = nullptr;
 		playerSprite = CSprites::GetInstance()->sprites[SPRITE_ICONMARIO_ID];
 	}
 }
@@ -82,7 +82,10 @@ void HUD::Render()
 	{
 		for (int i = 1; i <= runningStacks; i++)
 			if (i == MARIO_RUNNING_STACKS)
-				PSprite->Draw(x + 107, y + 8);
+			{
+				if (PAni != nullptr)
+					PAni->Render(x + 107, y + 8 + HUD_HEIGHT);
+			}
 			else
 				powerMelterSprite[i - 1]->Draw(x + FONT_BBOX_WIDTH * (i - 1) + 60, y + 8);
 	}

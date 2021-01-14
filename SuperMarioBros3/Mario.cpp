@@ -356,6 +356,8 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 								vy = -MARIO_JUMP_DEFLECT_SPEED;
 							}
 						}
+						else
+							vy = -MARIO_JUMP_DEFLECT_SPEED;
 					}
 					else if (e->nx != 0)
 					{
@@ -510,7 +512,12 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 							if (e->nx != 0)
 							{
 								if (ceil(mBottom) != oTop)
+								{
 									vx = 0;
+									isReadyToRun = false;
+									if (isRunning)
+										StopRunning();
+								}
 							}
 						}
 						else
@@ -525,7 +532,12 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 							if (e->nx != 0)
 							{
 								if (ceil(mBottom) != oTop)
+								{
 									vx = 0;
+									isReadyToRun = false;
+									if (isRunning)
+										StopRunning();
+								}
 							}
 						}
 					}
@@ -1223,4 +1235,16 @@ void CMario::Reset()
 	SetPosition(start_x, start_y);
 	SetSpeed(0, 0);
 }
-
+void CMario::Attacked()
+{
+	StartUntouchable();
+	if (level == MARIO_LEVEL_SMALL)
+	{
+		SetState(MARIO_STATE_DIE);
+		return;
+	}
+	if (level == MARIO_LEVEL_TAIL || level == MARIO_LEVEL_FIRE)
+		SetLevel(MARIO_LEVEL_BIG);
+	else if (level == MARIO_LEVEL_BIG)
+		SetLevel(MARIO_LEVEL_SMALL);
+}

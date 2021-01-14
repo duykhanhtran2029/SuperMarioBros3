@@ -5,8 +5,7 @@
 #include "Block.h"
 CGoomba::CGoomba()
 {
-	vx = -GOOMBA_WALKING_SPEED;
-	vy = GOOMBA_GRAVITY;
+	nx = -1;
 	SetState(GOOMBA_STATE_WALKING);
 }
 void CGoomba::CalcPotentialCollisions(vector<LPGAMEOBJECT>* coObjects, vector<LPCOLLISIONEVENT>& coEvents)
@@ -43,7 +42,7 @@ void CGoomba::GetBoundingBox(float& left, float& top, float& right, float& botto
 	{
 		right = x + GOOMBA_RED_BBOX_WIDTH;
 		bottom = y + GOOMBA_RED_BBOX_WINGS_HEIGHT;
-		if(state != GOOMBA_STATE_RED_JUMPING)
+		if (state == GOOMBA_STATE_RED_WINGSWALKING)
 			bottom = y + GOOMBA_RED_BBOX_HEIGHT;
 	}
 }
@@ -69,31 +68,32 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		{
 			isWalking = false;
 			jumping_stacks = 0;
-			y -= 5;
+			y -= GOOMBA_RED_BBOX_WINGS_HEIGHT - GOOMBA_RED_BBOX_HEIGHT;
 			SetState(GOOMBA_STATE_RED_JUMPING);
-			return;
 		}
-		if (GetTickCount64() - jumping_start >= GOOMBA_RED_TIME_JUMPING && isJumping)
-		{
-			vy = GOOMBA_JUMP_SPEED;
-			isJumping = false;
-			jumping_stacks++;
-			return;
-		}
-		if (GetTickCount64() - highjumping_start >= GOOMBA_RED_TIME_HIGHJUMPING && isHighJumping)
-		{
-			isHighJumping = false;
-			vy = GOOMBA_GRAVITY;
-			jumping_stacks = -1;
-			return;
-		}
+		//if (GetTickCount64() - chasing_start >= GOOMBA_RED_TIME_CHASING && chasing_start != 0)
+		//{
+		//	chasing_start = -1;
+		//}
+
 	}
 	//
 	// TO-DO: make sure Goomba can interact with the world and to each of them too!
 	// 
 	// Simple fall down
+	vy += ay * dt;
 
-	
+	// limit
+	if (vy < -GOOMBA_JUMP_SPEED && state == GOOMBA_STATE_RED_JUMPING)
+	{
+		vy = -GOOMBA_JUMP_SPEED;
+		ay = GOOMBA_GRAVITY;
+	}
+	if (vy < -GOOMBA_HIGHJUMP_SPEED && state == GOOMBA_STATE_RED_HIGHJUMPING)
+	{
+		vy = -GOOMBA_HIGHJUMP_SPEED;
+		ay = GOOMBA_GRAVITY;
+	}
 
 	vector<LPCOLLISIONEVENT> coEvents;
 	vector<LPCOLLISIONEVENT> coEventsResult;
@@ -116,8 +116,26 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				mario->AddScore(x, y, 100, true);
 				SetDirection(mario->nx);
 				SetState(GOOMBA_STATE_DIE_BY_TAIL);
+				return;
 			}
 		}
+		//if (abs(mario->x - x) <= GOOMBA_RED_RANGE_CHASING && tag == GOOMBA_RED && chasing_start == 0)
+		//	StartChasing();
+		//if (abs(mario->x - x) >= GOOMBA_RED_RANGE_CHASING && tag == GOOMBA_RED && chasing_start != -1)
+		//{
+		//	if (x < mario->x)
+		//	{
+		//		nx = 1;
+		//		vx = GOOMBA_WALKING_SPEED;
+		//	}
+		//	else
+		//	{
+		//		nx = -1;
+		//		vx = -GOOMBA_WALKING_SPEED;
+		//	}
+		//	DebugOut(L"[] %d\n", chasing_start);
+		//}
+		
 	}
 	// No collision occured, proceed normally
 	if (coEvents.size() == 0)
@@ -146,7 +164,6 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		if (ny != 0)
 			vy = 0;			
 
-
 		for (UINT i = 0; i < coEventsResult.size(); i++)
 		{
 			LPCOLLISIONEVENT e = coEventsResult[i];
@@ -157,15 +174,13 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			if (dynamic_cast<CGoomba*>(e->obj)) // if e->obj is Goomba 
 			{
 				CGoomba* goomba = dynamic_cast<CGoomba*>(e->obj);
-				if (e->nx != 0)
+				if (goomba->GetState() != GOOMBA_STATE_DIE)
 				{
-					if (goomba->GetState() != GOOMBA_STATE_DIE)
-					{
-						goomba->vx = -goomba->vx;
-						this->vx = -this->vx;
-					}
-
+					goomba->vx = -goomba->vx;
+					this->vx = -this->vx;
+					y = y0;
 				}
+
 			}
 			else if (dynamic_cast<CBrick*>(e->obj))
 			{
@@ -177,23 +192,29 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					vy = 0;
 					if (e->ny < 0 && tag == GOOMBA_RED)
 					{
-						if (jumping_stacks == GOOMBA_RED_JUMPING_STACKS)
+						if (!isWalking)
 						{
-							jumping_stacks = -1;
-							StartHighJumping();
-							//DebugOut(L"[JUMP]\n");
+							if (jumping_stacks == GOOMBA_RED_JUMPING_STACKS)
+							{
+								SetState(GOOMBA_STATE_RED_HIGHJUMPING);
+								jumping_stacks = -1;
+							}
+							else
+							{
+								if (jumping_stacks == -1)
+									SetState(GOOMBA_STATE_RED_WINGSWALKING);
+								else
+									SetState(GOOMBA_STATE_RED_JUMPING);
+								jumping_stacks++;
+							}
 						}
 						else
-						{
-							if (jumping_stacks == -1)
-							{
-								y += 5;
-								SetState(GOOMBA_STATE_RED_WINGSWALKING);
-							}							
-							else
-								SetState(GOOMBA_STATE_RED_JUMPING);
-						}
-						
+							ay = GOOMBA_GRAVITY;
+					}
+					if (e->ny > 0)
+					{
+						vy = 0;
+						ay = GOOMBA_GRAVITY;
 					}
 				}
 				if (e->nx != 0)
@@ -214,7 +235,7 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			}
 		}
 	}
-	if (vx < 0 && x < 0) {
+	if (vx < 0 && x <= 0) {
 		x = 0;
 		vx = -vx;
 	}
@@ -235,12 +256,12 @@ void CGoomba::Render()
 		break;
 	case GOOMBA_RED:
 		ani = GOOMBA_RED_ANI_WINGSWALKING;
+		if (state == GOOMBA_STATE_RED_JUMPING || state == GOOMBA_STATE_RED_HIGHJUMPING)
+			ani = GOOMBA_RED_ANI_JUMPING;
 		if (state == GOOMBA_STATE_DIE)
 			ani = GOOMBA_RED_ANI_DIE;
 		if (state == GOOMBA_STATE_DIE_BY_TAIL)
 			ani = GOOMBA_RED_ANI_DIE;
-		if (vy != 0)
-			ani = GOOMBA_RED_ANI_JUMPING;
 		break;
 	case GOOMBA_RED_NORMAL:
 		ani = GOOMBA_RED_ANI_WALKING;
@@ -268,20 +289,17 @@ void CGoomba::SetState(int state)
 		//StartDying();
 		break;
 	case GOOMBA_STATE_RED_JUMPING:
-		//if (this->state == GOOMBA_STATE_RED_WINGSWALKING)
-			//y -= 5;
-		StartJumping();
+		ay = -GOOMBA_GRAVITY;
+		break;
+	case GOOMBA_STATE_RED_HIGHJUMPING:
+		ay = -GOOMBA_GRAVITY;
 		break;
 	case GOOMBA_STATE_WALKING:
-		if (tag == GOOMBA_RED)
-		{
-			StartWalking();
-			vy = 0;
-		}
-		else
-			vy = GOOMBA_GRAVITY;
+		vx = nx * GOOMBA_WALKING_SPEED;
+		ay = GOOMBA_GRAVITY;
 	case GOOMBA_STATE_RED_WINGSWALKING:
 		StartWalking();
+		ay = GOOMBA_GRAVITY;
 		break;
 	}
 	CGameObject::SetState(state);

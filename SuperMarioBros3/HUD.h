@@ -11,7 +11,7 @@
 #define SPRITE_ICONMARIO_ID					50003
 #define SPRITE_ICONLUIGI_ID					50004
 #define SPRITE_FILLARROW_ID					50005
-#define SPRITE_P_ID							50006
+#define ANI_P_ID							5006
 
 #define PLAYSCENE_HUD	0
 #define WORLDSCENE_HUD	1
@@ -29,7 +29,7 @@ class HUD: public CGameObject
 	vector<LPSPRITE> scoreSprite;
 	vector<LPSPRITE> remainTimeSprites;
 	vector<LPSPRITE> powerMelterSprite;
-	LPSPRITE PSprite = NULL;
+	LPANIMATION PAni = NULL;
 	CAnimationSet* TakenCards = NULL;
 
 

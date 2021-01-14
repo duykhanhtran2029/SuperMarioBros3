@@ -26,7 +26,7 @@
 
 #define MARIO_BULLET_MAX			20
 
-#define MARIO_UNTOUCHABLE_TIME		5000
+#define MARIO_UNTOUCHABLE_TIME		6000
 #define MARIO_TURNING_TAIL_TIME		350
 #define MARIO_TURNING_STATE_TIME	70
 #define MARIO_SHOOTING_TIME			150
@@ -285,6 +285,7 @@ public:
 
 	bool isAtIntroScene = false;
 	bool lostControl = false;
+	bool isBlocked = false;
 	int turning_state = 0;
 
 	int RunningStacks = 0;
@@ -448,19 +449,7 @@ public:
 	void Reset();
 	virtual void GetBoundingBox(float &left, float &top, float &right, float &bottom);
 
-	void Attacked()
-	{
-		if (level == MARIO_LEVEL_SMALL)
-		{
-			SetState(MARIO_STATE_DIE);
-			return;
-		}
-		if (level == MARIO_LEVEL_TAIL || level == MARIO_LEVEL_FIRE)
-			SetLevel(MARIO_LEVEL_BIG);
-		else if (level == MARIO_LEVEL_BIG)
-			SetLevel(MARIO_LEVEL_SMALL);	
-		StartUntouchable();
-	}
+	void Attacked();
 	void AddLife(int l = 1) { this->life += l; }
 	void AddMoney(int m = 1) { this->money += m; }
 	void AddScore(int ox, int oy, int s = 100, bool isEnemy = false, bool showScore = true);

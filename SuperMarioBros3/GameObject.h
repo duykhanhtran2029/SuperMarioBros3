@@ -74,6 +74,7 @@ public:
 public: 
 	int tag = 0;
 	bool isDestroyed = false;
+	bool isEnable = true;
 
 	void GetPosition(float &x, float &y) { x = this->x; y = this->y; }
 	void GetSpeed(float &vx, float &vy) { vx = this->vx; vy = this->vy; }
@@ -84,11 +85,6 @@ public:
 	void SetSpeed(float vx, float vy) { this->vx = vx, this->vy = vy; }
 	void SetDirection(int nx) { this->nx = nx; }
 	void SetTag(int tag) { this->tag = tag; }
-	//void SetDelta(float mx, float my) { deltaX = mx; deltaY = my; }
-	//
-	//void SetDebugAlpha(int Da) { DebugAlpha = Da; }
-	//void SetDebugTag(int tag) { DebugTag = tag; }
-
 	void RenderBoundingBox(int alpha = 0);
 	bool isColliding(float friend_left, float friend_top, float friend_right, float friend_bottom);
 	void SetAnimationSet(LPANIMATION_SET ani_set) { animation_set = ani_set; }
@@ -106,7 +102,12 @@ public:
 		float &rdy);
 
 	CGameObject();
-
+	float GetWidth() 
+	{
+		float left, top, right, bottom;
+		GetBoundingBox(left, top, right, bottom);
+		return right - left;
+	}
 	virtual void GetBoundingBox(float &left, float &top, float &right, float &bottom) = 0;
 	virtual void Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects = NULL);
 	virtual void Render() = 0;

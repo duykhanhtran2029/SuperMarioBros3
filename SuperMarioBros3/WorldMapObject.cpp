@@ -14,7 +14,7 @@ void CWorldMapObject::Render()
 		animation_set->at(1)->Render(x, y);
 	else
 		animation_set->at(0)->Render(x, y);
-	RenderBoundingBox(0);
+	RenderBoundingBox();
 }
 void CWorldMapObject::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {

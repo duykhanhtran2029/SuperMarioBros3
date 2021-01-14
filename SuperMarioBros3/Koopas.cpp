@@ -8,7 +8,7 @@
 CKoopas::CKoopas()
 {
 	nx = -1;
-	SetState(KOOPAS_STATE_WALKING);
+	//SetState(KOOPAS_STATE_WALKING);
 	//SetState(KOOPAS_STATE_IN_SHELL);
 	//SetState(KOOPAS_STATE_SHELL_UP);
 }
@@ -202,6 +202,8 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					{
 						this->vx = -this->vx;
 						koopas->vx = -koopas->vx;
+						this->nx = -this->nx;
+						koopas->nx = -koopas->nx;
 					}
 				}
 
@@ -345,7 +347,10 @@ void CKoopas::SetState(int state)
 		break;
 	}
 	case KOOPAS_STATE_WALKING:
-		vx = nx*KOOPAS_WALKING_SPEED;
+		if(tag == KOOPAS_GREEN_PARA)
+			vx = nx * KOOPAS_PARA_WALKING_SPEED;
+		else
+			vx = nx*KOOPAS_WALKING_SPEED;
 		break;
 	case KOOPAS_STATE_SPINNING:
 		if (nx > 0)
@@ -359,6 +364,7 @@ void CKoopas::SetState(int state)
 		break;
 	case KOOPAS_STATE_PARA:
 		vy = -KOOPAS_JUMP_SPEED;
+		vx = nx * KOOPAS_PARA_WALKING_SPEED;
 		break;
 	}
 
