@@ -3,13 +3,15 @@
 #include"Textures.h"
 #include"PlayScene.h"
 #include"WorldScene.h"
+#include"BackUp.h"
 HUD::HUD(int type_hud)
 {
-	nlife = 0;
+	CBackUp* backup = CBackUp::GetInstance();
+	nlife = backup->life;
 	remainTime = DEFAULT_TIME;
-	score = 0;
-	money = 0;
-	time = 0;
+	score = backup->score;
+	money = backup->money;
+	time = backup->time;
 	runningStacks = 0;
 
 	this->type_hud = type_hud;
@@ -46,7 +48,8 @@ void HUD::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		runningStacks = mario->RunningStacks;
 		score = mario->score;
 		money = mario->money;
-		time += dt;
+		if (!mario->isGameDone)
+			time += dt;
 		remainTime = DEFAULT_TIME - time / 1000;
 	}
 	string time_str = to_string(remainTime);
@@ -65,6 +68,7 @@ void HUD::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		remainTime = 0;
 		runningStacks = 0;
 	}
+	//DebugOut(L"%d\n", money);
 }
 void HUD::Render()
 {

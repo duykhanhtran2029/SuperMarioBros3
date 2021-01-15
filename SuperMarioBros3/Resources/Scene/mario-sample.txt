@@ -1,9 +1,9 @@
 [SETTINGS]
-start	1
+start	4
 #id		path					type
 [SCENES]
 0	Resources\Scene\worldscene.txt	1
 1	Resources\Scene\scene1.txt	2
 2	Resources\Scene\extrascene.txt	2
-4	Resources\Scene\scene2.txt	2
+4	Resources\Scene\scene4.txt	2
 5	Resources\Scene\introscene.txt	0

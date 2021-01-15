@@ -169,7 +169,7 @@ void CQuestionBrick::CreateItem(int itemtype)
 	if (itemtype == ITEM_COIN)
 	{
 		item = new CCoin(COIN_TYPE_INBRICK);
-
+		item->SetType(IGNORE);
 		CAnimationSets* animation_sets = CAnimationSets::GetInstance();
 		LPANIMATION_SET tmp_ani_set = animation_sets->Get(COIN_ANI_SET_ID);
 
@@ -182,7 +182,7 @@ void CQuestionBrick::CreateItem(int itemtype)
 	if (itemtype == ITEM_LEAF)
 	{
 		item = new CLeaf();
-
+		item->SetType(IGNORE);
 		CAnimationSets* animation_sets = CAnimationSets::GetInstance();
 		LPANIMATION_SET tmp_ani_set = animation_sets->Get(LEAF_ANI_SET_ID);
 
@@ -195,7 +195,7 @@ void CQuestionBrick::CreateItem(int itemtype)
 	if (itemtype == ITEM_MUSHROOM_RED || itemtype == ITEM_MUSHROOM_GREEN)
 	{
 		item = new CMushRoom();
-
+		item->SetType(MOVING);
 		CAnimationSets* animation_sets = CAnimationSets::GetInstance();
 		LPANIMATION_SET tmp_ani_set = animation_sets->Get(MUSHROOM_ANI_SET_ID);
 

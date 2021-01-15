@@ -8,6 +8,12 @@
 #include "Font.h"
 #include "HUD.h"
 
+#define SCENE1_X	64
+#define SCENE1_Y	16
+
+#define SCENE4_X	160
+#define SCENE4_Y	48
+
 class CWorldScene : public CScene
 {
 protected:

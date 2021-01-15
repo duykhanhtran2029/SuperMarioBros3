@@ -36,20 +36,23 @@ void CLeaf::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					((CIntroScene*)CGame::GetInstance()->GetCurrentScene())->ReleaseGoomba();
 				}
 			}
+			if (GetTickCount64() - start_timing >= LEAF_FALLING_TIME)
+			{
+				vx = -vx;
+				start_timing = GetTickCount64();
+			}
+			if (!mario->isAtIntroScene)
+			{
+				if (y > ((CPlayScene*)CGame::GetInstance()->GetCurrentScene())->GetMap()->GetMapHeight())
+				{
+					isAppear = false;
+					isDestroyed = true;
+				}
+				//x = y = -50;
+			}
 
 		}
 
-		if (GetTickCount64() - start_timing >= LEAF_FALLING_TIME)
-		{
-			vx = -vx;
-			start_timing = GetTickCount64();
-		}
-		if (y > ((CPlayScene*)CGame::GetInstance()->GetCurrentScene())->GetMap()->GetMapHeight())
-		{
-			isAppear = false;
-			isDestroyed = true;
-			//x = y = -50;
-		}
 	}
 	if (state == LEAF_STATE_UP)
 	{

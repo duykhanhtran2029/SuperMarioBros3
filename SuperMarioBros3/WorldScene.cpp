@@ -7,6 +7,7 @@
 #include "Sprites.h"
 #include "Define.h"
 #include "Brick.h"
+#include "BackUp.h"
 #include "WorldMapObject.h"
 
 
@@ -259,6 +260,11 @@ void CWorldScene::Load()
 
 	fonts = new CFont();
 	hud = new HUD(WORLDSCENE_HUD);
+	//set position of player
+	CBackUp* backup = CBackUp::GetInstance();
+	for (size_t i = 1; i < objects.size(); i++)
+		if (objects[i]->tag == OBJECT_TYPE_PORTAL && ((CWorldMapObject*)objects[i])->GetSceneId() == backup->scene)
+			player->SetPosition(objects[i]->x, objects[i]->y);
 	CGame::GetInstance()->SetCamPos(0, -HUD_HEIGHT);
 	hud->SetPosition(0, current_map->GetMapHeight() - HUD_HEIGHT);
 

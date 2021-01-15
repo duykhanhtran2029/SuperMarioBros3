@@ -18,6 +18,9 @@
 #define GAMEDONE2_X		2620
 #define GAMEDONE2_Y		270
 
+#define WORLD_1_1	1
+#define WORLD_1_4	4
+
 class CPlayScene : public CScene
 {
 protected:
@@ -41,6 +44,7 @@ protected:
 public:
 	bool isGameDone1 = false;
 	bool isGameDone2 = false;
+	bool isGameDone3 = false;
 	CPlayScene(int id, LPCWSTR filePath);
 	virtual void Load();
 	virtual void SetCam(float cx, float cy);
@@ -57,11 +61,7 @@ public:
 	void PutPlayer(CMario* m)
 	{
 		if (dynamic_cast<CMario*> (objects[0]))
-		{
-			//CMario* temp = (CMario*)objects[0];
 			objects[0] = m;
-			//delete temp;
-		}
 	}
 	void Swap(LPGAMEOBJECT a, LPGAMEOBJECT b)
 	{
@@ -75,6 +75,8 @@ public:
 		}
 		swap(objects[ioa], objects[iob]);
 	}
+	void CalColliableObjects(LPGAMEOBJECT curobj, vector<LPGAMEOBJECT>* coObjects = NULL);
+	int CalScore();
 	//friend class CPlaySceneKeyHandler;
 };
 

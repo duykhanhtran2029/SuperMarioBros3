@@ -12,6 +12,7 @@ CCoin::CCoin(int tag) : CGameObject() {
 	if (tag == COIN_TYPE_TRANSFORM)
 		StartExist();
 	state = COIN_STATE_IDLE;
+	type = IGNORE;
 }
 void CCoin::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
@@ -34,7 +35,7 @@ void CCoin::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				isAppear = false;
 				isDestroyed = true;
 				coinmario->AddScore(x,y,100,false,false); 
-				coinmario->AddMoney();
+				coinmario->AddMoney(1);
 			}
 
 		}

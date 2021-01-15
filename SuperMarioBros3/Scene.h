@@ -22,12 +22,14 @@ class CScene
 protected:
 	CKeyEventHandler * key_handler;
 	int id;
+	int type;
 	LPCWSTR sceneFilePath;
 	CFont* fonts = NULL;
 public: 
 	CScene(int id, LPCWSTR filePath);
 	bool isUnLoaded = false;
 	CKeyEventHandler * GetKeyEventHandler() { return key_handler; }
+	int GetId() { return id; }
 	virtual void Load() = 0;
 	virtual void Unload() = 0;
 	virtual void Update(DWORD dt) = 0;

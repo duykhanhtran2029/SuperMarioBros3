@@ -40,6 +40,7 @@
 #define MARIO_TRANSFORMING_TIME		500
 #define MARIO_KILLSTREAK_TIME		1000
 #define MARIO_PIPE_TIME				1000
+#define MARIO_GAMEDONE_TIME			3000
 
 
 #define MARIO_RUNNING_STACKS		7
@@ -273,6 +274,7 @@ class CMario : public CGameObject
 	DWORD pipedown_start = 0;
 	DWORD pipeup_start = 0;
 	DWORD last_kill = 0;
+	DWORD gamedone = 0;
 
 	int iBullet = 0;
 	int kill_streak = 0;
@@ -348,25 +350,24 @@ public:
 	virtual void Render();
 	void CMario::TimingFlag();
 
-	//set
+
+	//setter
+	void SetState(int vState);
+	void SetLevel(int l, bool transform = true);
 	void SetIsOnGround(bool On) { this->isReadyToHold = On; }
 	void SetIsReadyToHold(bool hold) { this->isReadyToHold = hold; }
 	void SetIsHolding(bool m) { this->isHolding = m; }
-
 	void SetIsReadyToJump(bool jump) { isReadyToJump = jump; }
 	void SetIsJumping(bool jump) { this->isJumping = jump; }
 	void SetIsFlapping(bool flap) { this->isFlapping = flap; }
 	void SetIsTailFlying(bool fly) { this->isTailFlying = fly; }
-
 	void SetIsRunning(bool run) { this->isRunning = run; }
-
 	void SetIsReadyToSit(bool sit) { this->isReadyToSit = sit; }
 	void SetIsSitting(bool sit) { this->isSitting= sit; }
-
 	void SetIsShooting(bool shoot) { this->isShooting = shoot; }
-	void AddBullets(CFireBullet* c) { Bullets.push_back(c); }
 	void SetIsReadyToKick(bool m) { this->isReadyToKick = m; }
 	void SetIsKicking(bool m) { this->isKicking = m; }
+	void Reset();
 
 	//render for all
 	void BasicRenderLogicsForAllLevel(int& ani,
@@ -425,6 +426,7 @@ public:
 		isTailFlying = true;
 	}
 	void StartTransforming() { transforming_start = GetTickCount64(); isTransforming = true; }
+	void StartGameDone() { gamedone = GetTickCount64();}
 	void StartPipeDown(bool isIP = false) 
 	{
 		pipedown_start = GetTickCount64(); 
@@ -439,19 +441,13 @@ public:
 		isInPipe = isIP;
 		vy = -MARIO_GRAVITY;
 	}
-	void CalcPotentialCollisions(
-		vector<LPGAMEOBJECT>* coObjects,
-		vector<LPCOLLISIONEVENT>& coEvents);
-	//void RenderRunning(int& ani, int ani_run_up_right, int ani_run_up_left, int ani_run_down);
-	void SetState(int vState);
-	void SetLevel(int l, bool transform = true);
 	void StartUntouchable() { untouchable = 1; untouchable_start = GetTickCount64(); }
-	void Reset();
 	virtual void GetBoundingBox(float &left, float &top, float &right, float &bottom);
 
 	void Attacked();
 	void AddLife(int l = 1) { this->life += l; }
 	void AddMoney(int m = 1) { this->money += m; }
 	void AddScore(int ox, int oy, int s = 100, bool isEnemy = false, bool showScore = true);
+	void AddBullets(CFireBullet* c) { Bullets.push_back(c); }
 	CTail* getTail() { return tail; }
 };

@@ -339,7 +339,6 @@ void CGame::_ParseSection_SCENES(string line)
 	int id = atoi(tokens[0].c_str());
 	LPCWSTR path = ToLPCWSTR(tokens[1]);
 	int type = atoi(tokens[2].c_str());
-
 	if (type == PLAYSCENE)
 	{
 		LPSCENE playscene = new CPlayScene(id, path);

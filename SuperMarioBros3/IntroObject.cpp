@@ -5,6 +5,7 @@
 CIntroObject::CIntroObject()
 {
 	ax = ay = 0;
+	type = IGNORE;
 }
 void CIntroObject::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {

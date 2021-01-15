@@ -24,6 +24,7 @@ void CMap::Render()
 	int LastColumn = ceil( (CamX + CGame::GetInstance()->GetScreenWidth()) / TILE_WIDTH);
 	if (LastColumn >= TotalColumnsOfMap)
 		LastColumn = TotalColumnsOfMap - 1;
+	int d = 0;
 	for (int CurrentRow = 0; CurrentRow < TotalRowsOfMap; CurrentRow++)
 		for (int CurrentColumn = FirstColumn; CurrentColumn <= LastColumn; CurrentColumn++)
 		{

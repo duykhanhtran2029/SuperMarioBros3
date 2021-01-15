@@ -7,6 +7,9 @@
 #include "Sprites.h"
 #include "Animations.h"
 
+#define STATIC	0
+#define MOVING	1
+#define IGNORE	2
 
 using namespace std;
 
@@ -73,6 +76,7 @@ public:
 
 public: 
 	int tag = 0;
+	int type = 0;
 	bool isDestroyed = false;
 	bool isEnable = true;
 
@@ -85,6 +89,7 @@ public:
 	void SetSpeed(float vx, float vy) { this->vx = vx, this->vy = vy; }
 	void SetDirection(int nx) { this->nx = nx; }
 	void SetTag(int tag) { this->tag = tag; }
+	void SetType(int type) { this->type = type; }
 	void RenderBoundingBox(int alpha = 0);
 	bool isColliding(float friend_left, float friend_top, float friend_right, float friend_bottom);
 	void SetAnimationSet(LPANIMATION_SET ani_set) { animation_set = ani_set; }

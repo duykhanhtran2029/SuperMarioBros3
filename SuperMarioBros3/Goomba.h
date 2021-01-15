@@ -67,5 +67,4 @@ public:
 	void StartDying() { dying_start = GetTickCount64(); isDying = true;}
 	void StartChasing() { chasing_start = GetTickCount64();}
 	void StartWalking() { walking_start = GetTickCount64(); isWalking = true;}
-	void CalcPotentialCollisions(vector<LPGAMEOBJECT>* coObjects, vector<LPCOLLISIONEVENT>& coEvents);
 };

@@ -270,7 +270,30 @@ void CIntroScene::Load()
 	fonts = new CFont();
 	DebugOut(L"[INFO] Done loading scene resources %s\n", sceneFilePath);
 }
-
+void CIntroScene::CalColliableObjects(LPGAMEOBJECT curObj, vector<LPGAMEOBJECT>* coObjects)
+{
+	if (dynamic_cast<CMario*>(curObj))
+		for (UINT i = 0; i < coObjects->size(); i++)
+		{
+			LPGAMEOBJECT object = coObjects->at(i);
+			if (dynamic_cast<CLeaf*>(object)|| object->type == IGNORE
+				||(dynamic_cast<CKoopas*>(object) && object->state == KOOPAS_STATE_IN_SHELL && ((CMario*)curObj)->isHolding))
+			{
+				coObjects->erase(coObjects->begin() + i);
+				i--;
+			}
+		}
+	else
+		for (UINT i = 0; i < coObjects->size(); i++)
+		{
+			LPGAMEOBJECT object = coObjects->at(i);
+			if (coObjects->at(i)->type == IGNORE)
+			{
+				coObjects->erase(coObjects->begin() + i);
+				i--;
+			}
+		}
+}
 void CIntroScene::Update(DWORD dt)
 {
 	vector<LPGAMEOBJECT> coObjects;
@@ -513,10 +536,11 @@ void CIntroScene::Update(DWORD dt)
 		}
 
 	}
-	for (size_t i = 2; i < objects.size(); i++)
+	for (size_t i = 0; i < objects.size(); i++)
+	{
+		CalColliableObjects(objects[i], &coObjects);
 		objects[i]->Update(dt, &coObjects);
-	mario->Update(dt, &coObjects);
-	luigi->Update(dt, &coObjects);
+	}
 }
 void CIntroScene::Render()
 {

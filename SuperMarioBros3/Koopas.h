@@ -51,11 +51,13 @@ public:
 	bool isBeingHeld = false;
 	float lastStanding_Y;
 	bool CanPullBack = false;
+	float start_x = 0, start_y = 0;
 	void StartReviving() { reviving_start = GetTickCount64(); }
 	void StartShell() { shell_start = GetTickCount64(); reviving_start = 0; }
 	CKoopas();
 	void SetIsBeingHeld(bool m) { isBeingHeld = m; };
 	virtual void SetState(int state);
 	virtual void GetBoundingBox(float& left, float& top, float& right, float& bottom);
-	void CalcPotentialCollisions(vector<LPGAMEOBJECT>* coObjects, vector<LPCOLLISIONEVENT>& coEvents);
+	void Reset();
+	bool CalRevivable();
 };

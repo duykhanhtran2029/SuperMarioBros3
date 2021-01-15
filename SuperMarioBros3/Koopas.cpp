@@ -8,35 +8,10 @@
 CKoopas::CKoopas()
 {
 	nx = -1;
-	//SetState(KOOPAS_STATE_WALKING);
+	SetState(KOOPAS_STATE_WALKING);
 	//SetState(KOOPAS_STATE_IN_SHELL);
 	//SetState(KOOPAS_STATE_SHELL_UP);
 }
-
-
-void CKoopas::CalcPotentialCollisions(vector<LPGAMEOBJECT>* coObjects, vector<LPCOLLISIONEVENT>& coEvents)
-{
-	for (UINT i = 0; i < coObjects->size(); i++)
-	{
-		if (dynamic_cast<CIntroObject*>(coObjects->at(i)))
-			continue;
-		if (dynamic_cast<CMario*>(coObjects->at(i)))
-		{
-			CMario* tmp = dynamic_cast<CMario*>(coObjects->at(i));
-			if(tmp->isAtIntroScene && tmp->level == MARIO_LEVEL_SMALL)
-				continue;
-		}
-		LPCOLLISIONEVENT e = SweptAABBEx(coObjects->at(i));
-
-		if (e->t > 0 && e->t <= 1.0f)
-			coEvents.push_back(e);
-		else
-			delete e;
-	}
-
-	std::sort(coEvents.begin(), coEvents.end(), CCollisionEvent::compare);
-}
-
 
 void CKoopas::GetBoundingBox(float& left, float& top, float& right, float& bottom)
 {
@@ -50,7 +25,22 @@ void CKoopas::GetBoundingBox(float& left, float& top, float& right, float& botto
 	else
 		bottom = y + KOOPAS_BBOX_HEIGHT;
 }
+bool  CKoopas::CalRevivable()
+{
+	CGame* game = CGame::GetInstance();
+	float camX, camY;
 
+	camX = game->GetCamX();
+	camY = game->GetCamY();
+
+	bool can_1 =(start_x >= camX - GetWidth() - MARIO_BIG_BBOX_WIDTH && start_x < camX + SCREEN_WIDTH + MARIO_BIG_BBOX_WIDTH
+		&& start_y >= camY - (SCREEN_HEIGHT - game->GetScreenHeight()) && start_y < camY + SCREEN_HEIGHT);
+	bool can_2 = (x >= camX - GetWidth() - MARIO_BIG_BBOX_WIDTH && x < camX + SCREEN_WIDTH + MARIO_BIG_BBOX_WIDTH
+		&& x >= camY - (SCREEN_HEIGHT - game->GetScreenHeight()) && x < camY + SCREEN_HEIGHT);
+	if (can_1 == false && can_2 == false)
+		return true;
+	return false;
+}
 void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
 	//DebugOut(L"vx %f\n", vx);
@@ -83,6 +73,8 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			}
 			SetState(KOOPAS_STATE_WALKING);
 		}
+		if (CalRevivable())
+			Reset();
 	}
 	// Simple fall down
 	if (!isBeingHeld && !mario->isAtIntroScene)
@@ -368,4 +360,10 @@ void CKoopas::SetState(int state)
 		break;
 	}
 
+}
+void CKoopas::Reset()
+{
+	x = start_x;
+	y = start_y;
+	SetState(KOOPAS_STATE_WALKING);
 }

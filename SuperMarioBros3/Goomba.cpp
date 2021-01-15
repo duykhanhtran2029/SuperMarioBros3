@@ -8,22 +8,6 @@ CGoomba::CGoomba()
 	nx = -1;
 	SetState(GOOMBA_STATE_WALKING);
 }
-void CGoomba::CalcPotentialCollisions(vector<LPGAMEOBJECT>* coObjects, vector<LPCOLLISIONEVENT>& coEvents)
-{
-	for (UINT i = 0; i < coObjects->size(); i++)
-	{
-		LPCOLLISIONEVENT e = SweptAABBEx(coObjects->at(i));
-
-		if (e->t > 0 && e->t <= 1.0f)
-		{
-			coEvents.push_back(e);
-		}
-		else
-			delete e;
-	}
-
-	std::sort(coEvents.begin(), coEvents.end(), CCollisionEvent::compare);
-}
 void CGoomba::GetBoundingBox(float& left, float& top, float& right, float& bottom)
 {
 	if (state == GOOMBA_STATE_DIE_BY_TAIL)
@@ -81,6 +65,7 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	// TO-DO: make sure Goomba can interact with the world and to each of them too!
 	// 
 	// Simple fall down
+	if(!mario->isAtIntroScene)
 	vy += ay * dt;
 
 	// limit

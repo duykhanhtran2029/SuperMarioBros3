@@ -104,6 +104,7 @@ public:
 	{
 		switch_start = GetTickCount64();
 	}
+	void CalColliableObjects(LPGAMEOBJECT curobj, vector<LPGAMEOBJECT>* coObjects = NULL);
 	friend class IntroSceneHandler;
 };
 class IntroSceneKeyHandler : public CSceneKeyHandler

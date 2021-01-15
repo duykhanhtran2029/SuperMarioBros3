@@ -1,4 +1,5 @@
 #include "BackUp.h"
+#include "PlayScene.h"
 
 
 CBackUp* CBackUp::__instance = NULL;
@@ -8,13 +9,14 @@ CBackUp* CBackUp::GetInstance()
 	return __instance;
 }
 
-void CBackUp::BackUpMario(CMario * mario)
+void CBackUp::BackUpMario(CMario* mario)
 {
 	life = mario->life;
 	score = mario->score;
 	level = mario->level;
-	state = mario->state;
 	money = mario->money;
+	scene = CGame::GetInstance()->GetCurrentScene()->GetId();
+	cards = mario->cards;
 }
 
 void CBackUp::LoadBackUp(CMario* mario)
@@ -22,6 +24,6 @@ void CBackUp::LoadBackUp(CMario* mario)
 	mario->life = life;
 	mario->score = score;
 	mario->level = level;
-	mario->state = state;
 	mario->money = money;
+	mario->cards = cards;
 }

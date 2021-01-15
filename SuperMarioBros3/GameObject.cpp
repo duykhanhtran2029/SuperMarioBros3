@@ -76,14 +76,11 @@ void CGameObject::CalcPotentialCollisions(
 {
 	for (UINT i = 0; i < coObjects->size(); i++)
 	{
-		if (!dynamic_cast<CPiece*>(coObjects->at(i))&& !dynamic_cast<CScore*>(coObjects->at(i)))
-		{
-			LPCOLLISIONEVENT e = SweptAABBEx(coObjects->at(i));
-			if (e->t > 0 && e->t <= 1.0f)
-				coEvents.push_back(e);
-			else
-				delete e;
-		}
+		LPCOLLISIONEVENT e = SweptAABBEx(coObjects->at(i));
+		if (e->t > 0 && e->t <= 1.0f)
+			coEvents.push_back(e);
+		else
+			delete e;
 	}
 	std::sort(coEvents.begin(), coEvents.end(), CCollisionEvent::compare);
 }

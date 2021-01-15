@@ -27,8 +27,8 @@
 
 CMario::CMario(float x, float y, bool isatintroscene) : CGameObject()
 {
-	level = MARIO_LEVEL_SMALL;
-	//level = MARIO_LEVEL_TAIL;
+	//level = MARIO_LEVEL_SMALL;
+	level = MARIO_LEVEL_TAIL;
 	untouchable = 0;
 	SetState(MARIO_STATE_IDLE);
 	ax = MARIO_ACCELERATION;
@@ -46,34 +46,14 @@ CMario::CMario(float x, float y, bool isatintroscene) : CGameObject()
 	score = 0;
 	tail = new CTail(x,y);
 }
-void CMario::CalcPotentialCollisions(
-	vector<LPGAMEOBJECT>* coObjects,
-	vector<LPCOLLISIONEVENT>& coEvents)
-{
-	for (UINT i = 0; i < coObjects->size(); i++)
-	{
-		LPGAMEOBJECT object = coObjects->at(i);
-		if (dynamic_cast<CKoopas*>(object) && object->state == KOOPAS_STATE_IN_SHELL && isHolding)
-			continue;
-		if (dynamic_cast<CCoin*>(object) || dynamic_cast<CLeaf*>(object) 
-			|| dynamic_cast<CMushRoom*>(object) || dynamic_cast<CPiece*>(object)
-			|| dynamic_cast<CFireBullet*>(object) || dynamic_cast<CPlantBullet*>(object)
-			|| ((dynamic_cast<CPiranhaPlant*>(object) || dynamic_cast<CFirePiranhaPlant*>(object))&& object->state == PIRANHAPLANT_STATE_INACTIVE)
-			|| dynamic_cast<CScore*>(object) || dynamic_cast<CIntroObject*>(object))
-			continue;
-		else
-		{
-			LPCOLLISIONEVENT e = SweptAABBEx(coObjects->at(i));
-			if (e->t > 0 && e->t <= 1.0f)
-				coEvents.push_back(e);
-			else
-				delete e;
-		}
-	}
-	std::sort(coEvents.begin(), coEvents.end(), CCollisionEvent::compare);
-}
 void CMario::TimingFlag()
 {
+	if (GetTickCount64() - gamedone > MARIO_GAMEDONE_TIME && gamedone != 0)
+	{
+		gamedone = 0;
+		CGame::GetInstance()->SwitchScene(0);
+		return;
+	}
 	if (GetTickCount64() - slow_start > MARIO_SLOW_TIME && slow_start != 0)
 	{
 		slow_start = 0;
@@ -175,7 +155,13 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 			y += (MARIO_BIG_BBOX_HEIGHT - MARIO_SMALL_BBOX_HEIGHT - 1);
 		isTransforming = false;
 	}
-	if (isTransforming)
+	if (GetTickCount64() - gamedone > MARIO_GAMEDONE_TIME && gamedone != 0)
+	{
+		gamedone = 0;
+		((CPlayScene*)game->GetCurrentScene())->isGameDone3 = true;
+		return;
+	}
+	if (isTransforming || ((CPlayScene*)game->GetCurrentScene())->isGameDone2 == true)
 		return;
 	// Calculate dx, dy 
 	CGameObject::Update(dt);
@@ -194,6 +180,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 		//update speed
 		vx += ax * dt + RunningStacks * ax;
 		vy += ay * dt;
+		vy = 0;
 		//limit the speed of mario 
 		if (abs(vx) >= MARIO_WALKING_SPEED_MAX)
 		{
@@ -363,9 +350,13 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 					{
 						if (untouchable == 0 && goomba->GetState() != GOOMBA_STATE_DIE)
 						{
-							x = x0;
-							y = y0;
-							Attacked();
+							if (!isTurningTail)
+							{
+								x = x0;
+								y = y0;
+								Attacked();
+							}
+
 						}
 						else
 						{
@@ -402,6 +393,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 										if (((CIntroScene*)CGame::GetInstance()->GetCurrentScene())->mini_section == 9)
 										{
 											SetLevel(MARIO_LEVEL_SMALL);
+											koopas->x++;
 										}
 										else
 										{
@@ -460,7 +452,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 							}
 							else if (untouchable == 0 && isKicking == false)
 							{
-								if (koopas->GetState() != KOOPAS_STATE_IN_SHELL || koopas->GetState() != KOOPAS_STATE_SHELL_UP)
+								if ((koopas->GetState() != KOOPAS_STATE_IN_SHELL || koopas->GetState() != KOOPAS_STATE_SHELL_UP)&&!isTurningTail)
 									Attacked();
 							}
 
@@ -486,7 +478,11 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 				if (dynamic_cast<CBrick*>(e->obj))
 				{
 					if (isGameDone)
+					{
+						SetState(MARIO_STATE_WALKING_RIGHT);
 						vx = MARIO_WALKING_SPEED_MAX;
+						nx = 1;
+					}
 					CBrick* object = dynamic_cast<CBrick*>(e->obj);
 					//object->SetDebugAlpha(255);
 					if (isAtIntroScene && ((CIntroScene*)game->GetCurrentScene())->Revenge)
@@ -514,8 +510,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 								if (ceil(mBottom) != oTop)
 								{
 									vx = 0;
-									isReadyToRun = false;
-									if (isRunning)
+									if (isRunning && tag != PIPE)
 										StopRunning();
 								}
 							}
@@ -534,8 +529,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 								if (ceil(mBottom) != oTop)
 								{
 									vx = 0;
-									isReadyToRun = false;
-									if (isRunning)
+									if (isRunning && tag != PIPE)
 										StopRunning();
 								}
 							}
@@ -626,36 +620,56 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 	for (UINT i = 0; i < coEvents.size(); i++)
 		delete coEvents[i];
 	
-	//limit X, Y 
-	float mw = ((CPlayScene*)game->GetCurrentScene())->GetMap()->GetMapWidth();
-	float mh = ((CPlayScene*)game->GetCurrentScene())->GetMap()->GetMapHeight();
-	if (!dynamic_cast<CIntroScene*>(game->GetCurrentScene()) && !isGameDone)
+	
+	if (!isAtIntroScene)
 	{
-		//limit X
-		if (x >= mw - MARIO_BIG_BBOX_WIDTH)//Right edge
-			x = mw - MARIO_BIG_BBOX_WIDTH;
-		else if (x <= 0)//Left edge
-			x = 0;
-		//limit Y
-		if (y >= mh)
-			y = mh;
-		if (y <= -HUD_HEIGHT)
-			y = -HUD_HEIGHT;
-	}
-	if (x >= mw)
-	{
-		((CPlayScene*)game->GetCurrentScene())->isGameDone1 = true;
-		x = mw + 1;
-	}
-	if (y >= mh + MARIO_BIG_BBOX_WIDTH * 2)
-	{
-		((CPlayScene*)game->GetCurrentScene())->isGameDone2 = true;
-		y = mh + MARIO_BIG_BBOX_WIDTH * 2;
+		//limit X, Y
+		float mw = ((CPlayScene*)game->GetCurrentScene())->GetMap()->GetMapWidth();
+		float mh = ((CPlayScene*)game->GetCurrentScene())->GetMap()->GetMapHeight();
+		if (!dynamic_cast<CIntroScene*>(game->GetCurrentScene()) && !isGameDone)
+		{
+			//limit X
+			if (x >= mw - MARIO_BIG_BBOX_WIDTH)//Right edge
+				x = mw - MARIO_BIG_BBOX_WIDTH;
+			else if (x <= 0)//Left edge
+				x = 0;
+			//limit Y
+			if (y >= mh)
+				y = mh;
+			if (y <= -HUD_HEIGHT)
+				y = -HUD_HEIGHT;
+
+			if (game->GetCurrentScene()->GetId() == WORLD_1_4)
+			{
+				if (x <= game->GetCamX())
+				{
+					x = game->GetCamX();
+					SetState(MARIO_STATE_WALKING_RIGHT);
+					vx = MARIO_WALKING_SPEED_MIN;
+					nx = 1;
+				}
+				if (x >= game->GetCamX() + game->GetScreenWidth() - GetWidth())
+					x = game->GetCamX() + game->GetScreenWidth() - GetWidth();
+			}
+		}
+		if (x >= mw)
+		{
+			((CPlayScene*)game->GetCurrentScene())->isGameDone1 = true;
+		}
+		if (y >= mh + MARIO_BIG_BBOX_WIDTH * 2)
+		{
+			((CPlayScene*)game->GetCurrentScene())->isGameDone2 = true;
+			score += ((CPlayScene*)game->GetCurrentScene())->CalScore();
+			y = mh + MARIO_BIG_BBOX_WIDTH * 2;
+			if (gamedone == 0)
+				StartGameDone();
+		}
+		//update tail
+		tail->Update(dt);
 	}
 
-	//update tail
-	if(!isAtIntroScene)
-		tail->Update(dt);
+	DebugOut(L"[MARIO] x: %f\t y: %f\t \n", x, y);
+	//DebugOut(L"%d\n", money);
 }
 void CMario::BasicRenderLogicsForAllLevel(int& ani, int ani_jump_down_right, int ani_jump_down_left,
 	int ani_idle_right, int ani_idle_left,
@@ -1075,7 +1089,7 @@ void CMario::Render()
 	else
 		animation_set->at(ani)->Render(x, y, alpha);
 
-	RenderBoundingBox(128);
+	RenderBoundingBox(0);
 	if(isTurningTail)
 		tail->Render();
 }

@@ -9,6 +9,7 @@ CScore::CScore(int score)
 	isDestroyed = false;
 	start = GetTickCount64();
 	state = score;
+	SetType(IGNORE);
 }
 void CScore::GetBoundingBox(float& l, float& t, float& r, float& b)
 {
