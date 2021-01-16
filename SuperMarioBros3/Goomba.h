@@ -14,7 +14,8 @@
 #define GOOMBA_RED_TIME_WALKING			500
 #define GOOMBA_RED_TIME_HIGHJUMPING		500
 #define GOOMBA_RED_TIME_JUMPING			125
-#define GOOMBA_TIME_DIYING				250	
+#define GOOMBA_TIME_DIYING				250
+#define GOOMBA_TIME_DIYING_BY_TAIL		1000
 
 #define GOOMBA_RED_JUMPING_STACKS	3
 
@@ -54,6 +55,7 @@ class CGoomba : public CGameObject
 	DWORD chasing_start = 0;
 	DWORD walking_start = 0;
 	bool isDying = false;
+	bool isWhackedDying = false;
 	bool isWalking = false;
 	bool isJumping = false;
 	bool isHighJumping = false;
@@ -64,7 +66,7 @@ public:
 	virtual void GetBoundingBox(float& left, float& top, float& right, float& bottom);
 	virtual void Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects);
 	virtual void Render();
-	void StartDying() { dying_start = GetTickCount64(); isDying = true;}
+	void StartDying(bool l = false) { dying_start = GetTickCount64(); if (l) isWhackedDying = true; else isDying = true; }
 	void StartChasing() { chasing_start = GetTickCount64();}
 	void StartWalking() { walking_start = GetTickCount64(); isWalking = true;}
 };

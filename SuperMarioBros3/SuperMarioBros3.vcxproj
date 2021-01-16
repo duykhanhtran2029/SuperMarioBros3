@@ -132,6 +132,7 @@
     <ClCompile Include="Brick.cpp" />
     <ClCompile Include="Card.cpp" />
     <ClCompile Include="Coin.cpp" />
+    <ClCompile Include="FloatingWood.cpp" />
     <ClCompile Include="IntroGround.cpp" />
     <ClCompile Include="IntroObject.cpp" />
     <ClCompile Include="IntroScene.cpp" />
@@ -173,6 +174,7 @@
     <ClInclude Include="Brick.h" />
     <ClInclude Include="Card.h" />
     <ClInclude Include="Coin.h" />
+    <ClInclude Include="FloatingWood.h" />
     <ClInclude Include="IntroGround.h" />
     <ClInclude Include="IntroObject.h" />
     <ClInclude Include="IntroScene.h" />

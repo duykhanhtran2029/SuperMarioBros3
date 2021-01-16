@@ -12,7 +12,7 @@
 #define KOOPAS_DIE_DEFLECT_SPEED	0.4f
 #define KOOPAS_BBOX_WIDTH			16
 #define KOOPAS_BBOX_HEIGHT			26
-#define KOOPAS_BBOX_SHELL_HEIGHT	16
+#define KOOPAS_BBOX_SHELL_HEIGHT	15
 
 #define KOOPAS_STATE_WALKING	100
 #define KOOPAS_STATE_SHELL_UP	200
@@ -39,6 +39,7 @@
 #define KOOPAS_GREEN_PARA	2
 #define KOOPAS_RED_PARA		3
 
+#define ABYSS_X		2240
 
 
 class CKoopas : public CGameObject

@@ -25,8 +25,11 @@ void CQuestionBrick::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		{
 			mario->getTail()->GetBoundingBox(mLeft, mTop, mRight, mBottom);
 			GetBoundingBox(oLeft, oTop, oRight, oBottom);
-			if (isColliding(floor(mLeft), mTop, ceil(mRight), mBottom))
+			if (isColliding(floor(mLeft), mTop, ceil(mRight), mBottom) && mario->getTail()->hit_times == 0)
+			{
 				SetState(QUESTIONBRICK_STATE_HIT);
+				mario->getTail()->hit_times = 1;
+			}
 
 		}
 

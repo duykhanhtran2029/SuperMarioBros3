@@ -10,6 +10,7 @@ class CTail : public CGameObject
 	DWORD hit_start = 0;
 public:
 	bool isAppear = false;
+	bool hit_times = 0;
 	CTail(float x, float y) { this->x = x; this->y = y; }
 	virtual void Render();
 	virtual void Update(DWORD dt, vector<LPGAMEOBJECT>* colliable_objects = NULL);

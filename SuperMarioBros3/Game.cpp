@@ -398,9 +398,15 @@ void CGame::Load(LPCWSTR gameFile)
 void CGame::SwitchScene(int scene_id)
 {
 	DebugOut(L"[INFO] Switching to scene %d\n", scene_id);
+	if (current_scene == WORLD_1_1 || current_scene == WORLD_1_4)
+		((CPlayScene*)scenes[current_scene])->BackUpPlayer();
 	scenes[current_scene]->Unload();
-	if(pre_scene != -1)
+	if (pre_scene != -1)
+	{
+		((CPlayScene*)scenes[pre_scene])->SetPlayer(nullptr);
 		scenes[pre_scene]->Unload();
+		pre_scene = -1;
+	}
 
 	CTextures::GetInstance()->Clear();
 	CSprites::GetInstance()->Clear();
@@ -415,6 +421,8 @@ void CGame::SwitchScene(int scene_id)
 	LPSCENE s = scenes[scene_id];
 	CGame::GetInstance()->SetKeyHandler(s->GetKeyEventHandler());
 	s->Load();
+	if (current_scene == WORLD_1_1 || current_scene == WORLD_1_4)
+		((CPlayScene*)scenes[current_scene])->LoadBackUp();
 }
 void CGame::SwitchBackScene(int scene_id, float start_x, float start_y)
 {

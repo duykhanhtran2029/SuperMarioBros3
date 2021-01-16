@@ -99,6 +99,7 @@ void CMario::TimingFlag()
 		isTurningTail = false;
 		turning_state = 0;
 		turning_state_start = 0;
+		tail->hit_times = 0;
 	}
 	// reset untouchable timer if untouchable time has passed
 	if (GetTickCount64() - untouchable_start > MARIO_UNTOUCHABLE_TIME)
@@ -180,7 +181,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 		//update speed
 		vx += ax * dt + RunningStacks * ax;
 		vy += ay * dt;
-		vy = 0;
+		//vy = 0;
 		//limit the speed of mario 
 		if (abs(vx) >= MARIO_WALKING_SPEED_MAX)
 		{
@@ -232,6 +233,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 	if (vy < 0)
 		isOnGround = false;
 
+	//handle for collision
 	vector<LPCOLLISIONEVENT> coEvents;
 	vector<LPCOLLISIONEVENT> coEventsResult;
 
@@ -393,7 +395,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 										if (((CIntroScene*)CGame::GetInstance()->GetCurrentScene())->mini_section == 9)
 										{
 											SetLevel(MARIO_LEVEL_SMALL);
-											koopas->x++;
+											//koopas->x++;
 										}
 										else
 										{
@@ -424,17 +426,24 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 					else
 					{
 						if (e->ny > 0)
+						{
+							y = y0;
 							vy = 0;
+						}
 						if (e->ny < 0)
 						{
 							AddScore(koopas->x, koopas->y, 100, true);
 							vy = -1.5f * MARIO_JUMP_DEFLECT_SPEED;
-							if (koopas->GetState() != KOOPAS_STATE_IN_SHELL && koopas->GetState() != KOOPAS_STATE_SHELL_UP)
-								koopas->SetState(KOOPAS_STATE_IN_SHELL);
+							if (koopas->tag == KOOPAS_GREEN_PARA)
+								koopas->tag = KOOPAS_GREEN;
+							else if (koopas->tag == KOOPAS_RED_PARA)
+								koopas->tag = KOOPAS_RED;
+							else if (koopas->GetState() != KOOPAS_STATE_IN_SHELL && koopas->GetState() != KOOPAS_STATE_SHELL_UP)
+									koopas->SetState(KOOPAS_STATE_IN_SHELL);
 							else
 								koopas->SetState(KOOPAS_STATE_SPINNING);
 						}
-						else if (e->nx != 0 || e->ny > 0)
+						else if (e->nx != 0)
 						{
 							if (koopas->GetState() == KOOPAS_STATE_IN_SHELL || koopas->GetState() == KOOPAS_STATE_SHELL_UP)
 							{
@@ -450,12 +459,9 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 									koopas->SetState(KOOPAS_STATE_SPINNING);
 								}
 							}
-							else if (untouchable == 0 && isKicking == false)
-							{
-								if ((koopas->GetState() != KOOPAS_STATE_IN_SHELL || koopas->GetState() != KOOPAS_STATE_SHELL_UP)&&!isTurningTail)
+							else if (untouchable == 0 && isKicking == false && !isTurningTail
+								&& koopas->GetState() != KOOPAS_STATE_IN_SHELL&& koopas->GetState() != KOOPAS_STATE_SHELL_UP )
 									Attacked();
-							}
-
 						}
 					}
 
@@ -517,13 +523,19 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 						}
 						else
 						{
-							if (e->ny > 0)
+							if (!(tag == PIPE && isFlying))
 							{
-								ay = MARIO_GRAVITY;
-								isReadyToJump = false;
+								if (e->ny > 0)
+								{
+									ay = MARIO_GRAVITY;
+									isReadyToJump = false;
+								}
+								else if (e->ny < 0)
+								{
+
+									vy = 0;
+								}
 							}
-							else if (e->ny < 0)
-								vy = 0;
 							if (e->nx != 0)
 							{
 								if (ceil(mBottom) != oTop)
@@ -668,7 +680,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 		tail->Update(dt);
 	}
 
-	DebugOut(L"[MARIO] x: %f\t y: %f\t \n", x, y);
+	//DebugOut(L"[MARIO] x: %f\t y: %f\t \n", x, y);
 	//DebugOut(L"%d\n", money);
 }
 void CMario::BasicRenderLogicsForAllLevel(int& ani, int ani_jump_down_right, int ani_jump_down_left,
@@ -1089,7 +1101,7 @@ void CMario::Render()
 	else
 		animation_set->at(ani)->Render(x, y, alpha);
 
-	RenderBoundingBox(0);
+	RenderBoundingBox();
 	if(isTurningTail)
 		tail->Render();
 }

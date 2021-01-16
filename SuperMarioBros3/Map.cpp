@@ -30,7 +30,7 @@ void CMap::Render()
 		{
 			int index = TileMap[CurrentRow][CurrentColumn] - 1;
 			if(index < TotalTiles )
-				Tiles.at(index)->Draw(CurrentColumn * TILE_WIDTH, CurrentRow * TILE_HEIGHT - HUD_HEIGHT, 120);
+				Tiles.at(index)->Draw(CurrentColumn * TILE_WIDTH, CurrentRow * TILE_HEIGHT - HUD_HEIGHT);
 		}
 }
 

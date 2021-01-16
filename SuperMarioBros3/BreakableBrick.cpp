@@ -14,8 +14,11 @@ void CBreakableBrick::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		float oLeft, oTop, oRight, oBottom;
 		mario->getTail()->GetBoundingBox(mLeft, mTop, mRight, mBottom);
 		GetBoundingBox(oLeft, oTop, oRight, oBottom);
-		if (isColliding(floor(mLeft), mTop, ceil(mRight), mBottom))
+		if (isColliding(floor(mLeft), mTop, ceil(mRight), mBottom) && mario->getTail()->hit_times == 0)
+		{
 			Break();
+			mario->getTail()->hit_times = 1;
+		}
 	}
 }
 void CBreakableBrick::Render()

@@ -116,6 +116,7 @@
     <ClCompile Include="Card.cpp">
       <Filter>Map Objects</Filter>
     </ClCompile>
+    <ClCompile Include="FloatingWood.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Map.h">
@@ -238,6 +239,7 @@
     <ClInclude Include="Card.h">
       <Filter>Map Objects</Filter>
     </ClInclude>
+    <ClInclude Include="FloatingWood.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header Files">

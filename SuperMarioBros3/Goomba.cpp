@@ -41,12 +41,19 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		mario = ((CIntroScene*)CGame::GetInstance()->GetCurrentScene())->GetPlayer();
 	if (GetTickCount64() - dying_start >= GOOMBA_TIME_DIYING && isDying)
 	{
+		isDying = false;
 		isDestroyed = true;
 		if (dynamic_cast<CIntroScene*> (CGame::GetInstance()->GetCurrentScene()))
 			mario->SetState(MARIO_STATE_WALKING_RIGHT);
 		return;
 	}
-	if (tag == GOOMBA_RED)
+	if (GetTickCount64() - dying_start >= GOOMBA_TIME_DIYING_BY_TAIL && isWhackedDying)
+	{
+		isWhackedDying = false;
+		isDestroyed = true;
+		return;
+	}
+	if (tag == GOOMBA_RED && state != GOOMBA_STATE_DIE && state != GOOMBA_STATE_DIE_BY_TAIL)
 	{
 		if (GetTickCount64() - walking_start >= GOOMBA_RED_TIME_WALKING && isWalking)
 		{
@@ -66,7 +73,7 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	// 
 	// Simple fall down
 	if(!mario->isAtIntroScene)
-	vy += ay * dt;
+		vy += ay * dt;
 
 	// limit
 	if (vy < -GOOMBA_JUMP_SPEED && state == GOOMBA_STATE_RED_JUMPING)
@@ -101,6 +108,7 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				mario->AddScore(x, y, 100, true);
 				SetDirection(mario->nx);
 				SetState(GOOMBA_STATE_DIE_BY_TAIL);
+				mario->getTail()->ShowHitEffect();
 				return;
 			}
 		}
@@ -123,7 +131,7 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		
 	}
 	// No collision occured, proceed normally
-	if (coEvents.size() == 0)
+	if (coEvents.size() == 0 || state == GOOMBA_STATE_DIE_BY_TAIL)
 	{
 		x += dx;
 		y += dy;
@@ -167,7 +175,7 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				}
 
 			}
-			else if (dynamic_cast<CBrick*>(e->obj))
+			if (dynamic_cast<CBrick*>(e->obj))
 			{
 				CBrick* object = dynamic_cast<CBrick*>(e->obj);
 				object->GetBoundingBox(oLeft, oTop, oRight, oBottom);
@@ -175,7 +183,7 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				if (e->ny != 0)
 				{
 					vy = 0;
-					if (e->ny < 0 && tag == GOOMBA_RED)
+					if (e->ny < 0 && tag == GOOMBA_RED && state != GOOMBA_STATE_DIE)
 					{
 						if (!isWalking)
 						{
@@ -208,13 +216,13 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 						vx = - vx;
 				}
 			}
-			else if (dynamic_cast<CBlock*>(e->obj))
+			if (dynamic_cast<CBlock*>(e->obj))
 			{
 				CBlock* block = dynamic_cast<CBlock*>(e->obj);
 				x = x0 + dx;
 				y = y0 + dy;
 			}
-			else if (dynamic_cast<CFireBullet*>(e->obj))
+			if (dynamic_cast<CFireBullet*>(e->obj))
 			{
 				SetState(GOOMBA_STATE_DIE);
 			}
@@ -243,10 +251,8 @@ void CGoomba::Render()
 		ani = GOOMBA_RED_ANI_WINGSWALKING;
 		if (state == GOOMBA_STATE_RED_JUMPING || state == GOOMBA_STATE_RED_HIGHJUMPING)
 			ani = GOOMBA_RED_ANI_JUMPING;
-		if (state == GOOMBA_STATE_DIE)
-			ani = GOOMBA_RED_ANI_DIE;
 		if (state == GOOMBA_STATE_DIE_BY_TAIL)
-			ani = GOOMBA_RED_ANI_DIE;
+			ani = GOOMBA_RED_ANI_WALKING;
 		break;
 	case GOOMBA_RED_NORMAL:
 		ani = GOOMBA_RED_ANI_WALKING;
@@ -271,7 +277,8 @@ void CGoomba::SetState(int state)
 	case GOOMBA_STATE_DIE_BY_TAIL:
 		vy = -GOOMBA_DIE_DEFLECT_SPEED;
 		vx = -vx;
-		//StartDying();
+		ay = GOOMBA_GRAVITY;
+		StartDying(true);
 		break;
 	case GOOMBA_STATE_RED_JUMPING:
 		ay = -GOOMBA_GRAVITY;

@@ -336,9 +336,6 @@ void CPlayScene::Load()
 	CTextures::GetInstance()->Add(ID_TEX_BBOX, L"Resources\\Textures\\bbox.png", D3DCOLOR_XRGB(255, 255, 255));
 	fonts = new CFont();
 	hud = new HUD();
-	CBackUp* backup = CBackUp::GetInstance();
-	if(id != 2)
-		backup->LoadBackUp(player);
 	DebugOut(L"[INFO] Done loading scene resources %s\n", sceneFilePath);
 }
 void CPlayScene::CalColliableObjects(LPGAMEOBJECT curObj, vector<LPGAMEOBJECT>* coObjects)
@@ -347,6 +344,12 @@ void CPlayScene::CalColliableObjects(LPGAMEOBJECT curObj, vector<LPGAMEOBJECT>* 
 		for (UINT i = 0; i < coObjects->size(); i++)
 		{
 			LPGAMEOBJECT object = coObjects->at(i);
+			if (object == NULL)
+			{
+				coObjects->erase(coObjects->begin() + i);
+				i--;
+			}
+			else
 			if (dynamic_cast<CMushRoom*>(object)|| dynamic_cast<CFireBullet*>(object)
 				|| ((dynamic_cast<CPiranhaPlant*>(object) || dynamic_cast<CFirePiranhaPlant*>(object)) && object->state == PIRANHAPLANT_STATE_INACTIVE)
 				|| (dynamic_cast<CKoopas*>(object) && object->state == KOOPAS_STATE_IN_SHELL && player->isHolding) || object->type == IGNORE)
@@ -379,7 +382,7 @@ bool CPlayScene::IsInViewPort(LPGAMEOBJECT object)
 	if (dynamic_cast<CFireBullet*> (object) || dynamic_cast<CPlantBullet*> (object)|| dynamic_cast<CMario*>(object))
 		return true;
 
-	return objX >= camX - object->GetWidth() - MARIO_BIG_BBOX_WIDTH && objX < camX + SCREEN_WIDTH + MARIO_BIG_BBOX_WIDTH
+	return objX >= camX - object->GetWidth() - SCREEN_WIDTH/4 && objX < camX + SCREEN_WIDTH + SCREEN_WIDTH / 4
 		&& objY >= camY - (SCREEN_HEIGHT - game->GetScreenHeight()) && objY < camY + SCREEN_HEIGHT;
 };
 void CPlayScene::Update(DWORD dt)
@@ -413,18 +416,19 @@ void CPlayScene::Update(DWORD dt)
 	//stop the world when player is transforming/lost control
 	if (player->isTransforming || player->lostControl)
 	{
-		CalColliableObjects(player, &coObjects);
+		//CalColliableObjects(player, &coObjects);
 		player->Update(0, &coObjects);
 	}
 	else
 	{
 		for (size_t i = 0; i < objects.size(); i++)
 		{
-			CalColliableObjects(objects[i], &coObjects);
+			vector<LPGAMEOBJECT> tmpcoObjects = coObjects;
+			//CalColliableObjects(objects[i], &tmpcoObjects);
 			if (IsInViewPort(objects[i]))
-				objects[i]->Update(dt, &coObjects);
+				objects[i]->Update(dt, &tmpcoObjects);
 			else
-				objects[i]->Update(0, &coObjects);
+				objects[i]->Update(0, &tmpcoObjects);
 		}
 		hud->Update(dt, &coObjects);
 	}
@@ -530,7 +534,9 @@ int CPlayScene::CalScore()
 {
 	int score = 0;
 	for (size_t i = 1; i < objects.size(); i++)
-		if (dynamic_cast<CKoopas*> (objects[i])
+		if (objects[i]->isDestroyed)
+			continue;
+		else if (dynamic_cast<CKoopas*> (objects[i])
 			|| dynamic_cast<CGoomba*> (objects[i])
 			|| dynamic_cast<CPiranhaPlant*> (objects[i])
 			|| dynamic_cast<CFirePiranhaPlant*> (objects[i]))
@@ -542,13 +548,9 @@ int CPlayScene::CalScore()
 */
 void CPlayScene::Unload()
 {
-	if (player != NULL)
-	{
-		CBackUp* backup = CBackUp::GetInstance();
-		backup->BackUpMario(player);
-		DebugOut(L"[LEVEL]  %d\n", player->level);
-	}
-	for (int i = 0; i < objects.size(); i++)
+	if (player != nullptr)
+		delete player;
+	for (int i = 1; i < objects.size(); i++)
 		delete objects[i];
 	objects.clear();
 
@@ -568,7 +570,23 @@ void CPlayScene::Unload()
 
 	gamedone1 = nullptr;
 	gamedone2 = nullptr;
+
 	DebugOut(L"[INFO] Scene %s unloaded! \n", sceneFilePath);
+}
+void CPlayScene::LoadBackUp()
+{
+	CBackUp* backup = CBackUp::GetInstance();
+	if (id != 2)
+		backup->LoadBackUp(player);
+
+}
+void CPlayScene::BackUpPlayer()
+{
+	if (player != NULL)
+	{
+		CBackUp* backup = CBackUp::GetInstance();
+		backup->BackUpMario(player);
+	}
 }
 void CPlaySceneKeyHandler::OnKeyDown(int KeyCode)
 {

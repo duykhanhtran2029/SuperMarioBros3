@@ -8,6 +8,10 @@
 #include "GameObject.h"
 #include "Sprites.h"
 #include "Piece.h"
+#include "MushRoom.h"
+#include "Leaf.h"
+#include "PiranhaPlant.h"
+#include "FirePiranhaPlant.h"
 #include "Score.h"
 #include "HUD.h"
 #include "IntroScene.h"
@@ -74,14 +78,39 @@ void CGameObject::CalcPotentialCollisions(
 	vector<LPGAMEOBJECT> *coObjects, 
 	vector<LPCOLLISIONEVENT> &coEvents)
 {
-	for (UINT i = 0; i < coObjects->size(); i++)
+	if (dynamic_cast<CMario*>(this))
 	{
-		LPCOLLISIONEVENT e = SweptAABBEx(coObjects->at(i));
-		if (e->t > 0 && e->t <= 1.0f)
-			coEvents.push_back(e);
-		else
-			delete e;
+		for (UINT i = 0; i < coObjects->size(); i++)
+		{
+			LPGAMEOBJECT object = coObjects->at(i);
+			if (object!= nullptr && !(dynamic_cast<CMushRoom*>(object) || dynamic_cast<CFireBullet*>(object)
+				|| ((dynamic_cast<CPiranhaPlant*>(object) || dynamic_cast<CFirePiranhaPlant*>(object)) && object->state == PIRANHAPLANT_STATE_INACTIVE)
+				|| (dynamic_cast<CKoopas*>(object) && object->state == KOOPAS_STATE_IN_SHELL && ((CMario*)this)->isHolding) || object->type == IGNORE))
+				{
+					LPCOLLISIONEVENT e = SweptAABBEx(coObjects->at(i));
+					if (e->t > 0 && e->t <= 1.0f)
+						coEvents.push_back(e);
+					else
+						delete e;
+				}
+		}
 	}
+	else
+	{
+		for (UINT i = 0; i < coObjects->size(); i++)
+		{
+			LPGAMEOBJECT object = coObjects->at(i);
+			if (object != nullptr && object->type != IGNORE)
+			{
+				LPCOLLISIONEVENT e = SweptAABBEx(coObjects->at(i));
+				if (e->t > 0 && e->t <= 1.0f)
+					coEvents.push_back(e);
+				else
+					delete e;
+			}
+		}
+	}
+
 	std::sort(coEvents.begin(), coEvents.end(), CCollisionEvent::compare);
 }
 

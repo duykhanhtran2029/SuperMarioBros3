@@ -276,8 +276,9 @@ void CIntroScene::CalColliableObjects(LPGAMEOBJECT curObj, vector<LPGAMEOBJECT>*
 		for (UINT i = 0; i < coObjects->size(); i++)
 		{
 			LPGAMEOBJECT object = coObjects->at(i);
-			if (dynamic_cast<CLeaf*>(object)|| object->type == IGNORE
-				||(dynamic_cast<CKoopas*>(object) && object->state == KOOPAS_STATE_IN_SHELL && ((CMario*)curObj)->isHolding))
+			
+			if (object!= nullptr && (dynamic_cast<CLeaf*>(object)|| object->type == IGNORE
+				||(dynamic_cast<CKoopas*>(object) && object->state == KOOPAS_STATE_IN_SHELL && ((CMario*)curObj)->isHolding)))
 			{
 				coObjects->erase(coObjects->begin() + i);
 				i--;
@@ -287,7 +288,7 @@ void CIntroScene::CalColliableObjects(LPGAMEOBJECT curObj, vector<LPGAMEOBJECT>*
 		for (UINT i = 0; i < coObjects->size(); i++)
 		{
 			LPGAMEOBJECT object = coObjects->at(i);
-			if (coObjects->at(i)->type == IGNORE)
+			if (coObjects->at(i)->type == IGNORE || (dynamic_cast<CMario*>(coObjects->at(i))&& ((CMario*)coObjects->at(i))->level == MARIO_LEVEL_SMALL))
 			{
 				coObjects->erase(coObjects->begin() + i);
 				i--;
@@ -500,24 +501,20 @@ void CIntroScene::Update(DWORD dt)
 		}
 		for (size_t i = 0; i < koopas.size(); i++)
 		{
+			if (koopas[i]->x > SCREEN_WIDTH && mini_section == 0)
+					koopas[i]->SetIsDestroyed(true);
 			if (koopas[i]->x >= (GROUND_BBOX_WIDTH - KOOPAS_BBOX_WIDTH) * 2)
 			{
-				if (mini_section == 0)
-					koopas[i]->SetIsDestroyed(true);
-				else
+				koopas[i]->x = -KOOPAS_BBOX_WIDTH + 1;
+				if (i == 0)
+					mini_section = 0;
+				koopas[i]->y = mario->start_y + (MARIO_BIG_BBOX_HEIGHT - KOOPAS_BBOX_HEIGHT);
+				if (i == 1)
 				{
-					koopas[i]->x = -KOOPAS_BBOX_WIDTH + 1;
-					if (i == 0)
-						mini_section = 0;
-					koopas[i]->y = mario->start_y + (MARIO_BIG_BBOX_HEIGHT - KOOPAS_BBOX_HEIGHT);
-					if (i == 1)
-					{
-						koopas[0]->nx = 1;
-						koopas[0]->SetState(KOOPAS_STATE_WALKING);
-						koopas[0]->vx = KOOPAS_WALKING_SPEED * 2;
-					}
+					koopas[0]->nx = 1;
+					koopas[0]->SetState(KOOPAS_STATE_WALKING);
+					koopas[0]->vx = KOOPAS_WALKING_SPEED * 2;
 				}
-
 			}
 		}
 	}
