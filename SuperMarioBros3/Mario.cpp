@@ -318,8 +318,6 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 				{
 					CGoomba* goomba = dynamic_cast<CGoomba*>(e->obj);
 					// jump on top >> kill Goomba and deflect a bit 
-					if (e->ny > 0)
-						vy = 0;
 					if (e->ny < 0)
 					{
 						if (goomba->GetState() != GOOMBA_STATE_DIE)
@@ -348,23 +346,13 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 						else
 							vy = -MARIO_JUMP_DEFLECT_SPEED;
 					}
-					else if (e->nx != 0)
+					else
 					{
-						if (untouchable == 0 && goomba->GetState() != GOOMBA_STATE_DIE)
-						{
-							if (!isTurningTail)
-							{
-								x = x0;
-								y = y0;
+						x = x0;
+						y = y0;
+						if (untouchable == 0 && goomba->GetState() != GOOMBA_STATE_DIE && !isTurningTail)
 								Attacked();
-							}
 
-						}
-						else
-						{
-							x = x0;
-							y = y0;
-						}
 					}
 				}
 				if (dynamic_cast<CKoopas*>(e->obj)) // if e->obj is Koopas 

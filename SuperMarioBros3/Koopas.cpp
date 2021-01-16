@@ -33,9 +33,9 @@ bool  CKoopas::CalRevivable()
 	camX = game->GetCamX();
 	camY = game->GetCamY();
 
-	bool can_1 =(start_x >= camX - GetWidth() - MARIO_BIG_BBOX_WIDTH && start_x < camX + SCREEN_WIDTH + MARIO_BIG_BBOX_WIDTH
-		&& start_y >= camY - (SCREEN_HEIGHT - game->GetScreenHeight()) && start_y < camY + SCREEN_HEIGHT);
-	bool can_2 = (x >= camX - GetWidth() && x < camX + SCREEN_WIDTH
+	bool can_1 =(start_x > camX - GetWidth() - MARIO_BIG_BBOX_WIDTH && start_x < camX + SCREEN_WIDTH + MARIO_BIG_BBOX_WIDTH
+		&& start_y > camY - (SCREEN_HEIGHT - game->GetScreenHeight()) && start_y < camY + SCREEN_HEIGHT);
+	bool can_2 = (x >= camX - GetWidth() - MARIO_BIG_BBOX_WIDTH && x < camX + SCREEN_WIDTH + MARIO_BIG_BBOX_WIDTH
 		&& x >= camY - (SCREEN_HEIGHT - game->GetScreenHeight()) && x < camY + SCREEN_HEIGHT);
 	if (can_1 == false && can_2 == false && state != KOOPAS_STATE_WALKING)
 		return true;

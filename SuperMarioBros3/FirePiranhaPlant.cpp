@@ -77,8 +77,8 @@ void CFirePiranhaPlant::Update(DWORD dt,
 		if (mario->level != MARIO_LEVEL_SMALL)
 			mWidth = MARIO_BIG_BBOX_WIDTH;
 
-		if ((mario->x + (float)mWidth + PIRANHAPLANT_ACTIVE_RANGE <= x
-			|| mario->x >= x + PIRANHAPLANT_BBOX_WIDTH + PIRANHAPLANT_ACTIVE_RANGE)
+		if ((floor(mario->x) + (float)mWidth + PIRANHAPLANT_ACTIVE_RANGE <= x
+			|| ceil(mario->x) >= x + PIRANHAPLANT_BBOX_WIDTH + PIRANHAPLANT_ACTIVE_RANGE)
 			&& state == PIRANHAPLANT_STATE_INACTIVE && delay_start == 0)
 			SetState(PIRANHAPLANT_STATE_DARTING);
 
@@ -87,7 +87,10 @@ void CFirePiranhaPlant::Update(DWORD dt,
 			mario->getTail()->GetBoundingBox(mLeft, mTop, mRight, mBottom);
 			GetBoundingBox(oLeft, oTop, oRight, oBottom);
 			if (isColliding(floor(mLeft), mTop, ceil(mRight), mBottom))
+			{
 				SetState(PIRANHAPLANT_STATE_DEATH);
+				mario->getTail()->ShowHitEffect();
+			}
 		}
 	}
 }

@@ -633,6 +633,7 @@ void CIntroScene::StartThirdSection()
 		koopas[i]->nx = 1;
 		koopas[i]->SetState(KOOPAS_STATE_WALKING);
 	}
+	mini_section = 13;
 }
 void IntroSceneKeyHandler::OnKeyDown(int KeyCode)
 {

@@ -13,7 +13,7 @@ HUD::HUD(int type_hud)
 	money = backup->money;
 	time = backup->time;
 	runningStacks = 0;
-
+	cards = backup->cards;
 	this->type_hud = type_hud;
 	if (type_hud == PLAYSCENE_HUD)
 	{
