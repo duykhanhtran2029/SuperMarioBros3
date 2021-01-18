@@ -125,6 +125,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Abyss.cpp" />
     <ClCompile Include="Animations.cpp" />
     <ClCompile Include="BackUp.cpp" />
     <ClCompile Include="Block.cpp" />
@@ -167,6 +168,7 @@
     <ClCompile Include="WorldScene.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Abyss.h" />
     <ClInclude Include="Animations.h" />
     <ClInclude Include="BackUp.h" />
     <ClInclude Include="Block.h" />

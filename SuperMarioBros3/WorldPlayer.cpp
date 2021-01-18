@@ -65,8 +65,8 @@ void CWorldPlayer::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			//if (rdx != 0 && rdx!=dx)
 			//	x += nx*abs(rdx); 
 			float x0 = x, y0 = y;
-			x = x0 + min_tx * dx + nx * 0.4f;
-			y = y0 + min_ty * dy + ny * 0.4f;
+			x = x0 + min_tx * dx + nx * PUSHBACK;
+			y = y0 + min_ty * dy + ny * PUSHBACK;
 			//
 			// Collision logic with other objects
 			//

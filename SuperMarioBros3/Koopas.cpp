@@ -35,8 +35,8 @@ bool  CKoopas::CalRevivable()
 
 	bool can_1 =(start_x > camX - GetWidth() - MARIO_BIG_BBOX_WIDTH && start_x < camX + SCREEN_WIDTH + MARIO_BIG_BBOX_WIDTH
 		&& start_y > camY - (SCREEN_HEIGHT - game->GetScreenHeight()) && start_y < camY + SCREEN_HEIGHT);
-	bool can_2 = (x >= camX - GetWidth() - MARIO_BIG_BBOX_WIDTH && x < camX + SCREEN_WIDTH + MARIO_BIG_BBOX_WIDTH
-		&& x >= camY - (SCREEN_HEIGHT - game->GetScreenHeight()) && x < camY + SCREEN_HEIGHT);
+	bool can_2 = (x >= camX - GetWidth() - MARIO_BIG_BBOX_WIDTH && x <= camX + SCREEN_WIDTH + MARIO_BIG_BBOX_WIDTH
+		&& y >= camY - (SCREEN_HEIGHT - game->GetScreenHeight()) && y < camY + SCREEN_HEIGHT);
 	if (can_1 == false && can_2 == false && state != KOOPAS_STATE_WALKING)
 		return true;
 	return false;
@@ -168,8 +168,8 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 
 		// block 
 		float x0 = x, y0 = y;
-		x = x0 + min_tx * dx + nx * 0.4f;
-		y = y0 + min_ty * dy + ny * 0.4f;
+		x = x0 + min_tx * dx + nx * PUSHBACK;
+		y = y0 + min_ty * dy + ny * PUSHBACK;
 
 		//if (nx != 0) vx = 0;
 
@@ -231,12 +231,13 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					CBrick* object = dynamic_cast<CBrick*>(e->obj);
 					//object->SetDebugAlpha(255);
 					object->GetBoundingBox(oLeft, oTop, oRight, oBottom);
-					CanPullBack = true;
-					lastStanding_Y = y;
 					if (e->ny != 0) vy = 0;
-					if (e->ny < 0 && (tag == KOOPAS_GREEN_PARA || tag == KOOPAS_RED_PARA))
+					if (e->ny < 0)
 					{
-						vy = -KOOPAS_JUMP_SPEED;
+						CanPullBack = true;
+						lastStanding_Y = y;
+						if (tag == KOOPAS_GREEN_PARA || tag == KOOPAS_RED_PARA)
+							vy = -KOOPAS_JUMP_SPEED;
 					}
 					if (e->nx != 0)
 					{
@@ -258,11 +259,12 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			}
 			if (dynamic_cast<CBlock*>(e->obj))
 			{
-				CBlock* block = dynamic_cast<CBlock*>(e->obj);
-				CanPullBack = true;
-				lastStanding_Y = y;
 				if (e->ny < 0)
+				{
+					CanPullBack = true;
+					lastStanding_Y = y;
 					vy = 0;
+				}	
 				else
 				{
 					x = x0 + dx;
@@ -271,26 +273,11 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				}
 				if (e->ny < 0 && (tag == KOOPAS_GREEN_PARA || tag == KOOPAS_RED_PARA))
 				{
-					y = block->y - KOOPAS_BBOX_HEIGHT;
+					y = e->obj->y - KOOPAS_BBOX_HEIGHT;
 					vy = -KOOPAS_JUMP_SPEED;
 				}
 			}
-			if (dynamic_cast<CFireBullet*>(e->obj))
-				SetState(KOOPAS_STATE_IN_SHELL);
-		}
-	}
-	if (x >= ABYSS_X)
-	{
-		if (state == KOOPAS_STATE_SPINNING)
-		{
-			x = ABYSS_X + 0.4f;
-			y ++;
-		}
-		else if (state == KOOPAS_STATE_WALKING)
-		{
-			x -= KOOPAS_BBOX_WIDTH;
-			nx = -1;
-			vx =  -KOOPAS_WALKING_SPEED;
+			if (dynamic_cast<CFireBullet*>(e->obj))	SetState(KOOPAS_STATE_IN_SHELL);
 		}
 	}
 	// clean up collision events

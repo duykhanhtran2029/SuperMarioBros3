@@ -177,7 +177,6 @@ void CQuestionBrick::CreateItem(int itemtype)
 		LPANIMATION_SET tmp_ani_set = animation_sets->Get(COIN_ANI_SET_ID);
 
 		item->SetAnimationSet(tmp_ani_set);
-		item->SetPosition(-50, 100);
 
 		scene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
 		scene->PushBack(item);
@@ -190,7 +189,6 @@ void CQuestionBrick::CreateItem(int itemtype)
 		LPANIMATION_SET tmp_ani_set = animation_sets->Get(LEAF_ANI_SET_ID);
 
 		item->SetAnimationSet(tmp_ani_set);
-		item->SetPosition(-50, 100);
 
 		scene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
 		scene->PushBack(item);
@@ -198,12 +196,10 @@ void CQuestionBrick::CreateItem(int itemtype)
 	if (itemtype == ITEM_MUSHROOM_RED || itemtype == ITEM_MUSHROOM_GREEN)
 	{
 		item = new CMushRoom();
-		item->SetType(MOVING);
 		CAnimationSets* animation_sets = CAnimationSets::GetInstance();
 		LPANIMATION_SET tmp_ani_set = animation_sets->Get(MUSHROOM_ANI_SET_ID);
 
 		item->SetAnimationSet(tmp_ani_set);
-		item->SetPosition(-50, 100);
 
 		scene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
 		scene->PushBack(item);
@@ -216,7 +212,6 @@ void CQuestionBrick::CreateItem(int itemtype)
 		LPANIMATION_SET tmp_ani_set = animation_sets->Get(SWITCH_ANI_SET_ID);
 
 		item->SetAnimationSet(tmp_ani_set);
-		item->SetPosition(-50, 100);
 
 		scene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
 		scene->PushBack(item);

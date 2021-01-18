@@ -5,7 +5,7 @@ class CBackUp
 {
 public:
 	static CBackUp* __instance;
-	int life = 4;
+	int life = MARIO_DEFAULT_LIFES;
 	int money = 0;
 	DWORD time = 0;
 	int score = 0;

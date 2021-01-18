@@ -3,6 +3,7 @@
 
 #include "PlayScene.h"
 #include "Utils.h"
+#include "Abyss.h"
 #include "Textures.h"
 #include "Sprites.h"
 #include "Portal.h"
@@ -50,6 +51,7 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath) :
 #define OBJECT_TYPE_FIREPIRANHAPLANT	70
 #define OBJECT_TYPE_QUESTIONBRICK		142
 #define OBJECT_TYPE_BREAKABLEBRICK		112
+#define OBJECT_TYPE_ABYSS				113
 
 #define OBJECT_TYPE_PORTAL	50
 
@@ -205,6 +207,9 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	case OBJECT_TYPE_BLOCK:
 		obj = new CBlock();
 		break;
+	case OBJECT_TYPE_ABYSS:
+		obj = new CAbyss();
+		break;
 	case OBJECT_TYPE_PIRANHAPLANT:
 		obj = new CPiranhaPlant();
 		((CPiranhaPlant*)obj)->SetLimitY(y);
@@ -338,37 +343,6 @@ void CPlayScene::Load()
 	hud = new HUD();
 	DebugOut(L"[INFO] Done loading scene resources %s\n", sceneFilePath);
 }
-void CPlayScene::CalColliableObjects(LPGAMEOBJECT curObj, vector<LPGAMEOBJECT>* coObjects)
-{
-	if (dynamic_cast<CMario*>(curObj))
-		for (UINT i = 0; i < coObjects->size(); i++)
-		{
-			LPGAMEOBJECT object = coObjects->at(i);
-			if (object == NULL)
-			{
-				coObjects->erase(coObjects->begin() + i);
-				i--;
-			}
-			else
-			if (dynamic_cast<CMushRoom*>(object)|| dynamic_cast<CFireBullet*>(object)
-				|| ((dynamic_cast<CPiranhaPlant*>(object) || dynamic_cast<CFirePiranhaPlant*>(object)) && object->state == PIRANHAPLANT_STATE_INACTIVE)
-				|| (dynamic_cast<CKoopas*>(object) && object->state == KOOPAS_STATE_IN_SHELL && player->isHolding) || object->type == IGNORE)
-			{
-				coObjects->erase(coObjects->begin() + i);
-				i--;
-			}
-		}
-	else
-		for (UINT i = 0; i < coObjects->size(); i++)
-		{
-			LPGAMEOBJECT object = coObjects->at(i);
-			if (coObjects->at(i)->type == IGNORE)
-			{
-				coObjects->erase(coObjects->begin() + i);
-				i--;
-			}
-		}
-}
 bool CPlayScene::IsInViewPort(LPGAMEOBJECT object)
 {
 	CGame* game = CGame::GetInstance();
@@ -415,20 +389,15 @@ void CPlayScene::Update(DWORD dt)
 
 	//stop the world when player is transforming/lost control
 	if (player->isTransforming || player->lostControl)
-	{
-		//CalColliableObjects(player, &coObjects);
 		player->Update(0, &coObjects);
-	}
 	else
 	{
 		for (size_t i = 0; i < objects.size(); i++)
 		{
-			vector<LPGAMEOBJECT> tmpcoObjects = coObjects;
-			//CalColliableObjects(objects[i], &tmpcoObjects);
 			if (IsInViewPort(objects[i]))
-				objects[i]->Update(dt, &tmpcoObjects);
+				objects[i]->Update(dt, &coObjects);
 			else
-				objects[i]->Update(0, &tmpcoObjects);
+				objects[i]->Update(0, &coObjects);
 		}
 		hud->Update(dt, &coObjects);
 	}

@@ -39,6 +39,10 @@ void CFirePiranhaPlant::Shoot()
 void CFirePiranhaPlant::Update(DWORD dt,
 	vector<LPGAMEOBJECT>* coObjects)
 {
+	if (GetTickCount64() - dying_start >= PIRANHAPLANT_DIYING_TIME && dying_start != 0)
+		isDestroyed = true;
+	if (state == PIRANHAPLANT_STATE_DEATH)
+		return;
 	CGameObject::Update(dt, coObjects);
 	y += dy;
 	GetDirect();
@@ -73,9 +77,7 @@ void CFirePiranhaPlant::Update(DWORD dt,
 		float mLeft, mTop, mRight, mBottom;
 		float oLeft, oTop, oRight, oBottom;
 
-		int mWidth = MARIO_SMALL_BBOX_WIDTH;
-		if (mario->level != MARIO_LEVEL_SMALL)
-			mWidth = MARIO_BIG_BBOX_WIDTH;
+		int mWidth = mario->GetWidth();
 
 		if ((floor(mario->x) + (float)mWidth + PIRANHAPLANT_ACTIVE_RANGE <= x
 			|| ceil(mario->x) >= x + PIRANHAPLANT_BBOX_WIDTH + PIRANHAPLANT_ACTIVE_RANGE)
@@ -97,7 +99,7 @@ void CFirePiranhaPlant::Update(DWORD dt,
 void CFirePiranhaPlant::Render()
 {
 	int ani = PIRANHAPLANT_ANI_DEATH;
-	if (state != PIRANHAPLANT_STATE_DEATH)
+	if (state != PIRANHAPLANT_STATE_DEATH && dying_start == 0)
 	{
 		if (Up)
 			if (Right)
@@ -127,6 +129,8 @@ void CFirePiranhaPlant::SetState(int _state)
 		break;
 	case PIRANHAPLANT_STATE_DEATH:
 		vy = 0;
+		SetType(IGNORE);
+		StartDying();
 		break;
 	case PIRANHAPLANT_STATE_INACTIVE:
 		vy = 0;

@@ -17,13 +17,13 @@
 #define MARIO_ACCELERATION_JUMP		0.0005f
 #define MARIO_JUMP_SPEED_MAX		0.28f
 #define MARIO_JUMP_SPEED_MIN		0.18f
+#define MARIO_SLOW_FALLING_SPEED	0.075f
+#define MARIO_FLY_SPEED				0.135f
 #define MARIO_JUMP_DEFLECT_SPEED	0.3f
 #define MARIO_JUMP_DEFLECT_INTRO	0.35f
 #define MARIO_GRAVITY				0.002f
 #define MARIO_DIE_DEFLECT_SPEED		0.5f
-
 #define MARIO_RUN_SPEED_MAX			0.3f
-
 #define MARIO_BULLET_MAX			20
 
 #define MARIO_UNTOUCHABLE_TIME		6000
@@ -46,6 +46,8 @@
 #define MARIO_RUNNING_STACKS		7
 #define MARIO_WALKING_FAST_STACKS	4
 #define MARIO_TURNING_STACKS		5
+
+#define MARIO_DEFAULT_LIFES			4
 
 #define MARIO_STATE_IDLE			0
 #define MARIO_STATE_WALKING_RIGHT	100
@@ -248,7 +250,7 @@
 #define MARIO_BIG_BBOX_HEIGHT			27
 #define MARIO_BIG_BBOX_SITTING_HEIGHT	18
 #define MARIO_SMALL_BBOX_WIDTH			13
-#define MARIO_SMALL_BBOX_HEIGHT			15
+#define MARIO_SMALL_BBOX_HEIGHT			16
 
 #define MARIO_FIRE_BULLETS  2
 
@@ -284,6 +286,8 @@ class CMario : public CGameObject
 public:
 	float start_x;			// initial position of Mario at scene
 	float start_y;
+	
+	float lastStandingY = 0;
 
 	bool isAtIntroScene = false;
 	bool lostControl = false;

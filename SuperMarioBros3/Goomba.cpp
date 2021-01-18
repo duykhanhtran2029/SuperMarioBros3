@@ -151,8 +151,8 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		x0 = x;
 		y0 = y;
 
-		x += min_tx * dx + nx * 0.4f;		// nx*0.4f : need to push out a bit to avoid overlapping next frame
-		y += min_ty * dy + ny * 0.4f;
+		x += min_tx * dx + nx * PUSHBACK;		// nx*PUSHBACK : need to push out a bit to avoid overlapping next frame
+		y += min_ty * dy + ny * PUSHBACK;
 
 		if (ny != 0)
 			vy = 0;			
@@ -279,6 +279,7 @@ void CGoomba::SetState(int state)
 		vx = -vx;
 		ay = GOOMBA_GRAVITY;
 		StartDying(true);
+		SetType(IGNORE);
 		break;
 	case GOOMBA_STATE_RED_JUMPING:
 		ay = -GOOMBA_GRAVITY;

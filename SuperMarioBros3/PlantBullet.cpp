@@ -1,10 +1,11 @@
 #include "PlantBullet.h"
+#include "FirePiranhaPlant.h"
 #include "Mario.h"
 #include "PlayScene.h"
 #include "Map.h"
 CPlantBullet::CPlantBullet(float bx, float by, bool Up, bool Right)
 {
-	y = by + BULLET_BBOX_HEIGHT;
+	y = by + BULLET_START_HEIGHT;
 	if (Up)
 		vy = -BULLET_SPEED_Y;
 	else
@@ -12,13 +13,13 @@ CPlantBullet::CPlantBullet(float bx, float by, bool Up, bool Right)
 
 	if (Right)
 	{
-		x = bx + 16;
-		vx = BULLET_SPEED_Y;
+		x = bx + PIRANHAPLANT_BBOX_WIDTH;
+		vx = BULLET_SPEED_X;
 	}	
 	else
 	{
 		x = bx - BULLET_BBOX_WIDTH;
-		vx = -BULLET_SPEED_Y;
+		vx = -BULLET_SPEED_X;
 	}
 	SetType(IGNORE);
 }
@@ -37,27 +38,20 @@ void CPlantBullet::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			mario->Attacked();
 			isDestroyed = true;
 		}
-
 	}
 }
-
-
 void CPlantBullet::Render()
 {
 	int ani = 0;
 	if (vx > 0)
-	{
 		ani = BULLET_ANI_RIGHT;
-	}
 	else
 		ani = BULLET_ANI_LEFT;
 	animation_set->at(ani)->Render(x, y);
 	RenderBoundingBox();
 }
-
 void CPlantBullet::GetBoundingBox(float& l, float& t, float& r, float& b)
 {
-
 	l = x;
 	t = y;
 	r = x + BULLET_BBOX_WIDTH;

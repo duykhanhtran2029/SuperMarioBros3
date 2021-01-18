@@ -2,6 +2,7 @@
 #include "Utils.h"
 #include "Mario.h"
 #include "Block.h"
+#include "Brick.h"
 #include "PlayScene.h"
 #include "IntroScene.h"
 #include "PlantBullet.h"
@@ -65,8 +66,8 @@ void CMushRoom::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					FilterCollision(coEvents, coEventsResult, min_tx, min_ty, nx, ny, rdx, rdy);
 
 					float x0 = x, y0 = y;
-					x = x0 + min_tx * dx + nx * 0.4f;
-					y = y0 + min_ty * dy + ny * 0.4f;
+					x = x0 + min_tx * dx + nx * PUSHBACK;
+					y = y0 + min_ty * dy + ny * PUSHBACK;
 					//
 					// Collision logic with other objects
 					//
@@ -84,32 +85,29 @@ void CMushRoom::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 							}
 						GetBoundingBox(mLeft, mTop, mRight, mBottom);
 						e->obj->GetBoundingBox(oLeft, oTop, oRight, oBottom);
-						if (e->ny != 0)
+						if (dynamic_cast<CBrick*>(e->obj))
 						{
-							if(!dynamic_cast<CBlock*>(e->obj))
+							if (e->ny < 0)
 								vy = 0;
-							else 
-							{
-								if (ny < 0)
-									vy = 0;
-								else
-								{
-									y = y0 + dy;
-								}
-							}
-
-						}
-						if (e->nx != 0)
-						{
-							if (!dynamic_cast<CBlock*>(e->obj) && !dynamic_cast<CFireBullet*>(e->obj) || !dynamic_cast<CPlantBullet*>(e->obj))
+							if (e->nx != 0)
 							{
 								if (ceil(mBottom) != oTop)
 									vx = -vx;
 							}
+						}
+						else if (dynamic_cast<CBlock*>(e->obj))
+						{
+							CBlock* block = dynamic_cast<CBlock*>(e->obj);
+							x = x0 + dx;
+							if (ny < 0)
+								vy = 0;
 							else
-							{
-								x = x0 + dx;
-							}
+								y = y0 + dy;
+						}
+						else
+						{
+							x = x0 + dx;
+							y = y0 + dy;
 						}
 					}
 				}

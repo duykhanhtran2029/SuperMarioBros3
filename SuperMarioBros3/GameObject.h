@@ -10,6 +10,8 @@
 #define STATIC	0
 #define MOVING	1
 #define IGNORE	2
+ 
+#define PUSHBACK 0.4f
 
 using namespace std;
 

@@ -86,8 +86,8 @@ void CFireBullet::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			{
 				x0 = x;
 				y0 = y;
-				x += min_ty * dy + ny * 0.4f;
-				y += min_tx * dx + nx * 0.4f;
+				x += min_ty * dy + ny * PUSHBACK;
+				y += min_tx * dx + nx * PUSHBACK;
 				CBrick* obj = dynamic_cast<CBrick*>(e->obj);
 
 				if (ny != 0)

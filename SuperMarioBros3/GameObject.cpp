@@ -13,6 +13,7 @@
 #include "PiranhaPlant.h"
 #include "FirePiranhaPlant.h"
 #include "Score.h"
+#include "Abyss.h"
 #include "HUD.h"
 #include "IntroScene.h"
 
@@ -93,6 +94,21 @@ void CGameObject::CalcPotentialCollisions(
 					else
 						delete e;
 				}
+		}
+	}
+	else if (dynamic_cast<CMushRoom*>(this))
+	{
+		for (UINT i = 0; i < coObjects->size(); i++)
+		{
+			LPGAMEOBJECT object = coObjects->at(i);
+			if (object != nullptr && object->type == STATIC)
+			{
+				LPCOLLISIONEVENT e = SweptAABBEx(coObjects->at(i));
+				if (e->t > 0 && e->t <= 1.0f)
+					coEvents.push_back(e);
+				else
+					delete e;
+			}
 		}
 	}
 	else

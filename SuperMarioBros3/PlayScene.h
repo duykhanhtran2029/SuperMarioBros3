@@ -77,7 +77,6 @@ public:
 		}
 		swap(objects[ioa], objects[iob]);
 	}
-	void CalColliableObjects(LPGAMEOBJECT curobj, vector<LPGAMEOBJECT>* coObjects = NULL);
 	int CalScore();
 	//friend class CPlaySceneKeyHandler;
 };

@@ -4,7 +4,7 @@
 #define PIRANHAPLANT_GREEN_TYPE					0
 #define PIRANHAPLANT_RED_TYPE					1
 
-#define PIRANHAPLANT_BBOX_WIDTH					16
+#define PIRANHAPLANT_BBOX_WIDTH					20
 #define PIRANHAPLANT_GREEN_BBOX_HEIGHT			24
 #define PIRANHAPLANT_RED_BBOX_HEIGHT			32
 #define PIRANHAPLANT_DARTING_SPEED				0.03f
@@ -24,14 +24,16 @@
 
 #define PIRANHAPLANT_DELAY_TIME			750
 #define PIRANHAPLANT_AIM_TIME			750
+#define PIRANHAPLANT_DIYING_TIME		250
 
-#define PIRANHAPLANT_ACTIVE_RANGE		24
+#define PIRANHAPLANT_ACTIVE_RANGE		20
 
 class CFirePiranhaPlant :public CGameObject
 {
 	DWORD shooting_start = 0;
 	DWORD aim_start = 0;
 	DWORD delay_start = 0;
+	DWORD dying_start = 0;
 	float limitY = 0;
 	bool Up = false;
 	bool Right = false;
@@ -41,6 +43,7 @@ public:
 	void StartShooting() { shooting_start = GetTickCount64(); }
 	void StartAim() { aim_start = GetTickCount64(); }
 	void StartDelay() { delay_start = GetTickCount64(); }
+	void StartDying() { dying_start = GetTickCount64(); }
 	virtual void GetBoundingBox(float& left, float& top, float& right, float& bottom);
 	virtual void Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects);
 	virtual void Render();
