@@ -25,7 +25,7 @@ void CKoopas::GetBoundingBox(float& left, float& top, float& right, float& botto
 	else
 		bottom = y + KOOPAS_BBOX_HEIGHT;
 }
-bool  CKoopas::CalRevivable()
+bool CKoopas::CalRevivable()
 {
 	CGame* game = CGame::GetInstance();
 	float camX, camY;
@@ -33,16 +33,37 @@ bool  CKoopas::CalRevivable()
 	camX = game->GetCamX();
 	camY = game->GetCamY();
 
-	bool can_1 =(start_x > camX - GetWidth() - MARIO_BIG_BBOX_WIDTH && start_x < camX + SCREEN_WIDTH + MARIO_BIG_BBOX_WIDTH
+	bool IsStartInViewPort =(start_x > camX - GetWidth() - VIEWPORT_PUSHBACK && start_x < camX + SCREEN_WIDTH + VIEWPORT_PUSHBACK
 		&& start_y > camY - (SCREEN_HEIGHT - game->GetScreenHeight()) && start_y < camY + SCREEN_HEIGHT);
-	bool can_2 = (x >= camX - GetWidth() - MARIO_BIG_BBOX_WIDTH && x <= camX + SCREEN_WIDTH + MARIO_BIG_BBOX_WIDTH
-		&& y >= camY - (SCREEN_HEIGHT - game->GetScreenHeight()) && y < camY + SCREEN_HEIGHT);
-	if (can_1 == false && can_2 == false && state != KOOPAS_STATE_WALKING)
+	if (!IsStartInViewPort && !IsInViewPort())
 		return true;
 	return false;
 }
+bool CKoopas::CalKillable(vector<LPGAMEOBJECT>* coObjects)
+{
+	for(UINT i = 0; i < coObjects->size(); i++)
+		if (dynamic_cast<CBrick*>(coObjects->at(i)))
+		{
+			float mLeft, mTop, mRight, mBottom;
+			coObjects->at(i)->GetBoundingBox(mLeft, mTop, mRight, mBottom);
+			if (isColliding(floor(mLeft), floor(mTop), ceil(mRight), ceil(mBottom)))
+				return true;
+		}
+	return false;
+}
+bool CKoopas::CalTurnable(LPGAMEOBJECT object, vector<LPGAMEOBJECT>* coObjects)
+{
+	for (UINT i = 0; i < coObjects->size(); i++)
+		if (dynamic_cast<CBrick*>(coObjects->at(i)) || dynamic_cast<CBlock*>(coObjects->at(i)))
+			if (abs(coObjects->at(i)->y - object->y) <= 1.0f 
+				&& abs(coObjects->at(i)->x - (object->x + nx * BRICK_BBOX_WIDTH))<=1.0f)
+				return false;
+	return true;
+}
 void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
+	if (GetTickCount64() - dying_start >= KOOPAS_DIYING_TIME && dying_start != 0)
+		isDestroyed = true;
 	CGameObject::Update(dt, coObjects);
 	CMario* mario = {};
 	if (!dynamic_cast<CIntroScene*> (CGame::GetInstance()->GetCurrentScene()))
@@ -54,14 +75,14 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		else
 			mario = ((CIntroScene*)CGame::GetInstance()->GetCurrentScene())->holder;
 	}
-	if (!mario->isAtIntroScene)
+	if (!mario->isAtIntroScene && state != KOOPAS_STATE_DEATH)
 	{
 		if (GetTickCount64() - shell_start >= KOOPAS_SHELL_TIME && shell_start != 0 && state != KOOPAS_STATE_SPINNING)
 		{
 			shell_start = 0;
 			StartReviving();
 		}
-		if (GetTickCount64() - reviving_start >= KOOPAS_REVIVE_TIME && reviving_start != 0 && state != KOOPAS_STATE_SPINNING)
+		if (GetTickCount64() - reviving_start >= KOOPAS_REVIVE_TIME && reviving_start != 0 && state != KOOPAS_STATE_SPINNING && shell_start == 0)
 		{
 			reviving_start = 0;
 			y -= (KOOPAS_BBOX_HEIGHT - KOOPAS_BBOX_SHELL_HEIGHT) + 1.0f;
@@ -83,8 +104,8 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	vector<LPCOLLISIONEVENT> coEventsResult;
 
 	coEvents.clear();
-
-	CalcPotentialCollisions(coObjects, coEvents);
+	if (state != KOOPAS_STATE_DEATH)
+		CalcPotentialCollisions(coObjects, coEvents);
 		
 	float mLeft, mTop, mRight, mBottom;
 	float oLeft, oTop, oRight, oBottom;
@@ -94,7 +115,7 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		if (mario->isTurningTail)
 		{
 			mario->getTail()->GetBoundingBox(mLeft, mTop, mRight, mBottom);
-			if (isColliding(floor(mLeft), mTop, ceil(mRight), mBottom))
+			if (isColliding(floor(mLeft), floor(mTop), ceil(mRight), ceil(mBottom)))
 			{
 				SetState(KOOPAS_STATE_SHELL_UP);
 				mario->getTail()->ShowHitEffect();
@@ -112,6 +133,11 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					this->nx = mario->nx;
 					this->SetState(KOOPAS_STATE_SPINNING);
 					mario->StartKicking();
+					if (isKillable)
+					{
+						this->SetState(KOOPAS_STATE_DEATH);
+						mario->AddScore(x, y, 100, true);
+					}
 				}
 				if (state == KOOPAS_STATE_WALKING && mTop <= oBottom  &&
 					mario->untouchable == 0 && mario->isKicking == false && !mario->isTurningTail)
@@ -138,6 +164,8 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					x = mario->x + tmp * (KOOPAS_BBOX_WIDTH);
 				y -= (MARIO_BIG_BBOX_HEIGHT - MARIO_SMALL_BBOX_HEIGHT);
 			}
+			
+			isKillable = CalKillable(coObjects);
 		}
 	}
 	// No collision occured, proceed normally
@@ -145,15 +173,15 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	{
 		x += dx;
 		y += dy;
-		if (!isBeingHeld && state == KOOPAS_STATE_WALKING && 
-			(tag == KOOPAS_RED) && CanPullBack && (y - lastStanding_Y > 1.0f))
-		{
-			//DebugOut(L"[SHELL] x %f y %f newx %f newy %f\n", x, y,x - nx * KOOPAS_BBOX_WIDTH, lastStanding_Y);
-			y = lastStanding_Y;
-			x -= nx * KOOPAS_BBOX_WIDTH;
-			nx = -nx;
-			vx = -vx;			
-		}
+		//if (!isBeingHeld && state == KOOPAS_STATE_WALKING && 
+		//	(tag == KOOPAS_RED) && CanPullBack && (y - lastStanding_Y > 1.0f))
+		//{
+		//	//DebugOut(L"[SHELL] x %f y %f newx %f newy %f\n", x, y,x - nx * KOOPAS_BBOX_WIDTH, lastStanding_Y);
+		//	y = lastStanding_Y;
+		//	x -= nx * KOOPAS_BBOX_WIDTH;
+		//	nx = -nx;
+		//	vx = -vx;			
+		//}
 	}
 	else
 	{
@@ -186,25 +214,19 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			if (dynamic_cast<CKoopas*>(e->obj)) // if e->obj is Koopas 
 			{
 				CKoopas* koopas = dynamic_cast<CKoopas*>(e->obj);
-				this->vx = -this->vx;
-				koopas->vx = -koopas->vx;
-				this->nx = -this->nx;
-				koopas->nx = -koopas->nx;
-				if (e->nx != 0)
+				if (koopas->state == KOOPAS_STATE_SPINNING)
 				{
-					if (state == KOOPAS_STATE_SPINNING)
-					{
-						if (koopas->GetState() != KOOPAS_STATE_IN_SHELL)
-							koopas->SetState(KOOPAS_STATE_SHELL_UP);
-					}
+					this->SetState(KOOPAS_STATE_DEATH);
+					mario->AddScore(x, y, 100, true);
 				}
-				else if (e->ny < 0)
-						vy = -KOOPAS_JUMP_SPEED;
-					else
-					{
-						y = y0;
-						SetState(KOOPAS_STATE_IN_SHELL);
-					}
+				else
+				{
+					y = y0;
+					this->vx = -this->vx;
+					koopas->vx = -koopas->vx;
+					this->nx = -this->nx;
+					koopas->nx = -koopas->nx;
+				}
 			}
 			if (dynamic_cast<CGoomba*>(e->obj))
 			{
@@ -231,11 +253,25 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					CBrick* object = dynamic_cast<CBrick*>(e->obj);
 					//object->SetDebugAlpha(255);
 					object->GetBoundingBox(oLeft, oTop, oRight, oBottom);
-					if (e->ny != 0) vy = 0;
+					if (e->ny != 0) 
+						vy = 0;
 					if (e->ny < 0)
 					{
-						CanPullBack = true;
-						lastStanding_Y = y;
+						if (tag == KOOPAS_RED)
+						{
+							if (this->nx > 0 && x >= e->obj->x + KOOPAS_TURN_DIFF)
+								if (CalTurnable(e->obj, coObjects))
+								{
+									this->nx = -1;
+									vx = this->nx * KOOPAS_WALKING_SPEED;
+								}
+							if (this->nx < 0 && x <= e->obj->x - KOOPAS_TURN_DIFF)
+								if (CalTurnable(e->obj, coObjects))
+								{
+									this->nx = 1;
+									vx = this->nx * KOOPAS_WALKING_SPEED;
+								}
+						}
 						if (tag == KOOPAS_GREEN_PARA || tag == KOOPAS_RED_PARA)
 							vy = -KOOPAS_JUMP_SPEED;
 					}
@@ -261,10 +297,23 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			{
 				if (e->ny < 0)
 				{
-					CanPullBack = true;
-					lastStanding_Y = y;
 					vy = 0;
-				}	
+					if (tag == KOOPAS_RED)
+					{
+						if (this->nx > 0 && x >= e->obj->x + KOOPAS_TURN_DIFF)
+							if (CalTurnable(e->obj, coObjects))
+							{
+								this->nx = -1;
+								vx = this->nx * KOOPAS_WALKING_SPEED;
+							}
+						if (this->nx < 0 && x <= e->obj->x - KOOPAS_TURN_DIFF)
+							if (CalTurnable(e->obj, coObjects))
+							{
+								this->nx = 1;
+								vx = this->nx * KOOPAS_WALKING_SPEED;
+							}
+					}
+				}
 				else
 				{
 					x = x0 + dx;
@@ -276,8 +325,15 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					y = e->obj->y - KOOPAS_BBOX_HEIGHT;
 					vy = -KOOPAS_JUMP_SPEED;
 				}
+				//DebugOut(L"[KOOPAS] kx: %f ky: %f bx: %f by: %f\n",x,y, e->obj->x, e->obj->y);
 			}
-			if (dynamic_cast<CFireBullet*>(e->obj))	SetState(KOOPAS_STATE_IN_SHELL);
+			if (dynamic_cast<CFireBullet*>(e->obj))
+			{
+				y = y0;
+				mario->AddScore(x, y, 100, true);
+				SetDirection(mario->nx);
+				SetState(KOOPAS_STATE_DEATH);
+			}
 		}
 	}
 	// clean up collision events
@@ -285,17 +341,13 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	//if (state == KOOPAS_STATE_WALKING)
 	//	DebugOut(L"[KOOPAS] x: %f\t y: %f\t \n", x, y);
 }
-
 void CKoopas::Render()
 {
 	int ani = -1;
-	if (state == KOOPAS_STATE_SHELL_UP) {
+	if (state == KOOPAS_STATE_SHELL_UP || state == KOOPAS_STATE_DEATH) 
 		ani = KOOPAS_ANI_SHELL_UP;
-	}
 	else if (state == KOOPAS_STATE_IN_SHELL)
-	{
 		ani = KOOPAS_ANI_SHELL;
-	}
 	else if (state == KOOPAS_STATE_SPINNING)
 	{
 		if (vx < 0)
@@ -325,7 +377,6 @@ void CKoopas::Render()
 	animation_set->at(ani)->Render(x, y);
 	RenderBoundingBox();
 }
-
 void CKoopas::SetState(int state)
 {
 	CGameObject::SetState(state);
@@ -343,12 +394,12 @@ void CKoopas::SetState(int state)
 			else
 				mario = ((CIntroScene*)CGame::GetInstance()->GetCurrentScene())->holder;
 		}
-		vy = -KOOPAS_DIE_DEFLECT_SPEED;
-		if (x < mario->x)
+		vy = -KOOPAS_SHELL_DEFLECT_SPEED;
+		if (x <= mario->x)
 			nx = -1;
 		else
 			nx = 1;
-		vx = nx * KOOPAS_WALKING_SPEED;
+		vx = nx * KOOPAS_PARA_WALKING_SPEED;
 		StartShell();
 		break;
 	}
@@ -368,9 +419,11 @@ void CKoopas::SetState(int state)
 		vx = 0;
 		StartShell();
 		break;
-	case KOOPAS_STATE_PARA:
-		vy = -KOOPAS_JUMP_SPEED;
-		vx = nx * KOOPAS_PARA_WALKING_SPEED;
+	case KOOPAS_STATE_DEATH:
+		vy = -KOOPAS_DIE_DEFLECT_SPEED;
+		vx = 0;
+		StartDying();
+		SetType(IGNORE);
 		break;
 	}
 

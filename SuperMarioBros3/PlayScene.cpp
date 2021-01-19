@@ -1,26 +1,25 @@
 #include <iostream>
 #include <fstream>
 
-#include "PlayScene.h"
-#include "Utils.h"
 #include "Abyss.h"
-#include "Textures.h"
-#include "Sprites.h"
-#include "Portal.h"
+#include "BackUp.h"
 #include "Block.h"
-#include "Define.h"
-#include "Coin.h"
+#include "BreakableBrick.h"
 #include "Brick.h"
 #include "Card.h"
-#include "BackUp.h"
-#include "PiranhaPlant.h"
+#include "Coin.h"
+#include "Define.h"
 #include "FirePiranhaPlant.h"
-#include "QuestionBrick.h"
-#include "BreakableBrick.h"
-#include "PlantBullet.h"
 #include "Leaf.h"
-#include "Score.h"
 #include "MushRoom.h"
+#include "PiranhaPlant.h"
+#include "PlayScene.h"
+#include "Portal.h"
+#include "QuestionBrick.h"
+#include "Score.h"
+#include "Sprites.h"
+#include "Textures.h"
+#include "Utils.h"
 
 
 using namespace std;
@@ -44,7 +43,6 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath) :
 #define OBJECT_TYPE_BLOCK				4
 #define OBJECT_TYPE_COIN				6
 #define OBJECT_TYPE_PIRANHAPLANT		7
-#define OBJECT_TYPE_FIRE_BULLET			9
 #define OBJECT_TYPE_LEAF				36
 #define OBJECT_TYPE_MUSHROOM			37
 #define OBJECT_TYPE_CARD				57
@@ -224,9 +222,6 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 		obj = new CCoin(tag);
 		obj->SetType(IGNORE);
 		break;
-	case OBJECT_TYPE_FIRE_BULLET: 
-		obj = new CFireBullet(); 
-		break;
 	case OBJECT_TYPE_CARD:
 		obj = new CCard();
 		break;
@@ -256,13 +251,6 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 
 	LPANIMATION_SET ani_set = animation_sets->Get(ani_set_id);
 	obj->SetAnimationSet(ani_set);
-
-	if (object_type == OBJECT_TYPE_FIRE_BULLET && player != NULL)
-	{
-		CFireBullet* f = dynamic_cast<CFireBullet*>(obj);
-		player->AddBullets(f);
-	}
-
 	objects.push_back(obj);
 }
 void CPlayScene::_ParseSection_TILEMAP_DATA(string line)
@@ -343,22 +331,6 @@ void CPlayScene::Load()
 	hud = new HUD();
 	DebugOut(L"[INFO] Done loading scene resources %s\n", sceneFilePath);
 }
-bool CPlayScene::IsInViewPort(LPGAMEOBJECT object)
-{
-	CGame* game = CGame::GetInstance();
-	float camX, camY;
-	float objX, objY;
-
-	camX = game->GetCamX();
-	camY = game->GetCamY();
-
-	object->GetPosition(objX, objY);
-	if (dynamic_cast<CFireBullet*> (object) || dynamic_cast<CPlantBullet*> (object)|| dynamic_cast<CMario*>(object))
-		return true;
-
-	return objX >= camX - object->GetWidth() - SCREEN_WIDTH/4 && objX < camX + SCREEN_WIDTH + SCREEN_WIDTH / 4
-		&& objY >= camY - (SCREEN_HEIGHT - game->GetScreenHeight()) && objY < camY + SCREEN_HEIGHT;
-};
 void CPlayScene::Update(DWORD dt)
 {
 	// We know that Mario is the first object in the list hence we won't add him into the colliable object list
@@ -371,18 +343,15 @@ void CPlayScene::Update(DWORD dt)
 	vector<LPGAMEOBJECT> coObjects;
 	for (size_t i = 1; i < objects.size(); i++)
 	{
-		if (!objects[i]->isDestroyed)
-		{
-			if(IsInViewPort(objects[i]))
+		if (!objects[i]->isDestroyed && (objects[i]->IsInViewPort()))
 				coObjects.push_back(objects[i]);
-		}
-		else
-		{
-			LPGAMEOBJECT tmp = objects[i];
-			objects.erase(objects.begin() + i);
-			delete tmp;
-			i--;
-		}	
+		else if (objects[i]->isDestroyed || objects[i]->tag == IGNORE)
+			 {
+				LPGAMEOBJECT tmp = objects[i];
+				objects.erase(objects.begin() + i);
+				delete tmp;
+				i--;
+			 }
 	}
 	// skip the rest if scene was already unloaded (Mario::Update might trigger PlayScene::Unload)
 	if (player == NULL) return;
@@ -394,7 +363,7 @@ void CPlayScene::Update(DWORD dt)
 	{
 		for (size_t i = 0; i < objects.size(); i++)
 		{
-			if (IsInViewPort(objects[i]))
+			if (objects[i]->IsInViewPort())
 				objects[i]->Update(dt, &coObjects);
 			else
 				objects[i]->Update(0, &coObjects);

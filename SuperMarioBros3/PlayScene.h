@@ -53,7 +53,6 @@ public:
 	virtual void Unload();
 	void LoadBackUp();
 	void BackUpPlayer();
-	bool IsInViewPort(LPGAMEOBJECT object);
 	void PushBack(CGameObject* obj) { objects.push_back(obj); }
 	vector<LPGAMEOBJECT> GetObjects() { return objects; }
 	CMap* GetMap() { return current_map; }

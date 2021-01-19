@@ -6,12 +6,15 @@
 
 #include "Sprites.h"
 #include "Animations.h"
+#include "Define.h"
+#include "Game.h"
 
 #define STATIC	0
 #define MOVING	1
 #define IGNORE	2
  
 #define PUSHBACK 0.4f
+#define VIEWPORT_PUSHBACK	16
 
 using namespace std;
 
@@ -92,6 +95,16 @@ public:
 	void SetDirection(int nx) { this->nx = nx; }
 	void SetTag(int tag) { this->tag = tag; }
 	void SetType(int type) { this->type = type; }
+	bool IsInViewPort() 
+	{
+		CGame* game = CGame::GetInstance();
+		float camX, camY;
+
+		camX = game->GetCamX();
+		camY = game->GetCamY();
+		return x >= camX - GetWidth() - VIEWPORT_PUSHBACK && x < camX + SCREEN_WIDTH + VIEWPORT_PUSHBACK
+			&& y >= camY - (SCREEN_HEIGHT - game->GetScreenHeight()) && y < camY + SCREEN_HEIGHT;
+	}
 	void RenderBoundingBox(int alpha = 0);
 	bool isColliding(float friend_left, float friend_top, float friend_right, float friend_bottom);
 	void SetAnimationSet(LPANIMATION_SET ani_set) { animation_set = ani_set; }

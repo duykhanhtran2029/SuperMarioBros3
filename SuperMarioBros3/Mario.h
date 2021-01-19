@@ -267,8 +267,6 @@ class CMario : public CGameObject
 	DWORD turning_state_start;
 	DWORD flapping_start;
 	DWORD running_start;
-	DWORD reloading_start;
-	DWORD lastshoot;
 	DWORD running_stop;
 	DWORD slow_start = 0;
 	DWORD tailflying_start;
@@ -278,7 +276,6 @@ class CMario : public CGameObject
 	DWORD last_kill = 0;
 	DWORD gamedone = 0;
 
-	int iBullet = 0;
 	int kill_streak = 0;
 
 	//Vũ khí bí mật
@@ -387,37 +384,7 @@ public:
 	void StartRunning() { running_start = GetTickCount64(); isRunning = true; }
 	void StopRunning() { running_stop = GetTickCount64(); isRunning = false; }
 	void StartSlowDown() { slow_start = GetTickCount64(); isReadyToRun = false; }
-	void StartShooting(float bx, float by)
-	{ 
-		DWORD tmpShoot = GetTickCount64();	
-		if (lastshoot)
-		{
-			//DebugOut(L"[shoot] ShootTimes %d tmp %d\n", ShootTimes, tmpShoot);
-			if (!(tmpShoot - lastshoot >= MARIO_RELOAD_BULLET_TIME || ShootTimes < MARIO_FIRE_BULLETS))
-			{
-				isReadyToShoot = false;
-				return;
-			}
-			if (tmpShoot - lastshoot >= MARIO_RELOAD_BULLET_TIME)
-			{
-				ShootTimes = 0;
-				isReadyToShoot = true;
-			}
-		}
-		if (isReadyToShoot)
-		{
-			shooting_start = GetTickCount64();
-			isShooting = true;
-			if (iBullet >= MARIO_BULLET_MAX)
-				iBullet = 0;
-			Bullets[iBullet]->SetPosition(bx + nx * FIRE_BULLET_BBOX_WIDTH, by + (float)2 / 3 * (MARIO_LEVEL_SMALL ? MARIO_SMALL_BBOX_HEIGHT : MARIO_BIG_BBOX_HEIGHT));
-			Bullets[iBullet]->SetIsBeingUsed(true);
-			Bullets[iBullet]->SetSpeed(nx * FIRE_BULLET_SPEED_X, FIRE_BULLET_SPEED_Y);
-			Bullets[iBullet]->SetTemHeight(0);
-			iBullet++;
-			ShootTimes++;
-		}
-	}
+	void StartShooting(float bx, float by);
 	void StartTurning() { turning_start = GetTickCount64(); isTurningTail = true; turning_state_start = GetTickCount64(); turning_state = 1; }
 	void StartFlapping() 
 	{ 

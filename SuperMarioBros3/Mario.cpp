@@ -28,7 +28,7 @@
 CMario::CMario(float x, float y, bool isatintroscene) : CGameObject()
 {
 	//level = MARIO_LEVEL_SMALL;
-	level = MARIO_LEVEL_TAIL;
+	level = MARIO_LEVEL_FIRE;
 	untouchable = 0;
 	SetState(MARIO_STATE_IDLE);
 	ax = MARIO_ACCELERATION;
@@ -81,11 +81,7 @@ void CMario::TimingFlag()
 		}
 	}
 	if (GetTickCount64() - kicking_start > MARIO_KICKING_TIME && isKicking)	isKicking = false;
-	if (GetTickCount64() - shooting_start > MARIO_SHOOTING_TIME && isShooting)
-	{
-		isShooting = false;
-		lastshoot = GetTickCount64();
-	}
+	if (GetTickCount64() - shooting_start > MARIO_SHOOTING_TIME && isShooting) isShooting = false;
 	if (GetTickCount64() - turning_state_start > MARIO_TURNING_STATE_TIME && isTurningTail)
 	{
 		turning_state_start = GetTickCount64();
@@ -242,7 +238,6 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 	// turn off collision when die 
 	if (state!=MARIO_STATE_DIE)
 		CalcPotentialCollisions(coObjects, coEvents);
-
 	if (lostControl)
 	{
 		if (pipedown_start > 0)
@@ -312,41 +307,15 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 					}
 					else
 					{
-						if (object->tag == PLATFORM)
+						if (!(tag == PIPE && isFlying))
 						{
 							if (e->ny < 0)
-							{
 								vy = 0;
-							}
 							if (e->ny > 0)
 							{
+								vy = 0;
 								ay = MARIO_GRAVITY;
 								isReadyToJump = false;
-							}
-							if (e->nx != 0)
-							{
-								if (ceil(mBottom) != oTop)
-								{
-									vx = 0;
-									if (isRunning && tag != PIPE)
-										StopRunning();
-								}
-							}
-						}
-						else
-						{
-							if (!(tag == PIPE && isFlying))
-							{
-								if (e->ny > 0)
-								{
-									ay = MARIO_GRAVITY;
-									isReadyToJump = false;
-								}
-								else if (e->ny < 0)
-								{
-
-									vy = 0;
-								}
 							}
 							if (e->nx != 0)
 							{
@@ -377,12 +346,6 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 				if (dynamic_cast<CGoomba*>(e->obj)) // if e->obj is Goomba 
 				{
 					CGoomba* goomba = dynamic_cast<CGoomba*>(e->obj);
-					if (goomba->GetState() == GOOMBA_STATE_DIE_BY_TAIL)
-					{
-						x += dx;
-						y += dy;
-						continue;
-					}
 					// jump on top >> kill Goomba and deflect a bit 
 					if (e->ny < 0)
 					{
@@ -417,13 +380,13 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 						y = y0;
 						if (untouchable == 0 && goomba->GetState() != GOOMBA_STATE_DIE && !isTurningTail)
 							Attacked();
-						if (e->nx != 0 && isTurningTail)
-						{
-							AddScore(x, y, 100, true);
-							goomba->SetDirection(nx);
-							goomba->SetState(GOOMBA_STATE_DIE_BY_TAIL);
-							tail->ShowHitEffect();
-						}
+						//if (e->nx != 0 && isTurningTail)
+						//{
+						//	AddScore(x, y, 100, true);
+						//	goomba->SetDirection(nx);
+						//	goomba->SetState(GOOMBA_STATE_DIE_BY_TAIL);
+						//	tail->ShowHitEffect();
+						//}
 					}
 				}
 				if (dynamic_cast<CKoopas*>(e->obj)) // if e->obj is Koopas 
@@ -483,12 +446,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 					}
 					else
 					{
-						if (e->ny > 0)
-						{
-							y = y0;
-							vy = 0;
-						}
-						else if (e->ny < 0)
+						if (e->ny < 0)
 						{
 							AddScore(koopas->x, koopas->y, 100, true);
 							vy = -1.5f * MARIO_JUMP_DEFLECT_SPEED;
@@ -501,7 +459,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 							else
 								koopas->SetState(KOOPAS_STATE_SPINNING);
 						}
-						else if (e->nx != 0)
+						else
 						{
 							y = y0;
 							if (koopas->GetState() == KOOPAS_STATE_IN_SHELL || koopas->GetState() == KOOPAS_STATE_SHELL_UP)
@@ -523,11 +481,11 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 								if (untouchable == 0 && isKicking == false && !isTurningTail
 									&& koopas->GetState() != KOOPAS_STATE_IN_SHELL && koopas->GetState() != KOOPAS_STATE_SHELL_UP)
 									Attacked();
-								if (isTurningTail)
-								{
-									koopas->SetState(KOOPAS_STATE_SHELL_UP);
-									tail->ShowHitEffect();
-								}
+								//if (isTurningTail)
+								//{
+								//	koopas->SetState(KOOPAS_STATE_SHELL_UP);
+								//	tail->ShowHitEffect();
+								//}
 							}
 						}
 					}
@@ -1103,7 +1061,7 @@ void CMario::Render()
 	else
 		animation_set->at(ani)->Render(x, y, alpha);
 
-	RenderBoundingBox(128);
+	RenderBoundingBox();
 	if(isTurningTail)
 		tail->Render();
 }
@@ -1275,4 +1233,17 @@ void CMario::Attacked()
 		SetLevel(MARIO_LEVEL_BIG);
 	else if (level == MARIO_LEVEL_BIG)
 		SetLevel(MARIO_LEVEL_SMALL);
+}
+void CMario::StartShooting(float bx, float by)
+{
+	if (ShootTimes < MARIO_FIRE_BULLETS)
+	{
+		shooting_start = GetTickCount64();
+		isShooting = true;
+		CFireBullet* bullet = new CFireBullet(bx + nx * FIRE_BULLET_BBOX_WIDTH, by + FIRE_BULLET_SHOOT_DIFF * (MARIO_LEVEL_SMALL ? MARIO_SMALL_BBOX_HEIGHT : MARIO_BIG_BBOX_HEIGHT));
+		bullet->SetSpeed(nx * FIRE_BULLET_SPEED_X, FIRE_BULLET_SPEED_Y);
+		bullet->SetTemHeight(0);
+		((CPlayScene*)CGame::GetInstance()->GetCurrentScene())->PushBack(bullet);
+		ShootTimes++;
+	}
 }

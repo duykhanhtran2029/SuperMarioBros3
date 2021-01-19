@@ -1,11 +1,15 @@
 #include "FireBullet.h"
 #include "Utils.h"
+#include "Mario.h"
+#include "PlayScene.h"
 
 CFireBullet::CFireBullet(float x, float y) : CGameObject()
 {
 	vx = vy = 0;
 	this->x = x;
 	this->y = y;
+	animation_set = CAnimationSets::GetInstance()->Get(FIRE_BULLET_ANI_ID);
+	type = MOVING;
 }
 
 void CFireBullet::FilterCollision(
@@ -49,9 +53,13 @@ void CFireBullet::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
 
 	CGameObject::Update(dt);
-	if (!this->isBeingUsed)
+	if (!IsInViewPort())
+	{
+		isDestroyed = true;
+		((CPlayScene*)CGame::GetInstance()->GetCurrentScene())->GetPlayer()->ShootTimes--;
 		return;
-
+	}
+		
 	vector<LPCOLLISIONEVENT> coEvents;
 	vector<LPCOLLISIONEVENT> coEventsResult;
 
@@ -99,8 +107,8 @@ void CFireBullet::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 
 				if (nx != 0)
 				{
-					isBeingUsed = false;
-					x = y = -1;
+					isDestroyed = true;
+					((CPlayScene*)CGame::GetInstance()->GetCurrentScene())->GetPlayer()->ShootTimes--;
 				}
 			}
 			else
@@ -123,8 +131,6 @@ void CFireBullet::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 
 void CFireBullet::Render()
 {
-	if (!isBeingUsed)
-		return;
 	int ani = 0;
 	if (vx > 0)
 	{
@@ -138,7 +144,6 @@ void CFireBullet::Render()
 
 void CFireBullet::GetBoundingBox(float& l, float& t, float& r, float& b)
 {
-
 	l = x;
 	t = y;
 	r = x + FIRE_BULLET_BBOX_WIDTH;

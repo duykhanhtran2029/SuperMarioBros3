@@ -5,11 +5,17 @@
 #include "Map.h"
 CPlantBullet::CPlantBullet(float bx, float by, bool Up, bool Right)
 {
-	y = by + BULLET_START_HEIGHT;
 	if (Up)
+	{
+		y = by;
 		vy = -BULLET_SPEED_Y;
+	}
 	else
+	{
+		y = by + BULLET_BBOX_HEIGHT;
 		vy = BULLET_SPEED_Y;
+	}
+		
 
 	if (Right)
 	{
