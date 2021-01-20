@@ -5,15 +5,17 @@
 #include"Goomba.h"
 #include "PlayScene.h"
 #include "Scene.h"
-#define KOOPAS_WALKING_SPEED		0.03f
-#define KOOPAS_PARA_WALKING_SPEED	0.06f
-#define KOOPAS_JUMP_SPEED			0.35f
-#define KOOPAS_GRAVITY				0.002f
-#define KOOPAS_DIE_DEFLECT_SPEED	0.3f
-#define KOOPAS_SHELL_DEFLECT_SPEED	0.4f
-#define KOOPAS_BBOX_WIDTH			16
-#define KOOPAS_BBOX_HEIGHT			26
-#define KOOPAS_BBOX_SHELL_HEIGHT	16
+#define KOOPAS_WALKING_SPEED			0.03f
+#define KOOPAS_PARA_WALKING_SPEED		0.03f
+#define KOOPAS_JUMP_SPEED				0.35f
+#define KOOPAS_RED_SPEED				0.03f
+#define KOOPAS_GRAVITY					0.002f
+#define KOOPAS_PARA_GRAVITY				0.001f
+#define KOOPAS_DIE_DEFLECT_SPEED		0.3f
+#define KOOPAS_SHELL_DEFLECT_SPEED		0.4f
+#define KOOPAS_BBOX_WIDTH				16
+#define KOOPAS_BBOX_HEIGHT				26
+#define KOOPAS_BBOX_SHELL_HEIGHT		16
 
 #define KOOPAS_STATE_WALKING	100
 #define KOOPAS_STATE_SHELL_UP	200
@@ -41,7 +43,7 @@
 #define KOOPAS_GREEN_PARA	2
 #define KOOPAS_RED_PARA		3
 
-#define KOOPAS_TURN_DIFF	8
+#define KOOPAS_TURN_DIFF	4
 
 
 class CKoopas : public CGameObject
@@ -57,6 +59,7 @@ public:
 	float lastStanding_Y;
 	bool CanPullBack = false;
 	float start_x = 0, start_y = 0;
+	int start_tag = 0;
 	void StartReviving() { reviving_start = GetTickCount64(); }
 	void StartShell() { shell_start = GetTickCount64(); reviving_start = 0; }
 	CKoopas();

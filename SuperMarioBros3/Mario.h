@@ -241,6 +241,11 @@
 #define MARIO_ANI_TRANSFORM_SMALL_LEFT			116
 #define MARIO_ANI_TRANSFORM_BANG				117
 
+#define MARIO_SPRITE_PIPE_SMALL					10900
+#define MARIO_SPRITE_PIPE_BIG					11900
+#define MARIO_SPRITE_PIPE_TAIL					12900
+#define MARIO_SPRITE_PIPE_FIRE					13900
+
 #define	MARIO_LEVEL_SMALL	1
 #define	MARIO_LEVEL_BIG		2
 #define	MARIO_LEVEL_TAIL	3
@@ -252,7 +257,29 @@
 #define MARIO_SMALL_BBOX_WIDTH			13
 #define MARIO_SMALL_BBOX_HEIGHT			16
 
-#define MARIO_FIRE_BULLETS  2
+// whack tail
+#define MARIO_SPRITE_WHACK_LEFT_1_ID	12813
+#define MARIO_SPRITE_WHACK_LEFT_2_ID	12814
+#define MARIO_SPRITE_WHACK_LEFT_3_ID	12815
+#define MARIO_SPRITE_WHACK_LEFT_4_ID	12816
+
+#define MARIO_SPRITE_WHACK_RIGHT_1_ID	12803
+#define MARIO_SPRITE_WHACK_RIGHT_2_ID	12804
+#define MARIO_SPRITE_WHACK_RIGHT_3_ID	12805
+#define MARIO_SPRITE_WHACK_RIGHT_4_ID	12806
+
+#define MARIO_WHACK_STATE_1		1
+#define MARIO_WHACK_STATE_2		2
+#define MARIO_WHACK_STATE_3		3
+#define MARIO_WHACK_STATE_4		4
+#define MARIO_WHACK_STATE_5		5
+
+#define MARIO_WHACK_RENDER_DIFF_2	2 
+#define MARIO_WHACK_RENDER_DIFF_7	7 
+//others
+#define MARIO_RENDER_ALPHA				255
+#define MARIO_FIRE_BULLETS				2
+#define MARIO_SITTING_RENDER_DIFF_5		5 
 
 #define MARIO	0
 #define LUIGI	1
@@ -343,6 +370,8 @@ public:
 	//trasnforming
 	bool isTransforming = false;
 	bool transformState = false;
+	//floating wood
+	bool isTouchingWood = false;
 	//game done
 	bool isGameDone = false;
 

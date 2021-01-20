@@ -13,13 +13,11 @@
 #define GAMEDONE1_SPRITE_ID		50070
 #define GAMEDONE2_SPRITE_ID		50071
 
-#define GAMEDONE1_X		2630
-#define GAMEDONE1_Y		240
-#define GAMEDONE2_X		2620
-#define GAMEDONE2_Y		270
 
-#define WORLD_1_1	1
-#define WORLD_1_4	4
+#define WORLD_1			0
+#define WORLD_INTRO		5
+#define WORLD_1_1		1
+#define WORLD_1_4		4
 
 class CPlayScene : public CScene
 {

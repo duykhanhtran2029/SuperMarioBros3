@@ -7,6 +7,7 @@
 #include "Game.h"
 #include "GameObject.h"
 #include "Sprites.h"
+#include "FloatingWood.h"
 #include "Piece.h"
 #include "MushRoom.h"
 #include "Leaf.h"
@@ -84,9 +85,9 @@ void CGameObject::CalcPotentialCollisions(
 		for (UINT i = 0; i < coObjects->size(); i++)
 		{
 			LPGAMEOBJECT object = coObjects->at(i);
-			if (object!= nullptr && !(dynamic_cast<CMushRoom*>(object) || dynamic_cast<CFireBullet*>(object)
-				|| ((dynamic_cast<CPiranhaPlant*>(object) || dynamic_cast<CFirePiranhaPlant*>(object)) && object->state == PIRANHAPLANT_STATE_INACTIVE)
-				|| (dynamic_cast<CKoopas*>(object) && object->state == KOOPAS_STATE_IN_SHELL && ((CMario*)this)->isHolding) || object->type == IGNORE))
+			if (object!= nullptr && (object->type != IGNORE || dynamic_cast<CFloatingWood*>(object))
+				&& !(dynamic_cast<CFireBullet*>(object)
+				|| (dynamic_cast<CKoopas*>(object) && ((CKoopas*)object)->isBeingHeld)))
 				{
 					LPCOLLISIONEVENT e = SweptAABBEx(coObjects->at(i));
 					if (e->t > 0 && e->t <= 1.0f)

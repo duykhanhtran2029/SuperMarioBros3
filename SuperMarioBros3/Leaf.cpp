@@ -6,6 +6,8 @@
 
 void CLeaf::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
+	if (!IsInViewPort())
+		isDestroyed = true;
 	if (isDestroyed)
 		return;
 	CGameObject::Update(dt);
@@ -40,15 +42,6 @@ void CLeaf::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			{
 				vx = -vx;
 				start_timing = GetTickCount64();
-			}
-			if (!mario->isAtIntroScene)
-			{
-				if (y > ((CPlayScene*)CGame::GetInstance()->GetCurrentScene())->GetMap()->GetMapHeight())
-				{
-					isAppear = false;
-					isDestroyed = true;
-				}
-				//x = y = -50;
 			}
 
 		}

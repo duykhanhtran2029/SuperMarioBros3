@@ -11,7 +11,7 @@
 
 #define COIN_STATE_IDLE		0
 #define COIN_STATE_UP		100
-#define COIN_STATE_DOWN		200
+#define COIN_STATE_DOWN		111
 
 #define COIN_TYPE_NORMAL	6
 #define COIN_TYPE_INBRICK	61

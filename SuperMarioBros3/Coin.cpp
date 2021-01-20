@@ -34,7 +34,7 @@ void CCoin::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			{
 				isAppear = false;
 				isDestroyed = true;
-				coinmario->AddScore(x,y,100,false,false); 
+				coinmario->AddScore(x,y,50,false,false); 
 				coinmario->AddMoney(1);
 			}
 

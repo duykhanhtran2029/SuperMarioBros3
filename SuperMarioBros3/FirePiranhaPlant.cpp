@@ -90,6 +90,7 @@ void CFirePiranhaPlant::Update(DWORD dt,
 			GetBoundingBox(oLeft, oTop, oRight, oBottom);
 			if (isColliding(floor(mLeft), mTop, ceil(mRight), mBottom))
 			{
+				mario->AddScore(x, y, 100, true);
 				SetState(PIRANHAPLANT_STATE_DEATH);
 				mario->getTail()->ShowHitEffect();
 			}
@@ -122,6 +123,7 @@ void CFirePiranhaPlant::SetState(int _state)
 	{
 	case PIRANHAPLANT_STATE_DARTING:
 		vy = -PIRANHAPLANT_DARTING_SPEED;
+		SetType(MOVING);
 		break;
 	case PIRANHAPLANT_STATE_SHOOTING:
 		vy = 0;
@@ -134,6 +136,7 @@ void CFirePiranhaPlant::SetState(int _state)
 		break;
 	case PIRANHAPLANT_STATE_INACTIVE:
 		vy = 0;
+		SetType(IGNORE);
 		break;
 	}
 }

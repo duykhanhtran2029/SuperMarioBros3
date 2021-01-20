@@ -398,7 +398,7 @@ void CGame::Load(LPCWSTR gameFile)
 void CGame::SwitchScene(int scene_id)
 {
 	DebugOut(L"[INFO] Switching to scene %d\n", scene_id);
-	if (current_scene == WORLD_1_1 || current_scene == WORLD_1_4)
+	if (current_scene != WORLD_1 && current_scene != WORLD_INTRO)
 		((CPlayScene*)scenes[current_scene])->BackUpPlayer();
 	scenes[current_scene]->Unload();
 	if (pre_scene != -1)
@@ -413,15 +413,12 @@ void CGame::SwitchScene(int scene_id)
 	CAnimations::GetInstance()->Clear();
 	CAnimationSets::GetInstance()->Clear();
 
-	//delete tmptxt;
-	//delete tmpspt;
-	//delete tmpani; 
 
 	current_scene = scene_id;
 	LPSCENE s = scenes[scene_id];
 	CGame::GetInstance()->SetKeyHandler(s->GetKeyEventHandler());
 	s->Load();
-	if (current_scene == WORLD_1_1 || current_scene == WORLD_1_4)
+	if (current_scene != WORLD_1 && current_scene != WORLD_INTRO)
 		((CPlayScene*)scenes[current_scene])->LoadBackUp();
 }
 void CGame::SwitchBackScene(int scene_id, float start_x, float start_y)
@@ -438,7 +435,7 @@ void CGame::SwitchBackScene(int scene_id, float start_x, float start_y)
 	((CPlayScene*)s)->GetHUD()->SetHUD(((CPlayScene*)scenes[pre_scene])->GetHUD());
 	((CPlayScene*)s)->GetPlayer()->StartPipeUp(true);
 }
-void CGame::SwitchExtraScene(int scene_id, float start_x, float start_y)
+void CGame::SwitchExtraScene(int scene_id, float start_x, float start_y, bool pipeUp)
 {
 	DebugOut(L"[INFO] Switching to scene %d\n", scene_id);
 
@@ -462,5 +459,8 @@ void CGame::SwitchExtraScene(int scene_id, float start_x, float start_y)
 	if(isHaveToReload)
 		s->Load();
 	((CPlayScene*)s)->GetHUD()->SetHUD(((CPlayScene*)scenes[pre_scene])->GetHUD());
-	((CPlayScene*)s)->GetPlayer()->StartPipeDown(true);
+	if(!pipeUp)
+		((CPlayScene*)s)->GetPlayer()->StartPipeDown(true);
+	else
+		((CPlayScene*)s)->GetPlayer()->StartPipeUp(true);
 }

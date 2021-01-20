@@ -62,6 +62,7 @@ void CPiranhaPlant::Update(DWORD dt,vector<LPGAMEOBJECT>* coObjects)
 			GetBoundingBox(oLeft, oTop, oRight, oBottom);
 			if (isColliding(floor(mLeft), mTop, ceil(mRight), mBottom))
 			{
+				mario->AddScore(x, y, 100, true);
 				SetState(PIRANHAPLANT_STATE_DEATH);
 				mario->getTail()->ShowHitEffect();
 			}
@@ -87,6 +88,7 @@ void CPiranhaPlant::SetState(int _state)
 	{
 	case PIRANHAPLANT_STATE_DARTING:
 		vy = -PIRANHAPLANT_DARTING_SPEED;
+		SetType(MOVING);
 		break;
 	case PIRANHAPLANT_STATE_BITING:
 		vy = 0;
@@ -99,6 +101,7 @@ void CPiranhaPlant::SetState(int _state)
 		break;
 	case PIRANHAPLANT_STATE_INACTIVE:
 		vy = 0;
+		SetType(IGNORE);
 		StartBitting();
 		break;
 	}

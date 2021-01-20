@@ -97,9 +97,9 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 
 	float mLeft, mTop, mRight, mBottom;
 	float oLeft, oTop, oRight, oBottom;
-	if (mario != NULL )
+	if (mario != NULL && !mario->isAtIntroScene && state != GOOMBA_STATE_DIE_BY_TAIL && state != GOOMBA_STATE_DIE)
 	{
-		if (mario->isTurningTail && !mario->isAtIntroScene)
+		if (mario->isTurningTail)
 		{
 			mario->getTail()->GetBoundingBox(mLeft, mTop, mRight, mBottom);
 			GetBoundingBox(oLeft, oTop, oRight, oBottom);
@@ -110,6 +110,23 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				SetState(GOOMBA_STATE_DIE_BY_TAIL);
 				mario->getTail()->ShowHitEffect();
 				return;
+			}
+		}
+		if (mario->untouchable == 0)
+		{
+			mario->GetBoundingBox(mLeft, mTop, mRight, mBottom);
+			GetBoundingBox(oLeft, oTop, oRight, oBottom);
+			if (isColliding(floor(mLeft), floor(mTop), ceil(mRight), ceil(mBottom)))
+			{
+				if (abs(oTop - mBottom) <= 1.0f)
+				{
+					mario->AddScore(x, y, 100, true);
+					mario->vy = -MARIO_JUMP_DEFLECT_SPEED;
+					SetState(GOOMBA_STATE_DIE);
+					return;
+				}
+				else
+					mario->Attacked();
 			}
 		}
 		//if (abs(mario->x - x) <= GOOMBA_RED_RANGE_CHASING && tag == GOOMBA_RED && chasing_start == 0)
@@ -171,7 +188,9 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				{
 					goomba->vx = -goomba->vx;
 					this->vx = -this->vx;
-					y = y0;
+					goomba->nx = -goomba->nx;
+					this->nx = -this->nx;
+					y = y0 + dy;
 				}
 
 			}
@@ -204,16 +223,16 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 						else
 							ay = GOOMBA_GRAVITY;
 					}
-					if (e->ny > 0)
-					{
-						vy = 0;
+					else if (e->ny > 0)
 						ay = GOOMBA_GRAVITY;
-					}
 				}
 				if (e->nx != 0)
 				{
 					if (ceil(mBottom) != oTop)
-						vx = - vx;
+					{
+						vx = -vx;
+						this->nx = -this->nx;
+					}
 				}
 			}
 			if (dynamic_cast<CBlock*>(e->obj))

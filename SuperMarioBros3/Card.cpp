@@ -2,6 +2,9 @@
 #include "Utils.h"
 #include "PlayScene.h"
 
+#define CARD_RENDER_CLEAR_X_DIFF 189
+#define CARD_RENDER_CLEAR_Y_DIFF 83
+
 CCard::CCard()
 {
 	vx = 0;
@@ -46,8 +49,8 @@ void CCard::Update(DWORD dt, vector<LPGAMEOBJECT>* colliable_objects)
 	if (((CPlayScene*)CGame::GetInstance()->GetCurrentScene())->isGameDone2)
 	{
 		isAppear = true;
-		x = 2749;
-		y = 308;
+		x = CGame::GetInstance()->GetCamX() + CARD_RENDER_CLEAR_X_DIFF;
+		y = CGame::GetInstance()->GetCamY() + CARD_RENDER_CLEAR_Y_DIFF;
 		HUD* hud = ((CPlayScene*)CGame::GetInstance()->GetCurrentScene())->GetHUD();
 		hud->isTakingCard = true;
 		hud->idTakenCard = state - 1;

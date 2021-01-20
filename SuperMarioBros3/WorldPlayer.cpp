@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <assert.h>
 #include "Utils.h"
+#include "BackUp.h"
 
 #include "WorldPlayer.h"
 #include "WorldScene.h"
@@ -8,13 +9,13 @@
 
 CWorldPlayer::CWorldPlayer(float x, float y) : CGameObject()
 {
-	level = MARIO_LEVEL_SMALL;
+	level = CBackUp::GetInstance()->level;
 	SetState(MARIO_STATE_IDLE);
 	start_x = x;
 	start_y = y;
 	this->x = x;
 	this->y = y;
-	SetMove(false, true, true, false);
+	SetMove(false, false, true, false);
 }
 void CWorldPlayer::CalcPotentialCollisions(vector<LPGAMEOBJECT>* coObjects, vector<LPCOLLISIONEVENT>& coEvents)
 {
@@ -101,8 +102,7 @@ void CWorldPlayer::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 }
 void CWorldPlayer::Render()
 {
-	int ani = 0;
-	animation_set->at(ani)->Render(x, y);
+	animation_set->at(level - 1)->Render(x, y);
 	//DebugAlpha = 128;
 	RenderBoundingBox();
 }

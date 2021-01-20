@@ -4,12 +4,14 @@
 #include "Abyss.h"
 #include "BackUp.h"
 #include "Block.h"
+#include "BoomerangBrother.h"
 #include "BreakableBrick.h"
 #include "Brick.h"
 #include "Card.h"
 #include "Coin.h"
 #include "Define.h"
 #include "FirePiranhaPlant.h"
+#include "FloatingWood.h"
 #include "Leaf.h"
 #include "MushRoom.h"
 #include "PiranhaPlant.h"
@@ -21,7 +23,10 @@
 #include "Textures.h"
 #include "Utils.h"
 
-
+#define GAMEDONE_1_DIFF_X	80
+#define GAMEDONE_1_DIFF_Y	20
+#define GAMEDONE_2_DIFF_X	60
+#define GAMEDONE_2_DIFF_Y	45
 using namespace std;
 
 CPlayScene::CPlayScene(int id, LPCWSTR filePath) :
@@ -45,11 +50,14 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath) :
 #define OBJECT_TYPE_PIRANHAPLANT		7
 #define OBJECT_TYPE_LEAF				36
 #define OBJECT_TYPE_MUSHROOM			37
+#define OBJECT_TYPE_BOOMERANGBROTHER	48
 #define OBJECT_TYPE_CARD				57
 #define OBJECT_TYPE_FIREPIRANHAPLANT	70
 #define OBJECT_TYPE_QUESTIONBRICK		142
 #define OBJECT_TYPE_BREAKABLEBRICK		112
 #define OBJECT_TYPE_ABYSS				113
+
+#define OBJECT_TYPE_FLOATINGWOOD		26
 
 #define OBJECT_TYPE_PORTAL	50
 
@@ -191,6 +199,9 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 		break;
 	case OBJECT_TYPE_QUESTIONBRICK:
 		obj = new CQuestionBrick(tag, option_tag_1);
+		if (option_tag_2 > 0)
+			((CQuestionBrick*)obj)->items = option_tag_2;
+		((CQuestionBrick*)obj)->start_y = y;
 		break;
 	case OBJECT_TYPE_BREAKABLEBRICK:
 		obj = new CBreakableBrick();
@@ -198,9 +209,15 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	case OBJECT_TYPE_KOOPAS:
 		obj = new CKoopas();
 		obj->SetTag(tag);
+		((CKoopas*)obj)->start_tag = tag;
 		obj->SetType(MOVING);
 		((CKoopas*)obj)->start_x = x;
 		((CKoopas*)obj)->start_y = y;
+		break;
+	case OBJECT_TYPE_BOOMERANGBROTHER:
+		obj = new CBoomerangBrother();
+		obj->SetType(MOVING);
+		((CBoomerangBrother*)obj)->start_x = x;
 		break;
 	case OBJECT_TYPE_BLOCK:
 		obj = new CBlock();
@@ -225,19 +242,19 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	case OBJECT_TYPE_CARD:
 		obj = new CCard();
 		break;
+	case OBJECT_TYPE_FLOATINGWOOD:
+		obj = new CFloatingWood();
+		break;
 	case OBJECT_TYPE_PORTAL:
 		{	
-			float r = atof(tokens[4].c_str());
-			float b = atof(tokens[5].c_str());
-			int scene_id = atoi(tokens[6].c_str());
-			int isToExtraScene = atoi(tokens[7].c_str());
+			int scene_id = atoi(tokens[4].c_str());
+			int isToExtraScene = atoi(tokens[5].c_str());
 			float start_x = 0, start_y = 0;
-			if (tokens.size() >= 10)
-			{
-				start_x = atoi(tokens[8].c_str());
-				start_y = atoi(tokens[9].c_str());
-			}
-			obj = new CPortal(x, y, r, b, scene_id,start_x, start_y);
+			start_x = atoi(tokens[6].c_str());
+			start_y = atoi(tokens[7].c_str());
+			obj = new CPortal(scene_id,start_x, start_y);
+			if (tokens.size() >= 8)
+				((CPortal*)obj)->pipeUp = true;
 			obj->SetTag(isToExtraScene);
 		}
 		break;
@@ -343,15 +360,16 @@ void CPlayScene::Update(DWORD dt)
 	vector<LPGAMEOBJECT> coObjects;
 	for (size_t i = 1; i < objects.size(); i++)
 	{
-		if (!objects[i]->isDestroyed && (objects[i]->IsInViewPort()))
-				coObjects.push_back(objects[i]);
-		else if (objects[i]->isDestroyed || objects[i]->tag == IGNORE)
-			 {
-				LPGAMEOBJECT tmp = objects[i];
-				objects.erase(objects.begin() + i);
-				delete tmp;
-				i--;
-			 }
+		if (!objects[i]->isDestroyed)
+			coObjects.push_back(objects[i]);
+		else
+		{
+			LPGAMEOBJECT tmp = objects[i];
+			objects.erase(objects.begin() + i);
+			delete tmp;
+			tmp = NULL;
+			i--;
+		}
 	}
 	// skip the rest if scene was already unloaded (Mario::Update might trigger PlayScene::Unload)
 	if (player == NULL) return;
@@ -385,85 +403,87 @@ void CPlayScene::SetCam(float cx, float cy)
 	mh = current_map->GetMapHeight();
 
 	// Update camera to follow mario
-	//if (id == WORLD_1_1)
-	//{
-	//	cx -= sw / 2;
-	//	// CamX
-	//	if (cx <= 0)//Left Edge
-	//		cx = 0;
-	//	if (cx >= mw - sw)//Right Edge
-	//		cx = mw - sw;
-
-	//	//CamY
-	//	if (isTurnOnCamY)
-	//		cy -= sh / 2;
-	//	else
-	//		cy = mh - sh;
-
-	//	if (cy <= -HUD_HEIGHT)//Top Edge
-	//		cy = -HUD_HEIGHT;
-	//	if (cy + sh >= mh)//Bottom Edge
-	//		cy = mh - sh;
-
-	//	//Update CamY when Flying
-	//	if (player->isFlying)
-	//		isTurnOnCamY = true;
-	//	if (cy > mh - sh && !player->isFlying)
-	//		isTurnOnCamY = false;
-
-	//}
 	//if (id == WORLD_1_4)
 	//{
 	//	// CamX
 	//	cx = game->GetCamX();
-	//	cx ++;
+	//	cx += 0.5f;
 	//	if (cx <= 0)//Left Edge
 	//		cx = 0;
 	//	if (cx >= mw - sw)//Right Edge
 	//		cx = mw - sw;
 
-	//	cy -= sh / 2;
-	//	if (cy <= -HUD_HEIGHT)//Top Edge
-	//		cy = -HUD_HEIGHT;
-	//	if (cy + sh >= mh)//Bottom Edge
-	//		cy = mh - sh;
+	//	cy = mh - sh;
+	//	game->SetCamPos(cx, ceil(cy));
+	//	current_map->SetCamPos(cx, ceil(cy));
+	//	hud->SetPosition(cx, ceil(cy + sh - HUD_HEIGHT));
 	//}
+	//else 
+	{
+		cx -= sw / 2;
+		// CamX
+		if (cx <= 0)//Left Edge
+			cx = 0;
+		if (cx >= mw - sw)//Right Edge
+			cx = mw - sw;
 
-	cx -= sw / 2;
-	// CamX
-	if (cx <= 0)//Left Edge
-		cx = 0;
-	if (cx >= mw - sw)//Right Edge
-		cx = mw - sw;
+		//CamY
+		if (isTurnOnCamY)
+			cy -= sh / 2;
+		else
+			cy = mh - sh;
 
-	//CamY
-	if (isTurnOnCamY)
-		cy -= sh / 2;
-	else
-		cy = mh - sh;
+		if (cy <= -HUD_HEIGHT)//Top Edge
+			cy = -HUD_HEIGHT;
+		if (cy + sh >= mh)//Bottom Edge
+			cy = mh - sh;
 
-	if (cy <= -HUD_HEIGHT)//Top Edge
-		cy = -HUD_HEIGHT;
-	if (cy + sh >= mh)//Bottom Edge
-		cy = mh - sh;
+		//Update CamY when Flying
+		if (player->isFlying)
+			isTurnOnCamY = true;
+		if (cy > mh - sh && !player->isFlying)
+			isTurnOnCamY = false;
 
-	//Update CamY when Flying
-	if (player->isFlying)
-		isTurnOnCamY = true;
-	if (cy > mh - sh && !player->isFlying)
-		isTurnOnCamY = false;
+		game->SetCamPos(ceil(cx), ceil(cy));
+		current_map->SetCamPos(cx, cy);
+		hud->SetPosition(ceil(cx), ceil(cy + sh - HUD_HEIGHT));
+	}
+	//cx -= sw / 2;
+	//// CamX
+	//if (cx <= 0)//Left Edge
+	//	cx = 0;
+	//if (cx >= mw - sw)//Right Edge
+	//	cx = mw - sw;
+
+	////CamY
+	//if (isTurnOnCamY)
+	//	cy -= sh / 2;
+	//else
+	//	cy = mh - sh;
+
+	//if (cy <= -HUD_HEIGHT)//Top Edge
+	//	cy = -HUD_HEIGHT;
+	//if (cy + sh >= mh)//Bottom Edge
+	//	cy = mh - sh;
+
+	////Update CamY when Flying
+	//if (player->isFlying)
+	//	isTurnOnCamY = true;
+	//if (cy > mh - sh && !player->isFlying)
+	//	isTurnOnCamY = false;
 	
-	game->SetCamPos(ceil(cx), ceil(cy));
-	current_map->SetCamPos(cx, cy);
-	hud->SetPosition(ceil(cx), ceil(cy + sh - HUD_HEIGHT));
+	//game->SetCamPos(ceil(cx), ceil(cy));
+	//current_map->SetCamPos(cx, cy);
+	//hud->SetPosition(ceil(cx), ceil(cy + sh - HUD_HEIGHT));
+
 }
 void CPlayScene::Render()
 {
 	current_map->Render();
 	if (isGameDone1)
-		gamedone1->Draw(GAMEDONE1_X, GAMEDONE1_Y);
+		gamedone1->Draw(CGame::GetInstance()->GetCamX() + GAMEDONE_1_DIFF_X, CGame::GetInstance()->GetCamY() + GAMEDONE_1_DIFF_Y);
 	if (isGameDone2)
-		gamedone2->Draw(GAMEDONE2_X, GAMEDONE2_Y);
+		gamedone2->Draw(CGame::GetInstance()->GetCamX() + GAMEDONE_2_DIFF_X, CGame::GetInstance()->GetCamY() + GAMEDONE_2_DIFF_Y);
 	for (int i = 0; i < objects.size(); i++)
 		objects[i]->Render();
 	hud->Render();
@@ -563,6 +583,8 @@ void CPlaySceneKeyHandler::OnKeyDown(int KeyCode)
 			if (mario->isOnGround)
 			{
 				mario->SetIsReadyToJump(true);
+				if (mario->isTouchingWood)
+					mario->isTouchingWood = false;
 				//mario->
 			}
 			else if (mario->level == MARIO_LEVEL_TAIL && (!mario->isFlying && !mario->isFlapping && mario->vy > 0))

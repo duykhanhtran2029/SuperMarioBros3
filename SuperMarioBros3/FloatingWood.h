@@ -1,9 +1,9 @@
 #pragma once
-#include "Brick.h"
+#include "GameObject.h"
 #define FLOATING_WOOD_BBOX_WIDTH		48
 #define FLOATING_WOOD_BBOX_HEIGHT	16
 
-#define FLOATING_WOOD_SPEED_X		0.03f
+#define FLOATING_WOOD_SPEED		0.03f
 #define FLOATING_WOOD_GRAVITY		0.0001f
 
 #define FLOATING_WOOD_STATE_MOVING	0
@@ -12,7 +12,7 @@
 
 #define MOVING_PLAT_FORM_ANI			0
 class CFloatingWood :
-    public CBrick
+    public CGameObject
 {
 public:
 	CFloatingWood();

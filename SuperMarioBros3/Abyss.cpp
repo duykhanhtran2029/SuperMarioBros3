@@ -1,5 +1,6 @@
 #include "Abyss.h"
 #include "Koopas.h"
+#include "PlayScene.h"
 CAbyss::CAbyss()
 {
 	type = IGNORE;

@@ -10,115 +10,106 @@
 
 void CMushRoom::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
+	if (!IsInViewPort())
+		isDestroyed = true;
 	if (isDestroyed)
 		return;
 	CGameObject::Update(dt);
-	if (state == MUSHROOM_STATE_WALK)
+	float mLeft, mTop, mRight, mBottom;
+	float oLeft, oTop, oRight, oBottom;
+	CMario* mario = {};
+	if (!dynamic_cast<CIntroScene*> (CGame::GetInstance()->GetCurrentScene()))
+		mario = ((CPlayScene*)CGame::GetInstance()->GetCurrentScene())->GetPlayer();
+	else
+		mario = ((CIntroScene*)CGame::GetInstance()->GetCurrentScene())->GetPlayer();
+	if (mario != NULL)
 	{
-		float mLeft, mTop, mRight, mBottom;
-		float oLeft, oTop, oRight, oBottom;
-		CMario* mario = {};
-		if (!dynamic_cast<CIntroScene*> (CGame::GetInstance()->GetCurrentScene()))
-			mario = ((CPlayScene*)CGame::GetInstance()->GetCurrentScene())->GetPlayer();
-		else
-			mario = ((CIntroScene*)CGame::GetInstance()->GetCurrentScene())->GetPlayer();
-		if (mario != NULL)
+		mario->GetBoundingBox(mLeft, mTop, mRight, mBottom);
+		if (isColliding(mLeft, mTop, mRight, mBottom))
 		{
-			mario->GetBoundingBox(mLeft, mTop, mRight, mBottom);
-			if (isColliding(mLeft, mTop, mRight, mBottom))
+			if (tag == MUSHROOM_TYPE_RED)
 			{
-				if(tag == MUSHROOM_TYPE_RED)
-					mario->SetLevel(MARIO_LEVEL_BIG);
-				if (tag == MUSHROOM_TYPE_GREEN)
-				{
-					mario->AddLife();
-					mario->AddScore(x, y,1);
-				}
-				else
-					mario->AddScore(x, y,1000);
-				isAppear = false;
-				isDestroyed = true;
-				
-				//x = y = -50;
+				mario->SetLevel(MARIO_LEVEL_BIG);
+				mario->AddScore(x, y, 1000);
 			}
 			else
 			{
-				vector<LPCOLLISIONEVENT> coEvents;
-				vector<LPCOLLISIONEVENT> coEventsResult;
+				mario->AddScore(x, y, 1);
+				mario->AddLife();
+			}
+			isAppear = false;
+			isDestroyed = true;
+		}
+	}
+	if (state == MUSHROOM_STATE_WALK)
+	{
+		vector<LPCOLLISIONEVENT> coEvents;
+		vector<LPCOLLISIONEVENT> coEventsResult;
 
-				coEvents.clear();
-				CalcPotentialCollisions(coObjects, coEvents);
+		coEvents.clear();
+		CalcPotentialCollisions(coObjects, coEvents);
 
-				if (coEvents.size() == 0)
+		if (coEvents.size() == 0)
+		{
+			y += dy;
+			x += dx;
+			vy = MUSHROOM_GRAVITY;
+		}
+		else
+		{
+			float min_tx, min_ty;
+			int nx = 0, ny = 0;
+			float rdx = 0;
+			float rdy = 0;
+
+			// TODO: This is a very ugly designed function!!!!
+			FilterCollision(coEvents, coEventsResult, min_tx, min_ty, nx, ny, rdx, rdy);
+
+			float x0 = x, y0 = y;
+			x = x0 + min_tx * dx + nx * PUSHBACK;
+			y = y0 + min_ty * dy + ny * PUSHBACK;
+			//
+			// Collision logic with other objects
+			//
+			if(mario != NULL)
+				if (mario->isAtIntroScene)
+					vx = -MUSHROOM_SPEED;
+			for (UINT i = 0; i < coEventsResult.size(); i++)
+			{
+				LPCOLLISIONEVENT e = coEventsResult[i];
+				GetBoundingBox(mLeft, mTop, mRight, mBottom);
+				e->obj->GetBoundingBox(oLeft, oTop, oRight, oBottom);
+				if (dynamic_cast<CBrick*>(e->obj))
 				{
-					y += dy;
-					x += dx;
-					vy = MUSHROOM_GRAVITY;
+					if (e->ny < 0)
+						vy = 0;
+					if (e->nx != 0)
+					{
+						if (ceil(mBottom) != oTop)
+							vx = -vx;
+					}
+				}
+				else if (dynamic_cast<CBlock*>(e->obj))
+				{
+					CBlock* block = dynamic_cast<CBlock*>(e->obj);
+					x = x0 + dx;
+					if (ny < 0)
+						vy = 0;
+					else
+						y = y0 + dy;
 				}
 				else
 				{
-					float min_tx, min_ty;
-					int nx = 0, ny = 0;
-					float rdx = 0;
-					float rdy = 0;
-
-					// TODO: This is a very ugly designed function!!!!
-					FilterCollision(coEvents, coEventsResult, min_tx, min_ty, nx, ny, rdx, rdy);
-
-					float x0 = x, y0 = y;
-					x = x0 + min_tx * dx + nx * PUSHBACK;
-					y = y0 + min_ty * dy + ny * PUSHBACK;
-					//
-					// Collision logic with other objects
-					//
-					if (mario->isAtIntroScene)
-						vx = -MUSHROOM_SPEED;
-					for (UINT i = 0; i < coEventsResult.size(); i++)
-					{
-						LPCOLLISIONEVENT e = coEventsResult[i];
-						if (e->obj != NULL)
-							if (e->obj->isDestroyed == true)
-							{
-								x = x0 + dx;
-								y = y0 + dy;
-								continue;
-							}
-						GetBoundingBox(mLeft, mTop, mRight, mBottom);
-						e->obj->GetBoundingBox(oLeft, oTop, oRight, oBottom);
-						if (dynamic_cast<CBrick*>(e->obj))
-						{
-							if (e->ny < 0)
-								vy = 0;
-							if (e->nx != 0)
-							{
-								if (ceil(mBottom) != oTop)
-									vx = -vx;
-							}
-						}
-						else if (dynamic_cast<CBlock*>(e->obj))
-						{
-							CBlock* block = dynamic_cast<CBlock*>(e->obj);
-							x = x0 + dx;
-							if (ny < 0)
-								vy = 0;
-							else
-								y = y0 + dy;
-						}
-						else
-						{
-							x = x0 + dx;
-							y = y0 + dy;
-						}
-					}
+					x = x0 + dx;
+					y = y0 + dy;
 				}
-				// clean up collision events
-				for (UINT i = 0; i < coEvents.size(); i++)
-					delete coEvents[i];
 			}
-
-		}
-		
+		// clean up collision events
+		for (UINT i = 0; i < coEvents.size(); i++)
+			delete coEvents[i];
 	}
+
+}
 	if (state == MUSHROOM_STATE_UP)
 	{
 		y += dy;
@@ -129,7 +120,6 @@ void CMushRoom::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			SetState(MUSHROOM_STATE_WALK);
 		}
 	}
-
 }
 
 void CMushRoom::Render()

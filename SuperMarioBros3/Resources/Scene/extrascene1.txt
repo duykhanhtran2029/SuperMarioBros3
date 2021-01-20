@@ -5,12 +5,6 @@
 Resources\Tilemap\world1-1-1.txt
 # id	left	top	right	bottom	texture_id
 [SPRITES]
-# Type	Level	State	Direction	Serial
-# Type: 1 = Mario
-# Level: 0 = Small; 1 = Big; 2 = Tail; 3 = Fire
-# State: 0 = Walk; 1 = Max Speed; 2 = Jump; 3 = Brake; 4 = Sitdown; 5 = Hold; 6 = Fly, 7 = Kick 
-# Direction: 0 = Right; 1 = Left, null = Idle
-# Serial: Optional
 # ==== Brick ==== 
 22001	0	0	16	16	31
 22002	48	0	64	16	31
@@ -19,12 +13,6 @@ Resources\Tilemap\world1-1-1.txt
 22005	32	0	48	16	31
 # ani_id	sprite1_id	time1	sprite2_id	time2	...
 [ANIMATIONS]
-# ==== Mario =========
-#Type Level State Direction
-# Type: 1 = Mario
-# Level: 0 = Small; 1 = Big; 2 = Tail; 3 = Fire
-# State: 0 = Walk; 1 = max speed; 2 = Jump; 3 = Brake; 4 = Sitdown; 5 = Hold; 6 = Fast 
-# Direction: 0 = Right; 1 = Left, null = Idle; 3 = RightDown; 4 = LeftDown
 # ==== Brick =========
 6221	22001	100
 6222	22002	100
@@ -94,7 +82,6 @@ Resources\Tilemap\world1-1-1.txt
 1	352	16	120	10
 1	144	16	121	10
 1	368	16	121	10
-
 1	128	0	122	10
 1	352	0	122	10
 1	144	0	123	10

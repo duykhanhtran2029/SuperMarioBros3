@@ -21,10 +21,10 @@
       <Filter>Map</Filter>
     </ClCompile>
     <ClCompile Include="Mario.cpp">
-      <Filter>Mario</Filter>
+      <Filter>Map Objects\Mario</Filter>
     </ClCompile>
     <ClCompile Include="FireBullet.cpp">
-      <Filter>Mario</Filter>
+      <Filter>Map Objects\Mario</Filter>
     </ClCompile>
     <ClCompile Include="Brick.cpp">
       <Filter>Map Objects\Bricks</Filter>
@@ -93,7 +93,7 @@
       <Filter>Map Objects\WorldMap</Filter>
     </ClCompile>
     <ClCompile Include="Tail.cpp">
-      <Filter>Mario</Filter>
+      <Filter>Map Objects\Mario</Filter>
     </ClCompile>
     <ClCompile Include="IntroScene.cpp">
       <Filter>Scene</Filter>
@@ -101,7 +101,6 @@
     <ClCompile Include="IntroGround.cpp">
       <Filter>Map Objects\Bricks</Filter>
     </ClCompile>
-    <ClCompile Include="FloatingWood.cpp" />
     <ClCompile Include="Abyss.cpp">
       <Filter>Map Objects\Others</Filter>
     </ClCompile>
@@ -120,6 +119,10 @@
     <ClCompile Include="Score.cpp">
       <Filter>Map Objects\Others</Filter>
     </ClCompile>
+    <ClCompile Include="FloatingWood.cpp">
+      <Filter>Map Objects\Bricks</Filter>
+    </ClCompile>
+    <ClCompile Include="BoomerangBrother.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Map.h">
@@ -141,13 +144,13 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="Mario.h">
-      <Filter>Mario</Filter>
+      <Filter>Map Objects\Mario</Filter>
     </ClInclude>
     <ClInclude Include="Define.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="FireBullet.h">
-      <Filter>Mario</Filter>
+      <Filter>Map Objects\Mario</Filter>
     </ClInclude>
     <ClInclude Include="Brick.h">
       <Filter>Map Objects\Bricks</Filter>
@@ -219,7 +222,7 @@
       <Filter>Map Objects\WorldMap</Filter>
     </ClInclude>
     <ClInclude Include="Tail.h">
-      <Filter>Mario</Filter>
+      <Filter>Map Objects\Mario</Filter>
     </ClInclude>
     <ClInclude Include="IntroScene.h">
       <Filter>Scene</Filter>
@@ -227,7 +230,6 @@
     <ClInclude Include="IntroGround.h">
       <Filter>Map Objects\Bricks</Filter>
     </ClInclude>
-    <ClInclude Include="FloatingWood.h" />
     <ClInclude Include="Abyss.h">
       <Filter>Map Objects\Others</Filter>
     </ClInclude>
@@ -246,6 +248,10 @@
     <ClInclude Include="Score.h">
       <Filter>Map Objects\Others</Filter>
     </ClInclude>
+    <ClInclude Include="FloatingWood.h">
+      <Filter>Map Objects\Bricks</Filter>
+    </ClInclude>
+    <ClInclude Include="BoomerangBrother.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header Files">
@@ -262,9 +268,6 @@
     </Filter>
     <Filter Include="HUD">
       <UniqueIdentifier>{76be1072-b439-4dad-b832-af46e48d1e99}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Mario">
-      <UniqueIdentifier>{b21e6db8-be01-40d2-8def-ec37276fddee}</UniqueIdentifier>
     </Filter>
     <Filter Include="Map Objects\Bricks">
       <UniqueIdentifier>{bb0a78db-7f0d-4617-a4a1-22b79eaf9f11}</UniqueIdentifier>
@@ -283,6 +286,9 @@
     </Filter>
     <Filter Include="Map Objects\Others">
       <UniqueIdentifier>{b3d7ad03-e1de-4bbc-80f6-dcb81846f836}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Map Objects\Mario">
+      <UniqueIdentifier>{b21e6db8-be01-40d2-8def-ec37276fddee}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

@@ -17,13 +17,13 @@
 #define PLAYER_BBOX_WIDTH	8	
 
 // SMALL
-#define MARIO_ANI_SMALL_IDLE_RIGHT			0
+#define MARIO_ANI_SMALL			0
 //BIG
-#define MARIO_ANI_BIG_IDLE_RIGHT			14
+#define MARIO_ANI_BIG			1
 //TAIL
-#define MARIO_ANI_TAIL_IDLE_RIGHT			30
+#define MARIO_ANI_TAIL			2
 //FIRE
-#define MARIO_ANI_FIRE_IDLE_RIGHT			46
+#define MARIO_ANI_FIRE			3
 
 #define MARIO	0
 #define LUIGI	1
