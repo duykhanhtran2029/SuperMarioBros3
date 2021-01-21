@@ -18,6 +18,8 @@ void CFloatingWood::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
 	CGameObject::Update(dt, coObjects);
 	vy += ay * dt;
+	if (vy >= MARIO_JUMP_SPEED_MAX)
+		vy = MARIO_JUMP_SPEED_MAX;
 	x += dx;
 	y += dy;
 	if (isBeingTouched)
@@ -37,9 +39,10 @@ void CFloatingWood::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				mario->isTouchingWood = false;
 				isBeingTouched = false;
 			}
-			else if(oTop - mBottom < 1.0f)
+			else if(oTop - mBottom < 1.0f && mRight >= oLeft && mLeft <= oRight)
 			{
-				mario->vy = this->vy;
+				if(mario->vy >= 0)
+					mario->vy = this->vy;
 				mario->isOnGround = true;
 			}
 		}

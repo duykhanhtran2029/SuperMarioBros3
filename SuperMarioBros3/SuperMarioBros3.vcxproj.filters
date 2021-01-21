@@ -21,10 +21,10 @@
       <Filter>Map</Filter>
     </ClCompile>
     <ClCompile Include="Mario.cpp">
-      <Filter>Map Objects\Mario</Filter>
+      <Filter>Map Objects\Player</Filter>
     </ClCompile>
     <ClCompile Include="FireBullet.cpp">
-      <Filter>Map Objects\Mario</Filter>
+      <Filter>Map Objects\Player</Filter>
     </ClCompile>
     <ClCompile Include="Brick.cpp">
       <Filter>Map Objects\Bricks</Filter>
@@ -93,7 +93,7 @@
       <Filter>Map Objects\WorldMap</Filter>
     </ClCompile>
     <ClCompile Include="Tail.cpp">
-      <Filter>Map Objects\Mario</Filter>
+      <Filter>Map Objects\Player</Filter>
     </ClCompile>
     <ClCompile Include="IntroScene.cpp">
       <Filter>Scene</Filter>
@@ -122,7 +122,12 @@
     <ClCompile Include="FloatingWood.cpp">
       <Filter>Map Objects\Bricks</Filter>
     </ClCompile>
-    <ClCompile Include="BoomerangBrother.cpp" />
+    <ClCompile Include="BoomerangBrother.cpp">
+      <Filter>Map Objects\Enemies</Filter>
+    </ClCompile>
+    <ClCompile Include="Boomerang.cpp">
+      <Filter>Map Objects\Enemies</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Map.h">
@@ -144,13 +149,13 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="Mario.h">
-      <Filter>Map Objects\Mario</Filter>
+      <Filter>Map Objects\Player</Filter>
     </ClInclude>
     <ClInclude Include="Define.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="FireBullet.h">
-      <Filter>Map Objects\Mario</Filter>
+      <Filter>Map Objects\Player</Filter>
     </ClInclude>
     <ClInclude Include="Brick.h">
       <Filter>Map Objects\Bricks</Filter>
@@ -222,7 +227,7 @@
       <Filter>Map Objects\WorldMap</Filter>
     </ClInclude>
     <ClInclude Include="Tail.h">
-      <Filter>Map Objects\Mario</Filter>
+      <Filter>Map Objects\Player</Filter>
     </ClInclude>
     <ClInclude Include="IntroScene.h">
       <Filter>Scene</Filter>
@@ -251,7 +256,12 @@
     <ClInclude Include="FloatingWood.h">
       <Filter>Map Objects\Bricks</Filter>
     </ClInclude>
-    <ClInclude Include="BoomerangBrother.h" />
+    <ClInclude Include="BoomerangBrother.h">
+      <Filter>Map Objects\Enemies</Filter>
+    </ClInclude>
+    <ClInclude Include="Boomerang.h">
+      <Filter>Map Objects\Enemies</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header Files">
@@ -287,7 +297,7 @@
     <Filter Include="Map Objects\Others">
       <UniqueIdentifier>{b3d7ad03-e1de-4bbc-80f6-dcb81846f836}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Map Objects\Mario">
+    <Filter Include="Map Objects\Player">
       <UniqueIdentifier>{b21e6db8-be01-40d2-8def-ec37276fddee}</UniqueIdentifier>
     </Filter>
   </ItemGroup>

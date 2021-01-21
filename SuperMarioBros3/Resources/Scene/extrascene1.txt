@@ -100,5 +100,5 @@ Resources\Tilemap\world1-1-1.txt
 6	224	128	6	6
 6	240	128	6	6
 # --- SCENE PORTAL ----
-# type	l	t	ani_set_id	r	b	scene_id	isToExtraScene	start_x start_y
-50	356	33	0	380	34	1	2	2324	387
+#type	x	y	ani	scene	tag start_x start_y	pipeUp
+50	356	32	0	1	2	2324	387

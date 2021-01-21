@@ -1092,8 +1092,8 @@ Resources\Tilemap\world1-1.txt
 # type	x	y	ani_set_id	tag	tag1	tag2	
 # type: 0 = Mario , 1 = Brick, 2 = Goomba, 3 = Koopas, 4 = Block
 # MARIO
-#0	2500	300	1
-0	80	384	1
+0	2500	300	1
+#0	80	384	1
 # === CARD ===
 57	2688	336	57
 # === Brick === 
@@ -1466,24 +1466,7 @@ Resources\Tilemap\world1-1.txt
 6	1760	128	6	6
 6	1808	96	6	6
 6	1840	128	6	6
-# === Goomba === 
-# --- Yellow ---
-2	200	400	2	0
-2	530	400	2	0
-2	846	384	2	0
-2	880	384	2	0
-# --- Red ---
-2	999	375	2	1
-# === Koopas === 
-# --- Red ---
-3	592	356	3	1
-3	2100	357	3	1
-# --- Green ---
-3	1500	388	30	0
-3	1342	290	30	2
-3	1393	290	30	2
-3	1441	290	30	2
 # --- SCENE PORTAL ----
 #type	x	y	ani	scene	tag start_x start_y	pipeUp
-50	2260	111	0	2	1	132	0
-50	100	380	0	3	1	130	147	1
+50	2258	110	0	2	1	132	0
+#50	100	380	0	3	1	130	147	1

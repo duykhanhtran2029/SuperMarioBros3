@@ -447,7 +447,7 @@ void CGame::SwitchExtraScene(int scene_id, float start_x, float start_y, bool pi
 	pre_scene = current_scene;
 	current_scene = scene_id;
 	LPSCENE s = scenes[scene_id];
-	CGame::GetInstance()->SetKeyHandler(scenes[pre_scene]->GetKeyEventHandler());
+	CGame::GetInstance()->SetKeyHandler(s->GetKeyEventHandler());
 
 	//put player to extrascene
 	CMario* omario = ((CPlayScene*)scenes[pre_scene])->GetPlayer();

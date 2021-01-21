@@ -17,7 +17,7 @@
 #define MARIO_ACCELERATION_JUMP		0.0005f
 #define MARIO_JUMP_SPEED_MAX		0.28f
 #define MARIO_JUMP_SPEED_MIN		0.18f
-#define MARIO_SLOW_FALLING_SPEED	0.075f
+#define MARIO_SLOW_FALLING_SPEED	0.05f
 #define MARIO_FLY_SPEED				0.135f
 #define MARIO_JUMP_DEFLECT_SPEED	0.3f
 #define MARIO_JUMP_DEFLECT_INTRO	0.35f
@@ -315,7 +315,8 @@ public:
 
 	bool isAtIntroScene = false;
 	bool lostControl = false;
-	bool isBlocked = false;
+	bool isWannaDown = false;
+
 	int turning_state = 0;
 
 	int RunningStacks = 0;

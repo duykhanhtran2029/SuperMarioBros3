@@ -124,7 +124,7 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		if (y + KOOPAS_BBOX_HEIGHT 
 			>= ((CPlayScene*)CGame::GetInstance()->GetCurrentScene())->GetMap()->GetMapHeight())
 			vy = -KOOPAS_RED_SPEED;
-		DebugOut(L"[KOOPAS] nx %d\n",this->nx);
+		//DebugOut(L"[KOOPAS] nx %d\n",this->nx);
 	}
 
 	vector<LPCOLLISIONEVENT> coEvents;
@@ -353,13 +353,13 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					}
 				}
 			}
-			if (dynamic_cast<CQuestionBrick*>(e->obj) && state == KOOPAS_STATE_SPINNING && e->nx != 0)
+			if (dynamic_cast<CQuestionBrick*>(e->obj) && state == KOOPAS_STATE_SPINNING && e->nx != 0 && ceil(mBottom) != oTop)
 			{
 				CQuestionBrick* tmp = dynamic_cast<CQuestionBrick*>(e->obj);
 				if (tmp->state != QUESTIONBRICK_STATE_HIT)
 					tmp->SetState(QUESTIONBRICK_STATE_HIT);
 			}
-			if (dynamic_cast<CBreakableBrick*>(e->obj) && state == KOOPAS_STATE_SPINNING && e->nx != 0)
+			if (dynamic_cast<CBreakableBrick*>(e->obj) && state == KOOPAS_STATE_SPINNING && e->nx != 0 && ceil(mBottom) != oTop)
 			{
 				CBreakableBrick* tmp = dynamic_cast<CBreakableBrick*>(e->obj);
 				tmp->Break();

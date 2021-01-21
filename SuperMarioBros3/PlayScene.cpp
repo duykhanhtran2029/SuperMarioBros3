@@ -253,8 +253,10 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 			start_x = atoi(tokens[6].c_str());
 			start_y = atoi(tokens[7].c_str());
 			obj = new CPortal(scene_id,start_x, start_y);
-			if (tokens.size() >= 8)
+			if (tokens.size() >= 9)
 				((CPortal*)obj)->pipeUp = true;
+			else
+				((CPortal*)obj)->pipeUp = false;
 			obj->SetTag(isToExtraScene);
 		}
 		break;
@@ -567,6 +569,9 @@ void CPlaySceneKeyHandler::OnKeyDown(int KeyCode)
 		case DIK_4:
 			mario->SetLevel(MARIO_LEVEL_FIRE);
 			break;
+		case DIK_DOWN:
+			mario->isWannaDown = true;
+			break;
 		case DIK_A:
 			if (mario->level == MARIO_LEVEL_FIRE && !mario->isShooting && !mario->isSitting)
 			{
@@ -615,6 +620,7 @@ void CPlaySceneKeyHandler::OnKeyUp(int KeyCode)
 			break;
 		case DIK_DOWN:
 			mario->SetIsSitting(false);
+			mario->isWannaDown = false;
 		case DIK_A:
 			mario->SetIsHolding(false);
 			mario->SetIsReadyToHold(false);

@@ -1,5 +1,6 @@
 #pragma once
 #include "GameObject.h"
+#include "Boomerang.h"
 
 #define BOOMERANG_BROTHER_BBOX_WIDTH    16
 #define BOOMERANG_BROTHER_BBOX_HEIGHT   24
@@ -7,23 +8,35 @@
 #define BOOMERANG_BROTHER_STATE_FORWARD		1
 #define BOOMERANG_BROTHER_STATE_DIE			2
 
-#define BOOMERANG_BROTHER_ANI_AIM_LEFT		0
-#define BOOMERANG_BROTHER_ANI_THROW_LEFT	1
-#define BOOMERANG_BROTHER_ANI_AIM_RIGHT		2
-#define BOOMERANG_BROTHER_ANI_THROW_RIGHT	3
+#define BOOMERANG_BROTHER_ANI_AIM_RIGHT		0
+#define BOOMERANG_BROTHER_ANI_THROW_RIGHT	1
+#define BOOMERANG_BROTHER_ANI_AIM_LEFT		2
+#define BOOMERANG_BROTHER_ANI_THROW_LEFT	3
 #define BOOMERANG_BROTHER_ANI_DIE			4
 
-#define BOOMERANG_BROTHER_SPEED				0.02f
+#define BOOMERANG_BROTHER_SPEED				0.025f
 #define BOOMERANG_BROTHER_GRAVITY			0.001f
 #define BOOMERANG_BROTHER_DEFLECT_SPEED		0.35f
+
 #define BOOMERANG_BROTHER_LIMIT_RANGE		48
+#define BOOMERANG_BROTHER_ACTIVE_RANGE		80
+
+
 #define BOOMERANG_BROTHER_AIM_TIME			1000
+#define BOOMERANG_BROTHER_RELOAD_TIME		2000
 #define BOOMERANG_BROTHER_THROW_TIME		500
+#define BOOMERANG_BROTHER_CHANGE_TIME		1000
+
+#define BOOMERANG_BROTHER_BOOMERANGS		2
 class CBoomerangBrother :
     public CGameObject
 {
 	DWORD aim_start = 0;
 	DWORD throw_start = 0;
+	DWORD reload_start = 0;
+	DWORD change_start = 0;
+	vector <CBoomerang*> boomerangs;
+	int bmrIndex = 0;
 public:
 	float start_x = 0;
 	CBoomerangBrother();
@@ -33,5 +46,7 @@ public:
 	virtual void Render();
 	void StartAim() { aim_start = GetTickCount64(); }
 	void StartThrow() { throw_start = GetTickCount64(); }
+	void StartReload() { reload_start = GetTickCount64(); }
+	void StartChange() { change_start = GetTickCount64(); }
 };
 
