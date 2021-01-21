@@ -154,105 +154,121 @@ void CPlayScene::_ParseSection_ANIMATION_SETS(string line)
 */
 void CPlayScene::_ParseSection_OBJECTS(string line)
 {
-	vector<string> tokens = split(line);
-
-	//DebugOut(L"--> %s\n",ToWSTR(line).c_str());
-
-	if (tokens.size() < 3) return; // skip invalid lines - an object set must have at least id, x, y
-	int tag = 0, option_tag_1 = 0, option_tag_2 = 0;
-	int object_type = atoi(tokens[0].c_str());
-	float x = atof(tokens[1].c_str());
-	float y = atof(tokens[2].c_str());
-
-	int ani_set_id = atoi(tokens[3].c_str());
-	if (tokens.size() >= 5)
-		tag = atof(tokens[4].c_str());
-	if (tokens.size() >= 6)
-		option_tag_1 = atof(tokens[5].c_str());
-	if (tokens.size() >= 7)
-		option_tag_2 = atof(tokens[6].c_str());
-
-
-	CAnimationSets* animation_sets = CAnimationSets::GetInstance();
-	CGameObject* obj = NULL;
-
-	switch (object_type)
+	wstring path = ToWSTR(line);
+	ParseObjFromFile(path.c_str());
+}
+void CPlayScene::ParseObjFromFile(LPCWSTR path)
+{
+	ifstream f;
+	f.open(path);
+	if (!f)
+		DebugOut(L"\nFailed to open object file!");
+	char str[MAX_SCENE_LINE];
+	while (f.getline(str, MAX_SCENE_LINE))
 	{
-	case OBJECT_TYPE_MARIO:
-		if (player != NULL)
+		string line(str);
+		vector<string> tokens = split(line);
+
+		DebugOut(L"--> %s\n",ToWSTR(line).c_str());
+
+		if (line[0] == '#') continue;
+		if (tokens.size() < 3) continue; // skip invalid lines - an object set must have at least id, x, y
+
+
+		int tag = 0, option_tag_1 = 0, option_tag_2 = 0;
+		int object_type = atoi(tokens[0].c_str());
+		float x = atof(tokens[1].c_str());
+		float y = atof(tokens[2].c_str());
+
+		int ani_set_id = atoi(tokens[3].c_str());
+		if (tokens.size() >= 5)
+			tag = atof(tokens[4].c_str());
+		if (tokens.size() >= 6)
+			option_tag_1 = atof(tokens[5].c_str());
+		if (tokens.size() >= 7)
+			option_tag_2 = atof(tokens[6].c_str());
+
+
+		CAnimationSets* animation_sets = CAnimationSets::GetInstance();
+		CGameObject* obj = NULL;
+
+		switch (object_type)
 		{
-			DebugOut(L"[ERROR] MARIO object was created before!\n");
-			return;
-		}
-		obj = new CMario(x, y);
-		player = (CMario*)obj;
-		DebugOut(L"[INFO] Player object created!\n");
-		break;
-	case OBJECT_TYPE_GOOMBA:
-		obj = new CGoomba();
-		obj->SetTag(tag);
-		obj->SetType(MOVING);
-		break;
-	case OBJECT_TYPE_BRICK: 
-		obj = new CBrick();
-		obj->SetTag(tag);
-		break;
-	case OBJECT_TYPE_QUESTIONBRICK:
-		obj = new CQuestionBrick(tag, option_tag_1);
-		if (option_tag_2 > 0)
-			((CQuestionBrick*)obj)->items = option_tag_2;
-		((CQuestionBrick*)obj)->start_y = y;
-		break;
-	case OBJECT_TYPE_BREAKABLEBRICK:
-		obj = new CBreakableBrick();
-		break;
-	case OBJECT_TYPE_KOOPAS:
-		obj = new CKoopas();
-		obj->SetTag(tag);
-		((CKoopas*)obj)->start_tag = tag;
-		obj->SetType(MOVING);
-		((CKoopas*)obj)->start_x = x;
-		((CKoopas*)obj)->start_y = y;
-		break;
-	case OBJECT_TYPE_BOOMERANGBROTHER:
-		obj = new CBoomerangBrother();
-		obj->SetType(MOVING);
-		((CBoomerangBrother*)obj)->start_x = x;
-		break;
-	case OBJECT_TYPE_BLOCK:
-		obj = new CBlock();
-		break;
-	case OBJECT_TYPE_ABYSS:
-		obj = new CAbyss();
-		break;
-	case OBJECT_TYPE_PIRANHAPLANT:
-		obj = new CPiranhaPlant();
-		((CPiranhaPlant*)obj)->SetLimitY(y);
-		obj->SetType(MOVING);
-		break;
-	case OBJECT_TYPE_FIREPIRANHAPLANT:
-		obj = new CFirePiranhaPlant(tag);
-		((CFirePiranhaPlant*)obj)->SetLimitY(y);
-		obj->SetType(MOVING);
-		break;
-	case OBJECT_TYPE_COIN:
-		obj = new CCoin(tag);
-		obj->SetType(IGNORE);
-		break;
-	case OBJECT_TYPE_CARD:
-		obj = new CCard();
-		break;
-	case OBJECT_TYPE_FLOATINGWOOD:
-		obj = new CFloatingWood();
-		break;
-	case OBJECT_TYPE_PORTAL:
-		{	
+		case OBJECT_TYPE_MARIO:
+			if (player != NULL)
+			{
+				DebugOut(L"[ERROR] MARIO object was created before!\n");
+				return;
+			}
+			obj = new CMario(x, y);
+			player = (CMario*)obj;
+			DebugOut(L"[INFO] Player object created!\n");
+			break;
+		case OBJECT_TYPE_GOOMBA:
+			obj = new CGoomba();
+			obj->SetTag(tag);
+			obj->SetType(MOVING);
+			break;
+		case OBJECT_TYPE_BRICK:
+			obj = new CBrick();
+			obj->SetTag(tag);
+			break;
+		case OBJECT_TYPE_QUESTIONBRICK:
+			obj = new CQuestionBrick(tag, option_tag_1);
+			if (option_tag_2 > 0)
+				((CQuestionBrick*)obj)->items = option_tag_2;
+			((CQuestionBrick*)obj)->start_y = y;
+			break;
+		case OBJECT_TYPE_BREAKABLEBRICK:
+			obj = new CBreakableBrick();
+			break;
+		case OBJECT_TYPE_KOOPAS:
+			obj = new CKoopas();
+			obj->SetTag(tag);
+			((CKoopas*)obj)->start_tag = tag;
+			obj->SetType(MOVING);
+			((CKoopas*)obj)->start_x = x;
+			((CKoopas*)obj)->start_y = y;
+			break;
+		case OBJECT_TYPE_BOOMERANGBROTHER:
+			obj = new CBoomerangBrother();
+			obj->SetType(MOVING);
+			((CBoomerangBrother*)obj)->start_x = x;
+			break;
+		case OBJECT_TYPE_BLOCK:
+			obj = new CBlock();
+			break;
+		case OBJECT_TYPE_ABYSS:
+			obj = new CAbyss();
+			break;
+		case OBJECT_TYPE_PIRANHAPLANT:
+			obj = new CPiranhaPlant();
+			((CPiranhaPlant*)obj)->SetLimitY(y);
+			obj->SetType(MOVING);
+			break;
+		case OBJECT_TYPE_FIREPIRANHAPLANT:
+			obj = new CFirePiranhaPlant(tag);
+			((CFirePiranhaPlant*)obj)->SetLimitY(y);
+			obj->SetType(MOVING);
+			break;
+		case OBJECT_TYPE_COIN:
+			obj = new CCoin(tag);
+			obj->SetType(IGNORE);
+			break;
+		case OBJECT_TYPE_CARD:
+			obj = new CCard();
+			break;
+		case OBJECT_TYPE_FLOATINGWOOD:
+			obj = new CFloatingWood();
+			break;
+		case OBJECT_TYPE_PORTAL:
+		{
 			int scene_id = atoi(tokens[4].c_str());
 			int isToExtraScene = atoi(tokens[5].c_str());
 			float start_x = 0, start_y = 0;
 			start_x = atoi(tokens[6].c_str());
 			start_y = atoi(tokens[7].c_str());
-			obj = new CPortal(scene_id,start_x, start_y);
+			obj = new CPortal(scene_id, start_x, start_y);
 			if (tokens.size() >= 9)
 				((CPortal*)obj)->pipeUp = true;
 			else
@@ -260,17 +276,19 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 			obj->SetTag(isToExtraScene);
 		}
 		break;
-	default:
-		DebugOut(L"[ERR] Invalid object type: %d\n", object_type);
-		return;
+		default:
+			DebugOut(L"[ERR] Invalid object type: %d\n", object_type);
+			return;
+		}
+
+		// General object setup
+		obj->SetPosition(x, y);
+
+		LPANIMATION_SET ani_set = animation_sets->Get(ani_set_id);
+		obj->SetAnimationSet(ani_set);
+		objects.push_back(obj);
 	}
-
-	// General object setup
-	obj->SetPosition(x, y);
-
-	LPANIMATION_SET ani_set = animation_sets->Get(ani_set_id);
-	obj->SetAnimationSet(ani_set);
-	objects.push_back(obj);
+	f.close();
 }
 void CPlayScene::_ParseSection_TILEMAP_DATA(string line)
 {

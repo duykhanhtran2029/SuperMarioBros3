@@ -682,7 +682,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 		//update tail
 		tail->Update(dt);
 	}
-	//DebugOut(L"[MARIO] x %f y %f tt %d\n", x,y,isTurningTail);
+	//DebugOut(L"[MARIO] scw %d sch %d\n", game->GetScreenWidth(), game->GetScreenHeight());
 }
 void CMario::BasicRenderLogicsForAllLevel(int& ani, int ani_jump_down_right, int ani_jump_down_left,
 	int ani_idle_right, int ani_idle_left,

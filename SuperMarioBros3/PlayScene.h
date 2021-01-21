@@ -33,6 +33,7 @@ protected:
 	void _ParseSection_ANIMATION_SETS(string line);
 	void _ParseSection_OBJECTS(string line);
 	void _ParseSection_TILEMAP_DATA(string line);
+	void ParseObjFromFile(LPCWSTR path);
 
 	bool isTurnOnCamY = false;
 	LPSPRITE gamedone1 = nullptr;

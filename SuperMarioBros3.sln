@@ -5,6 +5,8 @@ VisualStudioVersion = 16.0.30503.244
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SuperMarioBros3", "SuperMarioBros3\SuperMarioBros3.vcxproj", "{C83A385D-5992-4E1B-B783-AB1D446414D5}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CreateGridFile", "CreateGridFile\CreateGridFile.vcxproj", "{64EE496B-7BA9-43F1-9FC7-AFD756FE64A8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,6 +33,20 @@ Global
 		{C83A385D-5992-4E1B-B783-AB1D446414D5}.Release|Win32.Build.0 = Release|Win32
 		{C83A385D-5992-4E1B-B783-AB1D446414D5}.Release|x64.ActiveCfg = Release|x64
 		{C83A385D-5992-4E1B-B783-AB1D446414D5}.Release|x64.Build.0 = Release|x64
+		{64EE496B-7BA9-43F1-9FC7-AFD756FE64A8}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{64EE496B-7BA9-43F1-9FC7-AFD756FE64A8}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{64EE496B-7BA9-43F1-9FC7-AFD756FE64A8}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{64EE496B-7BA9-43F1-9FC7-AFD756FE64A8}.Debug|Win32.ActiveCfg = Debug|Win32
+		{64EE496B-7BA9-43F1-9FC7-AFD756FE64A8}.Debug|Win32.Build.0 = Debug|Win32
+		{64EE496B-7BA9-43F1-9FC7-AFD756FE64A8}.Debug|x64.ActiveCfg = Debug|x64
+		{64EE496B-7BA9-43F1-9FC7-AFD756FE64A8}.Debug|x64.Build.0 = Debug|x64
+		{64EE496B-7BA9-43F1-9FC7-AFD756FE64A8}.Release|Any CPU.ActiveCfg = Release|Win32
+		{64EE496B-7BA9-43F1-9FC7-AFD756FE64A8}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{64EE496B-7BA9-43F1-9FC7-AFD756FE64A8}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{64EE496B-7BA9-43F1-9FC7-AFD756FE64A8}.Release|Win32.ActiveCfg = Release|Win32
+		{64EE496B-7BA9-43F1-9FC7-AFD756FE64A8}.Release|Win32.Build.0 = Release|Win32
+		{64EE496B-7BA9-43F1-9FC7-AFD756FE64A8}.Release|x64.ActiveCfg = Release|x64
+		{64EE496B-7BA9-43F1-9FC7-AFD756FE64A8}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
