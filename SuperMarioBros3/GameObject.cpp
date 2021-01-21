@@ -86,8 +86,7 @@ void CGameObject::CalcPotentialCollisions(
 		{
 			LPGAMEOBJECT object = coObjects->at(i);
 			if (object!= nullptr && (object->type != IGNORE || dynamic_cast<CFloatingWood*>(object))
-				&& !(dynamic_cast<CFireBullet*>(object)
-				|| (dynamic_cast<CKoopas*>(object) && ((CKoopas*)object)->isBeingHeld)))
+				&& !((dynamic_cast<CKoopas*>(object) && ((CKoopas*)object)->isBeingHeld)))
 				{
 					LPCOLLISIONEVENT e = SweptAABBEx(coObjects->at(i));
 					if (e->t > 0 && e->t <= 1.0f)

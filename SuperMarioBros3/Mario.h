@@ -327,7 +327,6 @@ public:
 	//card later
 
 	CPortal* portal = NULL;
-	vector <CFireBullet*> Bullets;
 	int level;
 	int prelevel;
 	int untouchable;
@@ -449,6 +448,6 @@ public:
 	void AddLife(int l = 1) { this->life += l; }
 	void AddMoney(int m = 1) { this->money += m; }
 	void AddScore(int ox, int oy, int s = 100, bool isEnemy = false, bool showScore = true);
-	void AddBullets(CFireBullet* c) { Bullets.push_back(c); }
+	//void AddBullets(CFireBullet* c) { Bullets.push_back(c); }
 	CTail* getTail() { return tail; }
 };

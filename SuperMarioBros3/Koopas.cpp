@@ -402,13 +402,6 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				}
 				//DebugOut(L"[KOOPAS] kx: %f ky: %f bx: %f by: %f\n",x,y, e->obj->x, e->obj->y);
 			}
-			if (dynamic_cast<CFireBullet*>(e->obj))
-			{
-				y = y0;
-				mario->AddScore(x, y, 100, true);
-				SetDirection(mario->nx);
-				SetState(KOOPAS_STATE_DEATH);
-			}
 		}
 	}
 	// clean up collision events

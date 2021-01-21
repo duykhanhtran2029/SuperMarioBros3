@@ -2,6 +2,11 @@
 #include "Utils.h"
 #include "Mario.h"
 #include "PlayScene.h"
+#include "Goomba.h"
+#include "Koopas.h"
+#include "BoomerangBrother.h"
+#include "PiranhaPlant.h"
+#include "FirePiranhaPlant.h"
 
 CFireBullet::CFireBullet(float x, float y) : CGameObject()
 {
@@ -9,7 +14,7 @@ CFireBullet::CFireBullet(float x, float y) : CGameObject()
 	this->x = x;
 	this->y = y;
 	animation_set = CAnimationSets::GetInstance()->Get(FIRE_BULLET_ANI_ID);
-	type = MOVING;
+	type = IGNORE;
 }
 
 void CFireBullet::FilterCollision(
@@ -59,7 +64,7 @@ void CFireBullet::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		((CPlayScene*)CGame::GetInstance()->GetCurrentScene())->GetPlayer()->ShootTimes--;
 		return;
 	}
-		
+	CMario* mario = ((CPlayScene*)CGame::GetInstance()->GetCurrentScene())->GetPlayer();
 	vector<LPCOLLISIONEVENT> coEvents;
 	vector<LPCOLLISIONEVENT> coEventsResult;
 
@@ -108,8 +113,39 @@ void CFireBullet::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				if (nx != 0)
 				{
 					isDestroyed = true;
-					((CPlayScene*)CGame::GetInstance()->GetCurrentScene())->GetPlayer()->ShootTimes--;
+					mario->ShootTimes--;
 				}
+			}
+			if (dynamic_cast<CGoomba*>(e->obj))
+			{
+				mario->AddScore(x, y, 100, true);
+				e->obj->SetDirection(mario->nx);
+				e->obj->SetState(GOOMBA_STATE_DIE_BY_TAIL);
+				isDestroyed = true;
+			}
+			else if (dynamic_cast<CKoopas*>(e->obj))
+			{
+				mario->AddScore(x, y, 100, true);
+				e->obj->SetDirection(mario->nx);
+				e->obj->SetState(KOOPAS_STATE_DEATH);
+				isDestroyed = true;
+				mario->ShootTimes--;
+			}
+			else if (dynamic_cast<CPiranhaPlant*>(e->obj) || dynamic_cast<CFirePiranhaPlant*>(e->obj))
+			{
+				mario->AddScore(x, y, 100, true);
+				e->obj->SetDirection(mario->nx);
+				e->obj->SetState(PIRANHAPLANT_STATE_DEATH);
+				isDestroyed = true;
+				mario->ShootTimes--;
+			}
+			else if (dynamic_cast<CBoomerangBrother*>(e->obj))
+			{
+				mario->AddScore(x, y, 1000, true);
+				e->obj->SetDirection(mario->nx);
+				e->obj->SetState(BOOMERANG_BROTHER_STATE_DIE);
+				isDestroyed = true;
+				mario->ShootTimes--;
 			}
 			else
 			{
