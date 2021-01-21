@@ -4,6 +4,19 @@
 #include"PlayScene.h"
 #include"WorldScene.h"
 #include"BackUp.h"
+
+#define HUD_DIFF_FIRST_ROW		8
+#define HUD_DIFF_SECOND_ROW		16
+#define HUD_DIFF_PLAYER			11
+#define HUD_DIFF_TIME			132
+#define HUD_DIFF_MONEY			140
+#define HUD_DIFF_LIFE			36
+#define HUD_DIFF_SCORE			60
+#define HUD_DIFF_P				107
+#define HUD_DIFF_CARD			172
+
+#define HUD_TIME_MAX	3
+#define HUD_SCORE_MAX	7
 HUD::HUD(int type_hud)
 {
 	CBackUp* backup = CBackUp::GetInstance();
@@ -53,11 +66,11 @@ void HUD::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		remainTime = DEFAULT_TIME - time / 1000;
 	}
 	string time_str = to_string(remainTime);
-	while (time_str.length() < 3) time_str = "0" + time_str;
+	while (time_str.length() < HUD_TIME_MAX) time_str = "0" + time_str;
 	remainTimeSprites = fonts->StringToSprite(time_str);
 
 	string score_str = to_string(score);
-	while (score_str.length() < 7) score_str = "0" + score_str;
+	while (score_str.length() < HUD_SCORE_MAX) score_str = "0" + score_str;
 	scoreSprite = fonts->StringToSprite(score_str);
 
 	lifeSprite = fonts->StringToSprite(to_string(nlife));
@@ -73,31 +86,31 @@ void HUD::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 void HUD::Render()
 {
 	CSprites::GetInstance()->sprites[SPRITE_HUD_ID]->Draw(x,y);
-	playerSprite->Draw(x + 11, y + 16);
+	playerSprite->Draw(x + HUD_DIFF_PLAYER, y + HUD_DIFF_SECOND_ROW);
 	for (unsigned int i = 0; i < remainTimeSprites.size(); i++)
-		remainTimeSprites[i]->Draw(x + FONT_BBOX_WIDTH * i + 132, y + 16);
+		remainTimeSprites[i]->Draw(x + FONT_BBOX_WIDTH * i + HUD_DIFF_TIME, y + HUD_DIFF_SECOND_ROW);
 	for (unsigned int i = 0; i < scoreSprite.size(); i++)
-		scoreSprite[i]->Draw(x + FONT_BBOX_WIDTH * i + 60, y + 16);
+		scoreSprite[i]->Draw(x + FONT_BBOX_WIDTH * i + HUD_DIFF_SCORE, y + HUD_DIFF_SECOND_ROW);
 	for (unsigned int i = 0; i < moneySprite.size(); i++)
-		moneySprite[i]->Draw(x + FONT_BBOX_WIDTH * i + 140, y + 8);
+		moneySprite[i]->Draw(x + FONT_BBOX_WIDTH * i + HUD_DIFF_MONEY, y + HUD_DIFF_FIRST_ROW);
 	for (unsigned int i = 0; i < lifeSprite.size(); i++)
-		lifeSprite[i]->Draw(x + FONT_BBOX_WIDTH * i + 36, y + 16);
+		lifeSprite[i]->Draw(x + FONT_BBOX_WIDTH * i + HUD_DIFF_LIFE, y + HUD_DIFF_SECOND_ROW);
 	if (mario != NULL &&type_hud == PLAYSCENE_HUD)
 	{
 		for (int i = 1; i <= runningStacks; i++)
 			if (i == MARIO_RUNNING_STACKS)
 			{
 				if (PAni != nullptr)
-					PAni->Render(x + 107, y + 8 + HUD_HEIGHT);
+					PAni->Render(x + HUD_DIFF_P, y + HUD_DIFF_FIRST_ROW + HUD_HEIGHT);
 			}
 			else
-				powerMelterSprite[i - 1]->Draw(x + FONT_BBOX_WIDTH * (i - 1) + 60, y + 8);
+				powerMelterSprite[i - 1]->Draw(x + FONT_BBOX_WIDTH * (i - 1) + HUD_DIFF_SCORE, y + HUD_DIFF_FIRST_ROW);
 	}
 	if (isTakingCard)
 	{
 		int index = cards.size() - 1;
 		if (index >= 0)
-			TakenCards->at(idTakenCard)->Render(x + 172, y + HUD_HEIGHT + 8);
+			TakenCards->at(idTakenCard)->Render(x + HUD_DIFF_CARD, y + HUD_HEIGHT + HUD_DIFF_FIRST_ROW);
 	}
 }
 void HUD::SetHUD(HUD* hud)
