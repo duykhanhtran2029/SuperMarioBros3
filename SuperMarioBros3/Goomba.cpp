@@ -118,15 +118,13 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			GetBoundingBox(oLeft, oTop, oRight, oBottom);
 			if (isColliding(floor(mLeft), floor(mTop), ceil(mRight), ceil(mBottom)))
 			{
-				if (abs(oTop - mBottom) <= 1.0f)
+				if (mBottom >= oTop && oBottom < mBottom)
 				{
 					mario->AddScore(x, y, 100, true);
 					mario->vy = -MARIO_JUMP_DEFLECT_SPEED;
 					SetState(GOOMBA_STATE_DIE);
 					return;
 				}
-				else
-					mario->Attacked();
 			}
 		}
 		//if (abs(mario->x - x) <= GOOMBA_RED_RANGE_CHASING && tag == GOOMBA_RED && chasing_start == 0)

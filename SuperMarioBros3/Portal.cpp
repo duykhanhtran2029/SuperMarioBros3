@@ -22,7 +22,8 @@ void CPortal::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	{
 		mario->GetBoundingBox(mLeft, mTop, mRight, mBottom);
 		GetBoundingBox(oLeft, oTop, oRight, oBottom);
-		if (isColliding(floor(mLeft), mTop, ceil(mRight), mBottom) && mario->isWannaDown)
+		if (isColliding(floor(mLeft), mTop, ceil(mRight), mBottom) && mario->isWannaDown 
+			&& mLeft >= oLeft && mRight <= oRight)
 		{
 			mario->portal = this;
 			if (tag == BACKTOPLAYSCENE)

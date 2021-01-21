@@ -398,7 +398,7 @@ void CGame::Load(LPCWSTR gameFile)
 void CGame::SwitchScene(int scene_id)
 {
 	DebugOut(L"[INFO] Switching to scene %d\n", scene_id);
-	if (current_scene != WORLD_1 && current_scene != WORLD_INTRO)
+	if (dynamic_cast<CPlayScene*>(scenes[current_scene]))
 		((CPlayScene*)scenes[current_scene])->BackUpPlayer();
 	scenes[current_scene]->Unload();
 	if (pre_scene != -1)
@@ -418,7 +418,7 @@ void CGame::SwitchScene(int scene_id)
 	LPSCENE s = scenes[scene_id];
 	CGame::GetInstance()->SetKeyHandler(s->GetKeyEventHandler());
 	s->Load();
-	if (current_scene != WORLD_1 && current_scene != WORLD_INTRO)
+	if (dynamic_cast<CPlayScene*>(scenes[current_scene]))
 		((CPlayScene*)scenes[current_scene])->LoadBackUp();
 }
 void CGame::SwitchBackScene(int scene_id, float start_x, float start_y)
@@ -433,6 +433,8 @@ void CGame::SwitchBackScene(int scene_id, float start_x, float start_y)
 	omario->SetPosition(start_x, start_y);
 	((CPlayScene*)s)->PutPlayer(omario);
 	((CPlayScene*)s)->GetHUD()->SetHUD(((CPlayScene*)scenes[pre_scene])->GetHUD());
+	((CPlayScene*)s)->GetHUD()->Update(0);
+	((CPlayScene*)s)->GetHUD()->Render();
 	((CPlayScene*)s)->GetPlayer()->StartPipeUp(true);
 }
 void CGame::SwitchExtraScene(int scene_id, float start_x, float start_y, bool pipeUp)
@@ -453,12 +455,13 @@ void CGame::SwitchExtraScene(int scene_id, float start_x, float start_y, bool pi
 	CMario* omario = ((CPlayScene*)scenes[pre_scene])->GetPlayer();
 	omario->SetPosition(start_x, start_y);
 	((CPlayScene*)s)->SetPlayer(omario);
-	((CPlayScene*)s)->PushBack(omario);
 
 	//load extra scene if necessary
 	if(isHaveToReload)
 		s->Load();
 	((CPlayScene*)s)->GetHUD()->SetHUD(((CPlayScene*)scenes[pre_scene])->GetHUD());
+	((CPlayScene*)s)->GetHUD()->Update(0);
+	((CPlayScene*)s)->GetHUD()->Render();
 	if(!pipeUp)
 		((CPlayScene*)s)->GetPlayer()->StartPipeDown(true);
 	else

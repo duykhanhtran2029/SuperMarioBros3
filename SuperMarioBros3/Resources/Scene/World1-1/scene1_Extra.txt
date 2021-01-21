@@ -29,4 +29,4 @@ Resources\Tilemap\world1-1-1.txt
 122	6224
 123	6225
 [OBJECTS]
-Resources\Scene\World1-1\world1-1-1_Obj.txt
+Resources\Scene\World1-1\world1-1-1_Grid.txt

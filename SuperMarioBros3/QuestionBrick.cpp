@@ -15,11 +15,6 @@ void CQuestionBrick::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	CGameObject::Update(dt);
 	CPlayScene* scene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
 	y += dy;
-	if (haveToSwap && item->state == LEAF_STATE_FALLING && item != NULL)
-	{
-		scene->Swap(this, this->item);
-		haveToSwap = false;
-	}
 	if (state == QUESTIONBRICK_STATE_IDLE)
 	{
 		CMario* mario = {};
@@ -68,6 +63,7 @@ void CQuestionBrick::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			obj->isAppear = true;
 			obj->SetPosition(x, y);
 			obj->SetState(MUSHROOM_STATE_UP);
+			scene->PushBack(item);
 		}
 		if (tag == ITEM_MUSHROOM_RED)
 		{
@@ -78,6 +74,7 @@ void CQuestionBrick::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			obj->isAppear = true;
 			obj->SetPosition(x, y);
 			obj->SetState(MUSHROOM_STATE_UP);
+			scene->PushBack(item);
 		}
 	}
 }
@@ -102,6 +99,7 @@ void CQuestionBrick::SetState(int state = BRICK_STATE_IDLE)
 				obj->isAppear = true;
 				obj->SetPosition(x, y - COIN_BBOX_HEIGHT - 1);
 				obj->SetState(COIN_STATE_UP);
+				scene->PushBack(item);
 			}
 			if (tag == ITEM_LEAF || (tag == ITEM_CUSTOM && mario->level == MARIO_LEVEL_BIG))
 			{
@@ -110,7 +108,7 @@ void CQuestionBrick::SetState(int state = BRICK_STATE_IDLE)
 				obj->isAppear = true;
 				obj->SetPosition(x, y);
 				obj->SetState(LEAF_STATE_UP);
-				haveToSwap = true;
+				scene->PushBack(item);
 			}
 			if (tag == ITEM_CUSTOM)
 			{
@@ -126,6 +124,7 @@ void CQuestionBrick::SetState(int state = BRICK_STATE_IDLE)
 				obj->isAppear = true;
 				obj->SetPosition(x, y);
 				obj->SetState(SWITCH_STATE_UP);
+				scene->PushBack(item);
 			}
 		}
 		break;
@@ -158,8 +157,6 @@ void CQuestionBrick::CreateItem(int itemtype)
 
 		item->SetAnimationSet(tmp_ani_set);
 
-		scene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
-		scene->PushBack(item);
 	}
 	if (itemtype == ITEM_LEAF)
 	{
@@ -169,9 +166,6 @@ void CQuestionBrick::CreateItem(int itemtype)
 		LPANIMATION_SET tmp_ani_set = animation_sets->Get(LEAF_ANI_SET_ID);
 
 		item->SetAnimationSet(tmp_ani_set);
-
-		scene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
-		scene->PushBack(item);
 	}
 	if (itemtype == ITEM_MUSHROOM_RED || itemtype == ITEM_MUSHROOM_GREEN)
 	{
@@ -181,9 +175,6 @@ void CQuestionBrick::CreateItem(int itemtype)
 		LPANIMATION_SET tmp_ani_set = animation_sets->Get(MUSHROOM_ANI_SET_ID);
 
 		item->SetAnimationSet(tmp_ani_set);
-
-		scene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
-		scene->PushBack(item);
 	}
 	if (itemtype == ITEM_SWITCH)
 	{
@@ -193,9 +184,5 @@ void CQuestionBrick::CreateItem(int itemtype)
 		LPANIMATION_SET tmp_ani_set = animation_sets->Get(SWITCH_ANI_SET_ID);
 
 		item->SetAnimationSet(tmp_ani_set);
-
-		scene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
-		scene->PushBack(item);
 	}
-	scene->Swap(this, this->item);
 }

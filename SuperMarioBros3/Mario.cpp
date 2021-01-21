@@ -418,19 +418,22 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 						else
 							vy = -MARIO_JUMP_DEFLECT_SPEED;
 					}
-					else
+					else if(goomba->GetState() != GOOMBA_STATE_DIE)
 					{
-						x += dx;
-						y = y0;
-						if (untouchable == 0 && goomba->GetState() != GOOMBA_STATE_DIE && !isTurningTail)
+						if (untouchable == 0)
 							Attacked();
-						//if (e->nx != 0 && isTurningTail)
-						//{
-						//	AddScore(x, y, 100, true);
-						//	goomba->SetDirection(nx);
-						//	goomba->SetState(GOOMBA_STATE_DIE_BY_TAIL);
-						//	tail->ShowHitEffect();
-						//}
+						else
+						{
+							x = x0 + dx;
+							y = y0;
+							if (e->ny > 0 && vy < 0)
+								y = y0 + dy;
+							if (e->nx != 0 && isTurningTail)
+							{
+								AddScore(goomba->x, goomba->y, 100, true);
+								goomba->SetState(GOOMBA_STATE_DIE_BY_TAIL);
+							}
+						}
 					}
 				}
 				if (dynamic_cast<CBoomerangBrother*>(e->obj)) // if e->obj is Goomba 
@@ -531,34 +534,40 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 						}
 						else
 						{
+							x = x0;
+							y = y0;
 							if (untouchable)
-							{
 								x = x0 + dx;
+							if (e->ny > 0 && vy < 0)
+								y = y0 + dy;
+							if (e->nx != 0 && isTurningTail)
+							{
+								koopas->SetState(KOOPAS_STATE_SHELL_UP);
 							}
 							else
-								y = y0;
-							if (koopas->GetState() == KOOPAS_STATE_IN_SHELL || koopas->GetState() == KOOPAS_STATE_SHELL_UP)
 							{
-								if (isReadyToHold)
+								if (koopas->GetState() == KOOPAS_STATE_IN_SHELL || koopas->GetState() == KOOPAS_STATE_SHELL_UP)
 								{
-									koopas->SetIsBeingHeld(true);
-									isHolding = true;
+									if (isReadyToHold)
+									{
+										koopas->SetIsBeingHeld(true);
+										isHolding = true;
+									}
+									else
+									{
+										StartKicking();
+										koopas->nx = this->nx;
+										koopas->SetState(KOOPAS_STATE_SPINNING);
+									}
 								}
 								else
 								{
-									StartKicking();
-									koopas->nx = this->nx;
-									koopas->SetState(KOOPAS_STATE_SPINNING);
+									if (untouchable == 0 && isKicking == false && !isTurningTail && !e->ny > 0
+										&& koopas->GetState() != KOOPAS_STATE_IN_SHELL && koopas->GetState() != KOOPAS_STATE_SHELL_UP)
+										Attacked();
 								}
 							}
-							else 
-							{
-								x = x0 + dx;
-								y = y0;
-								if (untouchable == 0 && isKicking == false && !isTurningTail && !e->ny > 0
-									&& koopas->GetState() != KOOPAS_STATE_IN_SHELL && koopas->GetState() != KOOPAS_STATE_SHELL_UP)
-									Attacked();
-							}
+
 						}
 					}
 
@@ -572,10 +581,13 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 					}
 					else
 					{
-						x = x0;
-						y = y0;
 						if (untouchable == 0)
 							Attacked();
+						else
+						{
+							x = x0 + dx;
+							y = y0 + dy;
+						}
 					}
 				}
 				//others

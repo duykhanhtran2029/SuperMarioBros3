@@ -30,7 +30,6 @@ class CQuestionBrick :
 	DWORD pushup_start = 0;
 	bool isFallingDown = false;
 	bool haveToWaitForPush = false;
-	bool haveToSwap = false;
 	int PushedStacks = 0;
 	int type = 0;
 

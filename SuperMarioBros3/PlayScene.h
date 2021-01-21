@@ -9,15 +9,18 @@
 #include "Koopas.h"
 #include "Map.h"
 #include "HUD.h"
+#include "Grid.h"
 
 #define GAMEDONE1_SPRITE_ID		50070
 #define GAMEDONE2_SPRITE_ID		50071
 
 
 #define WORLD_1			0
-#define WORLD_INTRO		5
+#define WORLD_INTRO		6
 #define WORLD_1_1		1
 #define WORLD_1_4		4
+
+#define CAM_CHANGE_TIME		30
 
 class CPlayScene : public CScene
 {
@@ -25,7 +28,14 @@ protected:
 	CMario* player = NULL;					// A play scene has to have player, right? 
 	CMap* current_map = NULL;
 	HUD* hud = NULL;
+
 	vector<LPGAMEOBJECT> objects;
+	vector<Unit*> units;
+	vector<LPGAMEOBJECT> objectsRenderFirst; //enemies // items pushed up
+	vector<LPGAMEOBJECT> objectsRenderSecond; // statics
+	vector<LPGAMEOBJECT> objectsRenderThird; // items fall down
+
+	Grid* grid;
 
 	void _ParseSection_TEXTURES(string line);
 	void _ParseSection_SPRITES(string line);
@@ -40,42 +50,39 @@ protected:
 	LPSPRITE gamedone2 = nullptr;
 	//DWORD lastDt = 0;
 
+
 public:
 	bool isGameDone1 = false;
 	bool isGameDone2 = false;
 	bool isGameDone3 = false;
+	DWORD sum_dt = 0;
 	CPlayScene(int id, LPCWSTR filePath);
 	virtual void Load();
-	virtual void SetCam(float cx, float cy);
+	virtual void SetCam(float cx, float cy, DWORD dt = 0);
 	virtual void Update(DWORD dt);
 	virtual void Render();
 	virtual void Unload();
 	void LoadBackUp();
 	void BackUpPlayer();
-	void PushBack(CGameObject* obj) { objects.push_back(obj); }
+	void PushBack(CGameObject* obj) 
+	{
+		Unit* unit = new Unit(grid, obj, obj->x, obj->y);
+	}
 	vector<LPGAMEOBJECT> GetObjects() { return objects; }
 	CMap* GetMap() { return current_map; }
 	HUD* GetHUD() { return hud; }
 	CMario* GetPlayer() { return player; }
+	Grid* GetGrid() { return grid; }
 	void SetPlayer(CMario* m) { player = m; }
 	void PutPlayer(CMario* m)
 	{
 		if (dynamic_cast<CMario*> (objects[0]))
 			objects[0] = m;
 	}
-	void Swap(LPGAMEOBJECT a, LPGAMEOBJECT b)
-	{
-		int ioa = 0, iob = 0;
-		for (size_t i = 1; i < objects.size(); i++)
-		{
-			if (objects[i] == a)
-				ioa = i;
-			if (objects[i] == b)
-				iob = i;
-		}
-		swap(objects[ioa], objects[iob]);
-	}
 	int CalScore();
+	//grid
+	void GetObjectFromGrid();
+	void UpdateGrid();
 	//friend class CPlaySceneKeyHandler;
 };
 

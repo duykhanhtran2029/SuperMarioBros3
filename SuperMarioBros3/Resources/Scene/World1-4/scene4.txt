@@ -932,4 +932,4 @@ Resources\Tilemap\world1-4.txt
 3	4000	4020	4001	4021	4070	4083	4093	4200	4201	4084
 30	4100	4120	4101	4121	4170	4183	4193 	4300	4301	4184
 [OBJECTS]
-Resources\Scene\World1-1\world1-4_Obj.txt
+Resources\Scene\World1-4\world1-4_Grid.txt

@@ -152,9 +152,9 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			else
 			{
 				mario->GetBoundingBox(mLeft, mTop, mRight, mBottom);
-				if (isColliding(mLeft, mTop, mRight, mBottom))
+				if (isColliding(floor(mLeft), floor(mTop), ceil(mRight), ceil(mBottom)) && mario->untouchable == 0)
 				{
-					if (abs(mTop - oBottom) <= 1.0f && state == KOOPAS_STATE_WALKING)
+					if (mTop <= oBottom && mTop > oTop && state == KOOPAS_STATE_WALKING)
 						mario->Attacked();
 				}
 			}
@@ -163,11 +163,10 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		{
 			float mLeft, mTop, mRight, mBottom;
 			mario->GetBoundingBox(mLeft, mTop, mRight, mBottom);
-			if (!mario->isHolding)
-				isBeingHeld = false;
-			if (isColliding(mLeft, mTop, mRight, mBottom))
+			if (!mario->isHolding && isBeingHeld)
 			{
-				if ((state == KOOPAS_STATE_IN_SHELL||state == KOOPAS_STATE_SHELL_UP) && !isBeingHeld)
+				isBeingHeld = false;
+				if ((state == KOOPAS_STATE_IN_SHELL || state == KOOPAS_STATE_SHELL_UP) && !isBeingHeld)
 				{
 					this->nx = mario->nx;
 					this->SetState(KOOPAS_STATE_SPINNING);
@@ -178,10 +177,12 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 						mario->AddScore(x, y, 100, true);
 					}
 				}
-				if (state == KOOPAS_STATE_WALKING && mTop >= oBottom  // hit mario on top
-					&& mario->untouchable == 0 && mario->isKicking == false && !mario->isTurningTail)
-						mario->Attacked();
 			}
+			if (state == KOOPAS_STATE_WALKING && isColliding(floor(mLeft), floor(mTop), ceil(mRight), ceil(mBottom))
+				&& mTop <= oBottom && mTop > oTop   // hit mario on top
+				&& mario->untouchable == 0 && mario->isKicking == false && !mario->isTurningTail)
+					mario->Attacked();
+
 		}
 		if (isBeingHeld)
 		{

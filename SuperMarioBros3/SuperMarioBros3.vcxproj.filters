@@ -128,6 +128,9 @@
     <ClCompile Include="Boomerang.cpp">
       <Filter>Map Objects\Enemies</Filter>
     </ClCompile>
+    <ClCompile Include="Grid.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Map.h">
@@ -261,6 +264,9 @@
     </ClInclude>
     <ClInclude Include="Boomerang.h">
       <Filter>Map Objects\Enemies</Filter>
+    </ClInclude>
+    <ClInclude Include="Grid.h">
+      <Filter>Scene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

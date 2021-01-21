@@ -3,7 +3,9 @@
 
 #include "Abyss.h"
 #include "BackUp.h"
+#include "Switch.h"
 #include "Block.h"
+#include "PlantBullet.h"
 #include "BoomerangBrother.h"
 #include "BreakableBrick.h"
 #include "Brick.h"
@@ -56,6 +58,7 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath) :
 #define OBJECT_TYPE_QUESTIONBRICK		142
 #define OBJECT_TYPE_BREAKABLEBRICK		112
 #define OBJECT_TYPE_ABYSS				113
+#define GRID							999
 
 #define OBJECT_TYPE_FLOATINGWOOD		26
 
@@ -175,19 +178,22 @@ void CPlayScene::ParseObjFromFile(LPCWSTR path)
 		if (tokens.size() < 3) continue; // skip invalid lines - an object set must have at least id, x, y
 
 
-		int tag = 0, option_tag_1 = 0, option_tag_2 = 0;
+		int ani_set_id, tag = 0, option_tag_1 = 0, option_tag_2 = 0;
 		int object_type = atoi(tokens[0].c_str());
-		float x = atof(tokens[1].c_str());
-		float y = atof(tokens[2].c_str());
+		float  x, y;
+		if (object_type != GRID)
+		{
+			x = atof(tokens[1].c_str());
+			y = atof(tokens[2].c_str());
 
-		int ani_set_id = atoi(tokens[3].c_str());
-		if (tokens.size() >= 5)
-			tag = atof(tokens[4].c_str());
-		if (tokens.size() >= 6)
-			option_tag_1 = atof(tokens[5].c_str());
-		if (tokens.size() >= 7)
-			option_tag_2 = atof(tokens[6].c_str());
-
+			ani_set_id = atoi(tokens[3].c_str());
+			if (tokens.size() >= 5)
+				tag = atof(tokens[4].c_str());
+			if (tokens.size() >= 6)
+				option_tag_1 = atof(tokens[5].c_str());
+			if (tokens.size() >= 7)
+				option_tag_2 = atof(tokens[6].c_str());
+		}
 
 		CAnimationSets* animation_sets = CAnimationSets::GetInstance();
 		CGameObject* obj = NULL;
@@ -214,9 +220,13 @@ void CPlayScene::ParseObjFromFile(LPCWSTR path)
 			obj->SetTag(tag);
 			break;
 		case OBJECT_TYPE_QUESTIONBRICK:
-			obj = new CQuestionBrick(tag, option_tag_1);
-			if (option_tag_2 > 0)
-				((CQuestionBrick*)obj)->items = option_tag_2;
+			obj = new CQuestionBrick(option_tag_1, option_tag_2);
+			if (tokens.size() >= 8)
+			{
+				int nboitem = atoi(tokens[7].c_str());
+				if (nboitem > 0)
+					((CQuestionBrick*)obj)->items = nboitem;
+			}
 			((CQuestionBrick*)obj)->start_y = y;
 			break;
 		case OBJECT_TYPE_BREAKABLEBRICK:
@@ -269,26 +279,44 @@ void CPlayScene::ParseObjFromFile(LPCWSTR path)
 			start_x = atoi(tokens[6].c_str());
 			start_y = atoi(tokens[7].c_str());
 			obj = new CPortal(scene_id, start_x, start_y);
-			if (tokens.size() >= 9)
+			int pu = atoi(tokens[8].c_str());
+			if(pu == 1)
 				((CPortal*)obj)->pipeUp = true;
 			else
 				((CPortal*)obj)->pipeUp = false;
 			obj->SetTag(isToExtraScene);
+			break;
 		}
-		break;
+		case GRID:
+		{
+			int gridCols = atoi(tokens[1].c_str());
+			int gridRows = atoi(tokens[2].c_str());
+			grid = new Grid(gridCols, gridRows);
+			DebugOut(L"\nParseSection_GRID: Done");
+			break;
+		}
 		default:
 			DebugOut(L"[ERR] Invalid object type: %d\n", object_type);
 			return;
 		}
+		if (object_type != GRID)
+		{
+			// General object setup
+			obj->SetPosition(x, y);
+			LPANIMATION_SET ani_set = animation_sets->Get(ani_set_id);
+			obj->SetAnimationSet(ani_set);
+		}
 
-		// General object setup
-		obj->SetPosition(x, y);
-
-		LPANIMATION_SET ani_set = animation_sets->Get(ani_set_id);
-		obj->SetAnimationSet(ani_set);
-		objects.push_back(obj);
+		// Insert objects to grid from file
+		if (object_type != OBJECT_TYPE_MARIO && object_type != GRID)
+		{
+			int gridCol = (int)atoi(tokens[tokens.size() - 1].c_str());
+			int gridRow = (int)atoi(tokens[tokens.size() - 2].c_str());
+			Unit* unit = new Unit(grid, obj, gridRow, gridCol);
+		}
 	}
 	f.close();
+	grid->Out();
 }
 void CPlayScene::_ParseSection_TILEMAP_DATA(string line)
 {
@@ -372,33 +400,28 @@ void CPlayScene::Update(DWORD dt)
 {
 	// We know that Mario is the first object in the list hence we won't add him into the colliable object list
 	// TO-DO: This is a "dirty" way, need a more organized way 
+		// skip the rest if scene was already unloaded (Mario::Update might trigger PlayScene::Unload)
+	if (player == NULL) return;
 	if (isGameDone3)
 	{
 		CGame::GetInstance()->SwitchScene(0);
 		return;
 	}
 	vector<LPGAMEOBJECT> coObjects;
-	for (size_t i = 1; i < objects.size(); i++)
+	coObjects.clear();
+	GetObjectFromGrid();
+	for (size_t i = 0; i < objects.size(); i++)
 	{
 		if (!objects[i]->isDestroyed)
 			coObjects.push_back(objects[i]);
-		else
-		{
-			LPGAMEOBJECT tmp = objects[i];
-			objects.erase(objects.begin() + i);
-			delete tmp;
-			tmp = NULL;
-			i--;
-		}
 	}
-	// skip the rest if scene was already unloaded (Mario::Update might trigger PlayScene::Unload)
-	if (player == NULL) return;
 
 	//stop the world when player is transforming/lost control
 	if (player->isTransforming || player->lostControl)
 		player->Update(0, &coObjects);
 	else
 	{
+		player->Update(dt, &coObjects);
 		for (size_t i = 0; i < objects.size(); i++)
 		{
 			if (objects[i]->IsInViewPort())
@@ -411,9 +434,60 @@ void CPlayScene::Update(DWORD dt)
 	//get map and screen information
 	float cx, cy;
 	player->GetPosition(cx, cy);
-	SetCam(cx, cy);
+	SetCam(cx, cy,dt);
+	UpdateGrid();
 }
-void CPlayScene::SetCam(float cx, float cy)
+void CPlayScene::GetObjectFromGrid()
+{
+	units.clear();
+	objectsRenderFirst.clear();
+	objectsRenderSecond.clear();
+	objectsRenderThird.clear();
+	objects.clear();
+
+
+	CGame* game = CGame::GetInstance();
+	float camX, camY;
+
+	camX = game->GetCamX();
+	camY = game->GetCamY();
+
+	grid->Get(camX, camY, units);
+
+	for (UINT i = 0; i < units.size(); i++)
+	{
+		LPGAMEOBJECT obj = units[i]->GetObj();
+		objects.push_back(obj);
+		if (dynamic_cast<CGoomba*> (obj) || dynamic_cast<CKoopas*> (obj)
+			|| dynamic_cast<CBoomerangBrother*> (obj) || dynamic_cast<CPiranhaPlant*> (obj) ||
+			dynamic_cast<CFirePiranhaPlant*> (obj) || dynamic_cast<CCoin*> (obj)
+			|| dynamic_cast<CMushRoom*> (obj) && obj->state == MUSHROOM_STATE_UP
+			|| dynamic_cast<CLeaf*> (obj) && obj->state == LEAF_STATE_UP
+			|| dynamic_cast<CSwitch*> (obj))
+			objectsRenderFirst.push_back(obj);
+		else if (dynamic_cast<CBrick*> (obj) && obj->tag != WOOD && obj->tag != PLATFORM 
+			|| (dynamic_cast<CQuestionBrick*> (obj) || (dynamic_cast<CBreakableBrick*> (obj))))
+			objectsRenderSecond.push_back(obj);
+		else if (dynamic_cast<CFireBullet*> (obj) || dynamic_cast<CPlantBullet*> (obj) 
+			|| dynamic_cast<CMushRoom*>(obj) && obj->state == MUSHROOM_STATE_WALK
+			|| dynamic_cast<CLeaf*> (obj) && obj->state == LEAF_STATE_FALLING 
+			|| dynamic_cast<CFloatingWood*> (obj)
+			|| dynamic_cast<CBoomerang*>(obj)|| dynamic_cast<CScore*>(obj) || dynamic_cast<CPiece*>(obj) 
+			|| dynamic_cast<CCard*>(obj))
+			objectsRenderThird.push_back(obj);
+	}
+}
+void CPlayScene::UpdateGrid()
+{
+	for (unsigned int i = 0; i < units.size(); i++)
+	{
+		LPGAMEOBJECT obj = units[i]->GetObj();
+		float newPosX, newPosY;
+		obj->GetPosition(newPosX, newPosY);
+		units[i]->Move(newPosX, newPosY);
+	}
+}
+void CPlayScene::SetCam(float cx, float cy, DWORD dt)
 {
 	float sw, sh, mw, mh, mx, my;
 	CGame* game = CGame::GetInstance();
@@ -421,24 +495,29 @@ void CPlayScene::SetCam(float cx, float cy)
 	sh = game->GetScreenHeight();
 	mw = current_map->GetMapWidth();
 	mh = current_map->GetMapHeight();
+	//DebugOut(L"dt %u\n", dt);
+	//Update camera to follow mario
+	if (id == WORLD_1_4)
+	{
+		sum_dt += dt;
+		// CamX
+		cx = game->GetCamX();
+		if (sum_dt >= CAM_CHANGE_TIME)
+		{
+			sum_dt = 0;
+			cx ++;
+		}
+		if (cx <= 0)//Left Edge
+			cx = 0;
+		if (cx >= mw - sw)//Right Edge
+			cx = mw - sw;
 
-	// Update camera to follow mario
-	//if (id == WORLD_1_4)
-	//{
-	//	// CamX
-	//	cx = game->GetCamX();
-	//	cx += 0.5f;
-	//	if (cx <= 0)//Left Edge
-	//		cx = 0;
-	//	if (cx >= mw - sw)//Right Edge
-	//		cx = mw - sw;
-
-	//	cy = mh - sh;
-	//	game->SetCamPos(cx, ceil(cy));
-	//	current_map->SetCamPos(cx, ceil(cy));
-	//	hud->SetPosition(cx, ceil(cy + sh - HUD_HEIGHT));
-	//}
-	//else 
+		cy = mh - sh;
+		game->SetCamPos(cx, ceil(cy));
+		current_map->SetCamPos(cx, ceil(cy));
+		hud->SetPosition(cx, ceil(cy + sh - HUD_HEIGHT));
+	}
+	else 
 	{
 		cx -= sw / 2;
 		// CamX
@@ -499,13 +578,21 @@ void CPlayScene::SetCam(float cx, float cy)
 }
 void CPlayScene::Render()
 {
+	if (player == NULL) return;
 	current_map->Render();
 	if (isGameDone1)
 		gamedone1->Draw(CGame::GetInstance()->GetCamX() + GAMEDONE_1_DIFF_X, CGame::GetInstance()->GetCamY() + GAMEDONE_1_DIFF_Y);
 	if (isGameDone2)
 		gamedone2->Draw(CGame::GetInstance()->GetCamX() + GAMEDONE_2_DIFF_X, CGame::GetInstance()->GetCamY() + GAMEDONE_2_DIFF_Y);
-	for (int i = 0; i < objects.size(); i++)
-		objects[i]->Render();
+	player->Render();
+	//for (int i = 0; i < objects.size(); i++)
+	//	objects[i]->Render();
+	for (int i = 0; i < objectsRenderFirst.size(); i++)
+		objectsRenderFirst[i]->Render();
+	for (int i = 0; i < objectsRenderSecond.size(); i++)
+		objectsRenderSecond[i]->Render();
+	for (int i = 0; i < objectsRenderThird.size(); i++)
+		objectsRenderThird[i]->Render();
 	hud->Render();
 }
 int CPlayScene::CalScore()
@@ -528,9 +615,12 @@ void CPlayScene::Unload()
 {
 	if (player != nullptr)
 		delete player;
-	for (int i = 1; i < objects.size(); i++)
-		delete objects[i];
+	grid->ClearAll();
 	objects.clear();
+	units.clear();
+	objectsRenderFirst.clear();
+	objectsRenderSecond.clear();
+	objectsRenderThird.clear();
 
 	delete current_map;
 	delete hud;
@@ -540,6 +630,7 @@ void CPlayScene::Unload()
 	hud = nullptr;
 	fonts = nullptr;
 	player = nullptr;
+	grid = nullptr;
 
 	isGameDone1 = false;
 	isGameDone2 = false;

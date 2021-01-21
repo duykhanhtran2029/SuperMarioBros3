@@ -62,4 +62,4 @@ Resources\Tilemap\world1-4-1.txt
 # Boomerang
 49	4820	4821	4822	4823
 [OBJECTS]
-Resources\Scene\World1-1\world1-4-1_Obj.txt
+Resources\Scene\World1-4\world1-4-1_Grid.txt

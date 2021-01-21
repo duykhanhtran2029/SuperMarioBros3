@@ -12,6 +12,7 @@ using namespace std;
 #define TILESET_HEIGHT	16
 #define CELL_WIDTH		136
 #define CELL_HEIGHT		128
+#define GRID			999
 
 
 void CreateGridFile(int sceneId);
@@ -103,7 +104,7 @@ void WriteGridFile(int sceneID, int gridCols, int gridRows)
 		sprintf_s(gridFileName, "..\\SuperMarioBros3\\Resources\\Scene\\World1-%d\\world1-%d_Grid.txt", sceneID, sceneID);
 	ofstream gridFile;
 	gridFile.open(gridFileName);
-	gridFile << gridCols << "\t" << gridRows;
+	gridFile << GRID <<"\t"<< gridCols << "\t" << gridRows;
 
 	char objectsFileName[100];
 	if (sceneID == 5 || sceneID == 2)

@@ -11,19 +11,27 @@ CBackUp* CBackUp::GetInstance()
 
 void CBackUp::BackUpMario(CMario* mario)
 {
-	life = mario->life;
-	score = mario->score;
-	level = mario->level;
-	money = mario->money;
-	scene = CGame::GetInstance()->GetCurrentScene()->GetId();
-	cards = mario->cards;
+	if (mario != NULL)
+	{
+		life = mario->life;
+		score = mario->score;
+		level = mario->level;
+		money = mario->money;
+		scene = CGame::GetInstance()->GetCurrentScene()->GetId();
+		cards = mario->cards;
+	}
+
 }
 
 void CBackUp::LoadBackUp(CMario* mario)
 {
-	mario->life = life;
-	mario->score = score;
-	mario->level = level;
-	mario->money = money;
-	mario->cards = cards;
+	if (mario != NULL)
+	{
+		mario->life = life;
+		mario->score = score;
+		mario->level = level;
+		mario->money = money;
+		mario->cards = cards;
+	}
+
 }
