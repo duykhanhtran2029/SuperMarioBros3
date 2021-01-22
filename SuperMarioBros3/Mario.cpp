@@ -112,6 +112,14 @@ void CMario::TimingFlag()
 		isRunning = false;
 		isFlying = false;
 	}
+	if (GetTickCount64() - fly_start > MARIO_FLYING_TIME && fly_start != 0 && isFlying)
+	{
+		fly_start = 0;
+		isTailFlying = false;
+		isRunning = false;
+		isFlying = false;
+		StartSlowDown();
+	}
 	if (GetTickCount64() - pipedown_start > MARIO_PIPE_TIME && pipedown_start > 0)
 	{
 		pipedown_start = 0;
@@ -224,6 +232,8 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 		}
 
 	}
+
+
 	//timing for stop/start
 	TimingFlag();
 
@@ -243,8 +253,15 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 	coEvents.clear();
 
 	// turn off collision when die 
-	if (state!=MARIO_STATE_DIE)
+	if (state != MARIO_STATE_DIE)
 		CalcPotentialCollisions(coObjects, coEvents);
+	else
+	{
+		x += dx;
+		y += dy;
+		return;
+	}
+
 	if (lostControl)
 	{
 		if (pipedown_start > 0)
@@ -337,20 +354,37 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 									vx = 0;
 									if (isRunning && tag != PIPE)
 										StopRunning();
+									if (x < game->GetCamX())
+									{
+										SetState(MARIO_STATE_DIE);
+										return;
+									}
 								}
 							}
 						}
 					}
 				}
-				if (dynamic_cast<CFloatingWood*>(e->obj))
+				if (dynamic_cast<CQuestionBrick*>(e->obj) && e->ny > 0)
+					e->obj->SetState(QUESTIONBRICK_STATE_HIT);
+				if (dynamic_cast<CBreakableBrick*>(e->obj) && e->ny > 0)
+				{
+					AddScore(e->obj->x, e->obj->y, 10, false, false);
+					((CBreakableBrick*)e->obj)->Break();
+				}
+				else if (dynamic_cast<CFloatingWood*>(e->obj))
 				{
 					CFloatingWood* floatingwood = dynamic_cast<CFloatingWood*>(e->obj);
-					if (e->nx != 0 && x > game->GetCamX())
+					if (e->nx != 0 && x > game->GetCamX() && abs(mRight - oLeft) <= 1.0f)
 					{
 						x--;
 						SetState(MARIO_STATE_WALKING_RIGHT);
 						vx = MARIO_WALKING_SPEED_MAX;
 						nx = 1;
+						if (x <= game->GetCamX())
+						{
+							SetState(MARIO_STATE_DIE);
+							return;
+						}
 					}
 					if (e->ny < 0)
 					{
@@ -365,16 +399,10 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 						ay = MARIO_GRAVITY;
 						isReadyToJump = false;
 					}
+
 					
 				}
-				if (dynamic_cast<CQuestionBrick*>(e->obj) && e->ny > 0)
-					e->obj->SetState(QUESTIONBRICK_STATE_HIT);
-				if (dynamic_cast<CBreakableBrick*>(e->obj) && e->ny > 0)
-				{
-					AddScore(e->obj->x, e->obj->y, 10, false, false);
-					((CBreakableBrick*)e->obj)->Break();
-				}
-				if (dynamic_cast<CBlock*>(e->obj))
+				else if (dynamic_cast<CBlock*>(e->obj))
 				{
 					if (e->nx != 0 && ceil(mBottom) != oTop)
 						x = x0 + dx;
@@ -382,12 +410,12 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 					{
 						lastStandingY = y;
 						vy = 0;
-					}	
-					if (e->ny > 0)
+					}
+					if (e->ny > 0 && vy < 0)
 						y = y0 + dy;	
 				}
 				//enemies
-				if (dynamic_cast<CGoomba*>(e->obj)) // if e->obj is Goomba 
+				else if (dynamic_cast<CGoomba*>(e->obj)) // if e->obj is Goomba 
 				{
 					CGoomba* goomba = dynamic_cast<CGoomba*>(e->obj);
 					// jump on top >> kill Goomba and deflect a bit 
@@ -436,7 +464,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 						}
 					}
 				}
-				if (dynamic_cast<CBoomerangBrother*>(e->obj)) // if e->obj is Goomba 
+				else if (dynamic_cast<CBoomerangBrother*>(e->obj)) // if e->obj is Goomba 
 				{
 					CBoomerangBrother* tmp = dynamic_cast<CBoomerangBrother*>(e->obj);
 					// jump on top >> kill Goomba and deflect a bit 
@@ -462,7 +490,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 							Attacked();
 					}
 				}
-				if (dynamic_cast<CKoopas*>(e->obj)) // if e->obj is Koopas 
+				else if (dynamic_cast<CKoopas*>(e->obj)) // if e->obj is Koopas 
 				{
 					CKoopas* koopas = dynamic_cast<CKoopas*>(e->obj);
 					if (isAtIntroScene)
@@ -519,6 +547,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 					}
 					else
 					{
+						DebugOut(L"[KOOPAS] e->nx %d e->ny %d\n", e->nx, e->ny);
 						if (e->ny < 0)
 						{
 							AddScore(koopas->x, koopas->y, 100, true);
@@ -534,45 +563,43 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 						}
 						else
 						{
-							x = x0;
-							y = y0;
-							if (untouchable)
+							if (koopas->y < y)	y = y0;
+							if (untouchable != 0)
+							{
 								x = x0 + dx;
-							if (e->ny > 0 && vy < 0)
-								y = y0 + dy;
+								if (e->ny > 0 && vy < 0)
+									y = y0 + dy;
+							}
 							if (e->nx != 0 && isTurningTail)
 							{
 								koopas->SetState(KOOPAS_STATE_SHELL_UP);
+								continue;
 							}
-							else
+							if (koopas->GetState() == KOOPAS_STATE_IN_SHELL
+								|| koopas->GetState() == KOOPAS_STATE_SHELL_UP)
 							{
-								if (koopas->GetState() == KOOPAS_STATE_IN_SHELL || koopas->GetState() == KOOPAS_STATE_SHELL_UP)
+								if (isReadyToHold)
 								{
-									if (isReadyToHold)
-									{
-										koopas->SetIsBeingHeld(true);
-										isHolding = true;
-									}
-									else
-									{
-										StartKicking();
-										koopas->nx = this->nx;
-										koopas->SetState(KOOPAS_STATE_SPINNING);
-									}
+									koopas->SetIsBeingHeld(true);
+									isHolding = true;
 								}
 								else
 								{
-									if (untouchable == 0 && isKicking == false && !isTurningTail && !e->ny > 0
-										&& koopas->GetState() != KOOPAS_STATE_IN_SHELL && koopas->GetState() != KOOPAS_STATE_SHELL_UP)
-										Attacked();
+									StartKicking();
+									koopas->nx = this->nx;
+									koopas->SetState(KOOPAS_STATE_SPINNING);
 								}
 							}
-
+							else
+							{
+								if (untouchable == 0 && isKicking == false && !isTurningTail && !e->ny > 0
+									&& (koopas->GetState() == KOOPAS_STATE_SPINNING || koopas->GetState() != KOOPAS_STATE_WALKING))
+									Attacked();
+							}
 						}
 					}
-
 				}
-				if (dynamic_cast<CPiranhaPlant*>(e->obj) || dynamic_cast<CFirePiranhaPlant*>(e->obj))
+				else if (dynamic_cast<CPiranhaPlant*>(e->obj) || dynamic_cast<CFirePiranhaPlant*>(e->obj))
 				{
 					if (isTurningTail && e->nx != 0)
 					{
@@ -586,12 +613,13 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 						else
 						{
 							x = x0 + dx;
-							y = y0 + dy;
+							if(e->ny < 0)
+								y = y0 + dy;
 						}
 					}
 				}
 				//others
-				if (dynamic_cast<CSwitch*>(e->obj))
+				else if (dynamic_cast<CSwitch*>(e->obj))
 				{
 					CSwitch* sw = dynamic_cast<CSwitch*>(e->obj);
 					if (e->ny > 0)
@@ -612,7 +640,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 							vx = 0;
 					}
 				}
-				if (dynamic_cast<CMario*>(e->obj)) // if e->obj is Mario 
+				else if (dynamic_cast<CMario*>(e->obj)) // if e->obj is Mario 
 				{
 					CMario* tmp = dynamic_cast<CMario*>(e->obj);
 					x = x0;
@@ -628,7 +656,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 						vx = vy = 0;
 					}
 				}
-				if (dynamic_cast<CCard*>(e->obj))
+				else if (dynamic_cast<CCard*>(e->obj))
 				{
 					srand(time(NULL));
 					int id = rand() % 3 + 1;
@@ -667,12 +695,12 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 
 			if (game->GetCurrentScene()->GetId() == WORLD_1_4)
 			{
-				if (x <= game->GetCamX())
+				if ( x - 1 <= game->GetCamX())
 				{
 					//if(!isBlocked)
-					x = game->GetCamX();
+					//vx
 					SetState(MARIO_STATE_WALKING_RIGHT);
-					vx = MARIO_WALKING_SPEED_MIN;
+					vx = 0.1f;
 					nx = 1;
 				}
 				if (x >= game->GetCamX() + game->GetScreenWidth() - GetWidth())
@@ -694,7 +722,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 		//update tail
 		tail->Update(dt);
 	}
-	//DebugOut(L"[MARIO] scw %d sch %d\n", game->GetScreenWidth(), game->GetScreenHeight());
+	//DebugOut(L"[MARIO] state %d \n", state);
 }
 void CMario::BasicRenderLogicsForAllLevel(int& ani, int ani_jump_down_right, int ani_jump_down_left,
 	int ani_idle_right, int ani_idle_left,
@@ -1197,7 +1225,10 @@ void CMario::SetState(int state)
 		if (vy > -MARIO_JUMP_SPEED_MIN)
 			vy = -MARIO_JUMP_SPEED_MIN;
 		if (RunningStacks == MARIO_RUNNING_STACKS)
+		{
 			isFlying = true;
+			StartFlying();
+		}
 		ay = -MARIO_ACCELERATION_JUMP;
 		if (isTouchingWood)
 			isTouchingWood = false;
@@ -1320,4 +1351,9 @@ void CMario::StartShooting(float bx, float by)
 		((CPlayScene*)CGame::GetInstance()->GetCurrentScene())->PushBack(bullet);
 		ShootTimes++;
 	}
+}
+void CMario::Tele()
+{
+	SetPosition(x + 500, 50);
+	SetSpeed(0, 0);
 }

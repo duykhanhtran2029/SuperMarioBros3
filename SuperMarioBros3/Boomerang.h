@@ -35,7 +35,7 @@ public:
 	float start_x = 0;
 	bool isAppear = false;
 	CBoomerang(float x, float y);
-	void StartChangState() { state_start = GetTickCount64(); }
+	void StartChangState() { state_start = 1; }
 	virtual void SetState(int state);
 	virtual void GetBoundingBox(float& left, float& top, float& right, float& bottom);
 	virtual void Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects);

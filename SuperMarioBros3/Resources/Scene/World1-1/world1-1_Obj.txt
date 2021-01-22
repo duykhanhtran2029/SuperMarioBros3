@@ -1,8 +1,9 @@
 # type	x	y	ani_set_id	tag	tag1	tag2	
 # type: 0 = Mario , 1 = Brick, 2 = Goomba, 3 = Koopas, 4 = Block
 # MARIO
-0	2500	300	1
-#0	80	384	1
+
+#0	2500	300	1
+0	80	384	1
 # === CARD ===
 57	2688	336	57
 # === Brick === 

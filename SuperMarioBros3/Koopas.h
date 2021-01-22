@@ -6,7 +6,7 @@
 #include "PlayScene.h"
 #include "Scene.h"
 #define KOOPAS_WALKING_SPEED			0.03f
-#define KOOPAS_PARA_WALKING_SPEED		0.03f
+#define KOOPAS_PARA_WALKING_SPEED		0.035f
 #define KOOPAS_JUMP_SPEED				0.35f
 #define KOOPAS_RED_SPEED				0.03f
 #define KOOPAS_GRAVITY					0.002f
@@ -68,7 +68,7 @@ public:
 	virtual void GetBoundingBox(float& left, float& top, float& right, float& bottom);
 	void StartDying() { dying_start = GetTickCount64(); }
 	void Reset();
-	bool CalRevivable();
+	int CalRevivable();
 	bool CalKillable(vector<LPGAMEOBJECT>* coObjects);
 	bool CalTurnable(LPGAMEOBJECT object, vector<LPGAMEOBJECT>* coObjects);
 };

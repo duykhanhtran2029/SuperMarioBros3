@@ -133,12 +133,14 @@ void Grid::Move(Unit* unit, float x, float y)
 
 void Grid::Get(float cam_x,float cam_y, vector<Unit*>& listUnits)
 {
-	int startCol = (int)(cam_x / CELL_WIDTH);
-	int endCol =(int) ceil((cam_x + SCREEN_WIDTH) / CELL_WIDTH);
+	int startCol = (int)((cam_x - VIEWPORT_PUSHBACK* 2) / CELL_WIDTH);
+	int endCol =(int) ceil((cam_x + SCREEN_WIDTH + VIEWPORT_PUSHBACK * 2) / CELL_WIDTH);
 	int ENDCOL = (int)ceil((mapWidth) / CELL_WIDTH);
 	if (endCol > ENDCOL)
 		endCol = ENDCOL;
-
+	if (startCol < 0)
+		startCol = 0;
+	//DebugOut(L"[GRID] %d %d\n", startCol, endCol);
 	int startRow = (int)(cam_y / CELL_HEIGHT);
 	int endRow = (int)ceil((cam_y + SCREEN_HEIGHT) / CELL_HEIGHT);
 	int ENDROW = (int)ceil((mapHeight) / CELL_HEIGHT);

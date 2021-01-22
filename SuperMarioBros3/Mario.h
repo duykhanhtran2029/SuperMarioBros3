@@ -37,6 +37,7 @@
 #define MARIO_SLOW_STACK_TIME		250
 #define MARIO_RELOAD_BULLET_TIME	500
 #define MARIO_TAIL_FLYING_TIME		250
+#define MARIO_FLYING_TIME			5000
 #define MARIO_TRANSFORMING_TIME		500
 #define MARIO_KILLSTREAK_TIME		1000
 #define MARIO_PIPE_TIME				1000
@@ -302,6 +303,7 @@ class CMario : public CGameObject
 	DWORD pipeup_start = 0;
 	DWORD last_kill = 0;
 	DWORD gamedone = 0;
+	DWORD fly_start = 0;
 
 	int kill_streak = 0;
 
@@ -398,6 +400,7 @@ public:
 	void SetIsReadyToKick(bool m) { this->isReadyToKick = m; }
 	void SetIsKicking(bool m) { this->isKicking = m; }
 	void Reset();
+	void Tele();
 
 	//render for all
 	void BasicRenderLogicsForAllLevel(int& ani,
@@ -424,6 +427,10 @@ public:
 	{
 		tailflying_start = GetTickCount64();
 		isTailFlying = true;
+	}
+	void StartFlying()
+	{
+		fly_start = GetTickCount64();
 	}
 	void StartTransforming() { transforming_start = GetTickCount64(); isTransforming = true; }
 	void StartGameDone() { gamedone = GetTickCount64();}

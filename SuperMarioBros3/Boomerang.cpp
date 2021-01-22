@@ -27,14 +27,16 @@ void CBoomerang::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	//update speed
 	x += dx;
 	y += dy;
-	if (state == 1 && GetTickCount64() - state_start >= BOOMERANG_CHANGE_STATE_TIME)
+	if(state_start != 0)
+		state_start += dt;
+	if (state == 1 &&  state_start >= BOOMERANG_CHANGE_STATE_TIME)
 	{
-		state_start = GetTickCount64();
+		state_start = 1;
 		SetState(state + 1);
 	}
-	if (state > BOOMERANG_STATE_1 && state <= BOOMERANG_STATE_6 && GetTickCount64() - state_start >= BOOMERANG_CHANGE_STATE_TIME / BOOMERANG_DIFF)
+	if (state > BOOMERANG_STATE_1 && state <= BOOMERANG_STATE_6 && state_start >= BOOMERANG_CHANGE_STATE_TIME / BOOMERANG_DIFF)
 	{
-		state_start = GetTickCount64();
+		state_start = 1;
 		SetState(state + 1);
 	}
 	CMario* mario = ((CPlayScene*)CGame::GetInstance()->GetCurrentScene())->GetPlayer();

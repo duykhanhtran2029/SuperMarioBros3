@@ -45,7 +45,7 @@ void CBoomerangBrother::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	float oLeft, oTop, oRight, oBottom;
 	if (mario != NULL && state != BOOMERANG_BROTHER_STATE_DIE)
 	{
-		if (mario->isTurningTail)
+		if (mario->isTurningTail && mario->level == MARIO_LEVEL_TAIL)
 		{
 			mario->getTail()->GetBoundingBox(mLeft, mTop, mRight, mBottom);
 			GetBoundingBox(oLeft, oTop, oRight, oBottom);

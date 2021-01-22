@@ -22,7 +22,7 @@ void CQuestionBrick::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		float oLeft, oTop, oRight, oBottom;
 		if (scene != NULL)
 			mario = ((CPlayScene*)scene)->GetPlayer();
-		if (mario != NULL && mario->isTurningTail)
+		if (mario != NULL && mario->isTurningTail && mario->level == MARIO_LEVEL_TAIL)
 		{
 			mario->getTail()->GetBoundingBox(mLeft, mTop, mRight, mBottom);
 			GetBoundingBox(oLeft, oTop, oRight, oBottom);

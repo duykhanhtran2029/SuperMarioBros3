@@ -99,7 +99,7 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	float oLeft, oTop, oRight, oBottom;
 	if (mario != NULL && !mario->isAtIntroScene && state != GOOMBA_STATE_DIE_BY_TAIL && state != GOOMBA_STATE_DIE)
 	{
-		if (mario->isTurningTail)
+		if (mario->isTurningTail && mario->level == MARIO_LEVEL_TAIL)
 		{
 			mario->getTail()->GetBoundingBox(mLeft, mTop, mRight, mBottom);
 			GetBoundingBox(oLeft, oTop, oRight, oBottom);
@@ -112,19 +112,16 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				return;
 			}
 		}
-		if (mario->untouchable == 0)
+		mario->GetBoundingBox(mLeft, mTop, mRight, mBottom);
+		GetBoundingBox(oLeft, oTop, oRight, oBottom);
+		if (isColliding(floor(mLeft), floor(mTop), ceil(mRight), ceil(mBottom)))
 		{
-			mario->GetBoundingBox(mLeft, mTop, mRight, mBottom);
-			GetBoundingBox(oLeft, oTop, oRight, oBottom);
-			if (isColliding(floor(mLeft), floor(mTop), ceil(mRight), ceil(mBottom)))
+			if (mBottom >= oTop && oBottom < mBottom)
 			{
-				if (mBottom >= oTop && oBottom < mBottom)
-				{
-					mario->AddScore(x, y, 100, true);
-					mario->vy = -MARIO_JUMP_DEFLECT_SPEED;
-					SetState(GOOMBA_STATE_DIE);
-					return;
-				}
+				mario->AddScore(x, y, 100, true);
+				mario->vy = -MARIO_JUMP_DEFLECT_SPEED;
+				SetState(GOOMBA_STATE_DIE);
+				return;
 			}
 		}
 		//if (abs(mario->x - x) <= GOOMBA_RED_RANGE_CHASING && tag == GOOMBA_RED && chasing_start == 0)
@@ -184,11 +181,25 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				CGoomba* goomba = dynamic_cast<CGoomba*>(e->obj);
 				if (goomba->GetState() != GOOMBA_STATE_DIE)
 				{
-					goomba->vx = -goomba->vx;
-					this->vx = -this->vx;
-					goomba->nx = -goomba->nx;
-					this->nx = -this->nx;
-					y = y0 + dy;
+					if (e->ny != 0)
+					{
+						if (y < goomba->y)
+						{
+							y = y0;
+						}
+						else
+							y = y0 + dy;
+					}
+					else if (goomba->tag != GOOMBA_RED)
+					{
+						goomba->vx = -goomba->vx;
+						this->vx = -this->vx;
+						goomba->nx = -goomba->nx;
+						this->nx = -this->nx;
+					}
+					else
+						x = x0 + dx;
+					
 				}
 
 			}

@@ -14,7 +14,7 @@
 #define IGNORE	2
  
 #define PUSHBACK 0.4f
-#define VIEWPORT_PUSHBACK	64
+#define VIEWPORT_PUSHBACK	16
 
 
 using namespace std;
@@ -104,7 +104,7 @@ public:
 		camX = game->GetCamX();
 		camY = game->GetCamY();
 
-		bool xInViewPort = x >= camX - GetWidth() - VIEWPORT_PUSHBACK && x < camX + SCREEN_WIDTH + VIEWPORT_PUSHBACK;
+		bool xInViewPort = x >= camX - GetWidth() && x < camX + game->GetScreenWidth();
 		bool yInViewPort = y >= camY - (SCREEN_HEIGHT - game->GetScreenHeight()) && y < camY + SCREEN_HEIGHT;
 		
 		return xInViewPort && yInViewPort;

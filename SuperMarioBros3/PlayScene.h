@@ -80,6 +80,8 @@ public:
 			objects[0] = m;
 	}
 	int CalScore();
+	void SetActivation();
+	void SetInactivation();
 	//grid
 	void GetObjectFromGrid();
 	void UpdateGrid();

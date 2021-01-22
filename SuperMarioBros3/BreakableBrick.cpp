@@ -8,7 +8,7 @@ void CBreakableBrick::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	if (isDestroyed)
 		return;
 	CMario* mario = ((CPlayScene*)CGame::GetInstance()->GetCurrentScene())->GetPlayer();
-	if (mario != NULL && mario->isTurningTail)
+	if (mario != NULL && mario->isTurningTail && mario->level == MARIO_LEVEL_TAIL)
 	{
 		float mLeft, mTop, mRight, mBottom;
 		float oLeft, oTop, oRight, oBottom;

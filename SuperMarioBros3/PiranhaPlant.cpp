@@ -56,7 +56,7 @@ void CPiranhaPlant::Update(DWORD dt,vector<LPGAMEOBJECT>* coObjects)
 			&& state == PIRANHAPLANT_STATE_INACTIVE && biting_start == 0)
 			SetState(PIRANHAPLANT_STATE_DARTING);
 
-		if (mario->isTurningTail)
+		if (mario->isTurningTail && mario->level == MARIO_LEVEL_TAIL)
 		{
 			mario->getTail()->GetBoundingBox(mLeft, mTop, mRight, mBottom);
 			GetBoundingBox(oLeft, oTop, oRight, oBottom);

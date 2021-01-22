@@ -85,8 +85,8 @@ void CGameObject::CalcPotentialCollisions(
 		for (UINT i = 0; i < coObjects->size(); i++)
 		{
 			LPGAMEOBJECT object = coObjects->at(i);
-			if (object!= nullptr && (object->type != IGNORE || dynamic_cast<CFloatingWood*>(object))
-				&& !((dynamic_cast<CKoopas*>(object) && ((CKoopas*)object)->isBeingHeld)))
+			if (object!= nullptr && object->isEnable &&
+				(object->type != IGNORE || dynamic_cast<CFloatingWood*>(object)))
 				{
 					LPCOLLISIONEVENT e = SweptAABBEx(coObjects->at(i));
 					if (e->t > 0 && e->t <= 1.0f)
@@ -111,12 +111,27 @@ void CGameObject::CalcPotentialCollisions(
 			}
 		}
 	}
+	else if (dynamic_cast<CGoomba*>(this))
+	{
+		for (UINT i = 0; i < coObjects->size(); i++)
+		{
+			LPGAMEOBJECT object = coObjects->at(i);
+			if (object != nullptr && object->type != IGNORE && object->isEnable && !dynamic_cast<CKoopas*>(this))
+			{
+				LPCOLLISIONEVENT e = SweptAABBEx(coObjects->at(i));
+				if (e->t > 0 && e->t <= 1.0f)
+					coEvents.push_back(e);
+				else
+					delete e;
+			}
+		}
+	}
 	else
 	{
 		for (UINT i = 0; i < coObjects->size(); i++)
 		{
 			LPGAMEOBJECT object = coObjects->at(i);
-			if (object != nullptr && object->type != IGNORE)
+			if (object != nullptr && object->type != IGNORE && object->isEnable)
 			{
 				LPCOLLISIONEVENT e = SweptAABBEx(coObjects->at(i));
 				if (e->t > 0 && e->t <= 1.0f)

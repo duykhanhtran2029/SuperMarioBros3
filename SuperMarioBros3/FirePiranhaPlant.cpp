@@ -84,7 +84,7 @@ void CFirePiranhaPlant::Update(DWORD dt,
 			&& state == PIRANHAPLANT_STATE_INACTIVE && delay_start == 0)
 			SetState(PIRANHAPLANT_STATE_DARTING);
 
-		if (mario->isTurningTail)
+		if (mario->isTurningTail && mario->level == MARIO_LEVEL_TAIL)
 		{
 			mario->getTail()->GetBoundingBox(mLeft, mTop, mRight, mBottom);
 			GetBoundingBox(oLeft, oTop, oRight, oBottom);
