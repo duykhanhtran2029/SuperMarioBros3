@@ -116,11 +116,14 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		GetBoundingBox(oLeft, oTop, oRight, oBottom);
 		if (isColliding(floor(mLeft), floor(mTop), ceil(mRight), ceil(mBottom)))
 		{
-			if (mBottom >= oTop && oBottom < mBottom)
+			if (abs(mBottom - oTop) <= 1.0f && mario->vy > 0)
 			{
 				mario->AddScore(x, y, 100, true);
 				mario->vy = -MARIO_JUMP_DEFLECT_SPEED;
-				SetState(GOOMBA_STATE_DIE);
+				if (tag == GOOMBA_RED)
+					tag = GOOMBA_RED_NORMAL;
+				else
+					SetState(GOOMBA_STATE_DIE);
 				return;
 			}
 		}
@@ -152,7 +155,7 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	{
 
 		float min_tx, min_ty, x0, y0;
-		int nx = 0, ny = 0;
+		float nx = 0, ny = 0;
 		float rdx = 0;
 		float rdy = 0;
 
@@ -181,24 +184,18 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				CGoomba* goomba = dynamic_cast<CGoomba*>(e->obj);
 				if (goomba->GetState() != GOOMBA_STATE_DIE)
 				{
-					if (e->ny != 0)
+					if (goomba->tag == GOOMBA_RED || tag == GOOMBA_RED)
 					{
-						if (y < goomba->y)
-						{
-							y = y0;
-						}
-						else
-							y = y0 + dy;
+						x = x0 + dx;
+						y = y0;
 					}
-					else if (goomba->tag != GOOMBA_RED)
+					else
 					{
 						goomba->vx = -goomba->vx;
 						this->vx = -this->vx;
 						goomba->nx = -goomba->nx;
 						this->nx = -this->nx;
 					}
-					else
-						x = x0 + dx;
 					
 				}
 

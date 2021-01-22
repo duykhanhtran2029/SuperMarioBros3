@@ -36,6 +36,6 @@ public:
 		vector<LPCOLLISIONEVENT>& coEvents,
 		vector<LPCOLLISIONEVENT>& coEventsResult,
 		float& min_tx, float& min_ty,
-		int& nx, int& ny, float& rdx, float& rdy);
+		float& nx, float& ny, float& rdx, float& rdy);
 	CFireBullet(float x = -1, float y = -1);
 };

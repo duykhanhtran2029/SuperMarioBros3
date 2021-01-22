@@ -18,6 +18,8 @@ void CBackUp::BackUpMario(CMario* mario)
 		level = mario->level;
 		money = mario->money;
 		scene = CGame::GetInstance()->GetCurrentScene()->GetId();
+		if (scene == 2 || scene == 5)
+			scene--;
 		cards = mario->cards;
 	}
 

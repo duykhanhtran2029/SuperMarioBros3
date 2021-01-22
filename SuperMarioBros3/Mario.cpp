@@ -281,8 +281,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 		}
 		else
 		{
-			float min_tx, min_ty;
-			int nx = 0, ny = 0;
+			float min_tx, min_ty, nx = 0, ny;
 			float rdx = 0;
 			float rdy = 0;
 
@@ -448,6 +447,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 					}
 					else if(goomba->GetState() != GOOMBA_STATE_DIE)
 					{
+						y = y0;
 						if (untouchable == 0)
 							Attacked();
 						else
@@ -547,11 +547,20 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 					}
 					else
 					{
-						DebugOut(L"[KOOPAS] e->nx %d e->ny %d\n", e->nx, e->ny);
 						if (e->ny < 0)
 						{
 							AddScore(koopas->x, koopas->y, 100, true);
 							vy = -1.5f * MARIO_JUMP_DEFLECT_SPEED;
+							if (this->nx > 0)
+							{
+								if (vx < MARIO_WALKING_SPEED_MIN * 2)
+									vx = MARIO_WALKING_SPEED_MIN * 2;
+							}
+							else
+							{
+								if (vx > -MARIO_WALKING_SPEED_MIN * 2)
+									vx = -MARIO_WALKING_SPEED_MIN * 2;
+							}
 							if (koopas->tag == KOOPAS_GREEN_PARA)
 								koopas->tag = KOOPAS_GREEN;
 							else if (koopas->tag == KOOPAS_RED_PARA)
@@ -563,20 +572,15 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 						}
 						else
 						{
-							if (koopas->y < y)	y = y0;
+							if (e->ny > 0)	
+								y = y0;
 							if (untouchable != 0)
 							{
 								x = x0 + dx;
 								if (e->ny > 0 && vy < 0)
 									y = y0 + dy;
 							}
-							if (e->nx != 0 && isTurningTail)
-							{
-								koopas->SetState(KOOPAS_STATE_SHELL_UP);
-								continue;
-							}
-							if (koopas->GetState() == KOOPAS_STATE_IN_SHELL
-								|| koopas->GetState() == KOOPAS_STATE_SHELL_UP)
+							if (koopas->GetState() == KOOPAS_STATE_IN_SHELL|| koopas->GetState() == KOOPAS_STATE_SHELL_UP)
 							{
 								if (isReadyToHold)
 								{
@@ -590,12 +594,8 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 									koopas->SetState(KOOPAS_STATE_SPINNING);
 								}
 							}
-							else
-							{
-								if (untouchable == 0 && isKicking == false && !isTurningTail && !e->ny > 0
-									&& (koopas->GetState() == KOOPAS_STATE_SPINNING || koopas->GetState() != KOOPAS_STATE_WALKING))
+							else if (untouchable == 0 && (koopas->GetState() == KOOPAS_STATE_SPINNING || koopas->GetState() == KOOPAS_STATE_WALKING))
 									Attacked();
-							}
 						}
 					}
 				}

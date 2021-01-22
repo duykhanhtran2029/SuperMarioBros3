@@ -41,8 +41,7 @@ LPCOLLISIONEVENT CGameObject::SweptAABBEx(LPGAMEOBJECT coO)
 {
 	float sl, st, sr, sb;		// static object bbox
 	float ml, mt, mr, mb;		// moving object bbox
-	float t;
-	int nx, ny;
+	float t, nx, ny;
 
 	coO->GetBoundingBox(sl, st, sr, sb);
 
@@ -50,8 +49,8 @@ LPCOLLISIONEVENT CGameObject::SweptAABBEx(LPGAMEOBJECT coO)
 	float svx, svy;
 	coO->GetSpeed(svx, svy);
 
-	float sdx = svx*dt;
-	float sdy = svy*dt;
+	float sdx = svx * dt;
+	float sdy = svy * dt;
 
 	// (rdx, rdy) is RELATIVE movement distance/velocity 
 	float rdx = this->dx - sdx;
@@ -66,7 +65,7 @@ LPCOLLISIONEVENT CGameObject::SweptAABBEx(LPGAMEOBJECT coO)
 		t, nx, ny
 	);
 
-	CCollisionEvent * e = new CCollisionEvent(t, nx, ny, rdx, rdy, coO);
+	CCollisionEvent* e = new CCollisionEvent(t, nx, ny, rdx, rdy, coO);
 	return e;
 }
 
@@ -86,7 +85,8 @@ void CGameObject::CalcPotentialCollisions(
 		{
 			LPGAMEOBJECT object = coObjects->at(i);
 			if (object!= nullptr && object->isEnable &&
-				(object->type != IGNORE || dynamic_cast<CFloatingWood*>(object)))
+				!(dynamic_cast<CKoopas*>(object) && ((CKoopas*)object)->isBeingHeld)
+				&&(object->type != IGNORE || dynamic_cast<CFloatingWood*>(object)))
 				{
 					LPCOLLISIONEVENT e = SweptAABBEx(coObjects->at(i));
 					if (e->t > 0 && e->t <= 1.0f)
@@ -116,7 +116,8 @@ void CGameObject::CalcPotentialCollisions(
 		for (UINT i = 0; i < coObjects->size(); i++)
 		{
 			LPGAMEOBJECT object = coObjects->at(i);
-			if (object != nullptr && object->type != IGNORE && object->isEnable && !dynamic_cast<CKoopas*>(this))
+			if (object != nullptr && object->type != IGNORE && object->isEnable 
+				&& !dynamic_cast<CKoopas*>(this))
 			{
 				LPCOLLISIONEVENT e = SweptAABBEx(coObjects->at(i));
 				if (e->t > 0 && e->t <= 1.0f)
@@ -149,7 +150,7 @@ void CGameObject::FilterCollision(
 	vector<LPCOLLISIONEVENT> &coEvents,
 	vector<LPCOLLISIONEVENT> &coEventsResult,
 	float &min_tx, float &min_ty, 
-	int &nx, int &ny, float &rdx, float &rdy)
+	float &nx, float&ny, float &rdx, float &rdy)
 {
 	min_tx = 1.0f;
 	min_ty = 1.0f;

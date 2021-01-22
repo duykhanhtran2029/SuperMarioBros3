@@ -74,12 +74,12 @@ public:
 		float dx,			// 
 		float dy,			// 
 		float sl,			// static left
-		float st, 
-		float sr, 
+		float st,
+		float sr,
 		float sb,
-		float &t, 
-		int &nx, 
-		int &ny);
+		float& t,
+		float& nx,
+		float& ny);
 
 	LPDIRECT3DDEVICE9 GetDirect3DDevice() { return this->d3ddv; }
 	LPDIRECT3DSURFACE9 GetBackBuffer() { return backBuffer; }

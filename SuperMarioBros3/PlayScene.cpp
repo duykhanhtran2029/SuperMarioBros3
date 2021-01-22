@@ -421,7 +421,10 @@ void CPlayScene::Update(DWORD dt)
 	{
 		player->Update(dt, &coObjects);
 		for (size_t i = 0; i < objects.size(); i++)
-			objects[i]->Update(dt, &coObjects);
+			if(objects[i]->IsInViewPort())
+				objects[i]->Update(dt, &coObjects);
+			else
+				objects[i]->Update(0, &coObjects);
 		hud->Update(dt, &coObjects);
 	}
 	SetInactivation();
@@ -479,8 +482,12 @@ void CPlayScene::SetInactivation()
 	{
 		if (!object->IsInViewPort())
 		{
-			if (dynamic_cast<CKoopas*>(object) && dynamic_cast<CKoopas*>(object)->CalRevivable())
-				((CKoopas*)object)->Reset();
+			if (dynamic_cast<CKoopas*>(object))
+			{
+				CKoopas* koopas = dynamic_cast<CKoopas*>(object);
+				if (koopas->x != koopas->start_x && koopas->y != koopas->start_y)
+					koopas->Reset();
+			}
 			else if (dynamic_cast<CMushRoom*>(object) || dynamic_cast<CLeaf*>(object)
 				|| dynamic_cast<CFireBullet*>(object) || dynamic_cast<CPlantBullet*>(object))
 				object->isDestroyed = true;
@@ -494,7 +501,8 @@ void CPlayScene::SetActivation()
 
 	for (auto object : objects)
 	{
-		if (dynamic_cast<CKoopas*>(object) && !dynamic_cast<CKoopas*>(object)->CalRevivable())
+		if (dynamic_cast<CKoopas*>(object) && !dynamic_cast<CKoopas*>(object)->CalRevivable() 
+			&& object->isEnable == false)
 			object->isEnable = true;
 	};
 }
@@ -518,85 +526,85 @@ void CPlayScene::SetCam(float cx, float cy, DWORD dt)
 	mh = current_map->GetMapHeight();
 	//DebugOut(L"dt %u\n", dt);
 	//Update camera to follow mario
-	//if (id == WORLD_1_4)
-	//{
-	//	sum_dt += dt;
-	//	// CamX
-	//	cx = game->GetCamX();
-	//	if (sum_dt >= CAM_CHANGE_TIME)
-	//	{
-	//		sum_dt = 0;
-	//		cx ++;
-	//	}
-	//	if (cx <= 0)//Left Edge
-	//		cx = 0;
-	//	if (cx >= mw - sw)//Right Edge
-	//		cx = mw - sw;
+	if (id == WORLD_1_4)
+	{
+		sum_dt += dt;
+		// CamX
+		cx = game->GetCamX();
+		if (sum_dt >= CAM_CHANGE_TIME)
+		{
+			sum_dt = 0;
+			cx ++;
+		}
+		if (cx <= 0)//Left Edge
+			cx = 0;
+		if (cx >= mw - sw)//Right Edge
+			cx = mw - sw;
 
+		cy = mh - sh;
+		game->SetCamPos(cx, ceil(cy));
+		current_map->SetCamPos(cx, ceil(cy));
+		hud->SetPosition(cx, ceil(cy + sh - HUD_HEIGHT));
+	}
+	else 
+	{
+		cx -= sw / 2;
+		// CamX
+		if (cx <= 0)//Left Edge
+			cx = 0;
+		if (cx >= mw - sw)//Right Edge
+			cx = mw - sw;
+
+		//CamY
+		if (isTurnOnCamY)
+			cy -= sh / 2;
+		else
+			cy = mh - sh;
+
+		if (cy <= -HUD_HEIGHT)//Top Edge
+			cy = -HUD_HEIGHT;
+		if (cy + sh >= mh)//Bottom Edge
+			cy = mh - sh;
+
+		//Update CamY when Flying
+		if (player->isFlying)
+			isTurnOnCamY = true;
+		if (cy > mh - sh && !player->isFlying)
+			isTurnOnCamY = false;
+
+		game->SetCamPos(ceil(cx), ceil(cy));
+		current_map->SetCamPos(cx, cy);
+		hud->SetPosition(ceil(cx), ceil(cy + sh - HUD_HEIGHT));
+	}
+
+
+	//cx -= sw / 2;
+	//// CamX
+	//if (cx <= 0)//Left Edge
+	//	cx = 0;
+	//if (cx >= mw - sw)//Right Edge
+	//	cx = mw - sw;
+
+	////CamY
+	//if (isTurnOnCamY)
+	//	cy -= sh / 2;
+	//else
 	//	cy = mh - sh;
-	//	game->SetCamPos(cx, ceil(cy));
-	//	current_map->SetCamPos(cx, ceil(cy));
-	//	hud->SetPosition(cx, ceil(cy + sh - HUD_HEIGHT));
-	//}
-	//else 
-	//{
-	//	cx -= sw / 2;
-	//	// CamX
-	//	if (cx <= 0)//Left Edge
-	//		cx = 0;
-	//	if (cx >= mw - sw)//Right Edge
-	//		cx = mw - sw;
 
-	//	//CamY
-	//	if (isTurnOnCamY)
-	//		cy -= sh / 2;
-	//	else
-	//		cy = mh - sh;
+	//if (cy <= -HUD_HEIGHT)//Top Edge
+	//	cy = -HUD_HEIGHT;
+	//if (cy + sh >= mh)//Bottom Edge
+	//	cy = mh - sh;
 
-	//	if (cy <= -HUD_HEIGHT)//Top Edge
-	//		cy = -HUD_HEIGHT;
-	//	if (cy + sh >= mh)//Bottom Edge
-	//		cy = mh - sh;
-
-	//	//Update CamY when Flying
-	//	if (player->isFlying)
-	//		isTurnOnCamY = true;
-	//	if (cy > mh - sh && !player->isFlying)
-	//		isTurnOnCamY = false;
-
-	//	game->SetCamPos(ceil(cx), ceil(cy));
-	//	current_map->SetCamPos(cx, cy);
-	//	hud->SetPosition(ceil(cx), ceil(cy + sh - HUD_HEIGHT));
-	//}
-
-
-	cx -= sw / 2;
-	// CamX
-	if (cx <= 0)//Left Edge
-		cx = 0;
-	if (cx >= mw - sw)//Right Edge
-		cx = mw - sw;
-
-	//CamY
-	if (isTurnOnCamY)
-		cy -= sh / 2;
-	else
-		cy = mh - sh;
-
-	if (cy <= -HUD_HEIGHT)//Top Edge
-		cy = -HUD_HEIGHT;
-	if (cy + sh >= mh)//Bottom Edge
-		cy = mh - sh;
-
-	//Update CamY when Flying
-	if (player->isFlying)
-		isTurnOnCamY = true;
-	if (cy > mh - sh && !player->isFlying)
-		isTurnOnCamY = false;
-	
-	game->SetCamPos(ceil(cx), ceil(cy));
-	current_map->SetCamPos(cx, cy);
-	hud->SetPosition(ceil(cx), ceil(cy + sh - HUD_HEIGHT));
+	////Update CamY when Flying
+	//if (player->isFlying)
+	//	isTurnOnCamY = true;
+	//if (cy > mh - sh && !player->isFlying)
+	//	isTurnOnCamY = false;
+	//
+	//game->SetCamPos(ceil(cx), ceil(cy));
+	//current_map->SetCamPos(cx, cy);
+	//hud->SetPosition(ceil(cx), ceil(cy + sh - HUD_HEIGHT));
 
 }
 void CPlayScene::Render()
@@ -640,6 +648,7 @@ void CPlayScene::Unload()
 		delete player;
 	if (grid != nullptr)
 		grid->ClearAll();
+
 	objects.clear();
 	units.clear();
 	objectsRenderFirst.clear();

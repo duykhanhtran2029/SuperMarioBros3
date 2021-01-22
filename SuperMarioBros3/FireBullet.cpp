@@ -21,7 +21,7 @@ void CFireBullet::FilterCollision(
 	vector<LPCOLLISIONEVENT>& coEvents,
 	vector<LPCOLLISIONEVENT>& coEventsResult,
 	float& min_tx, float& min_ty,
-	int& nx, int& ny, float& rdx, float& rdy)
+	float& nx, float& ny, float& rdx, float& rdy)
 {
 	min_tx = 1.0f;
 	min_ty = 1.0f;
@@ -81,7 +81,7 @@ void CFireBullet::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	else
 	{
 		float min_tx, min_ty;
-		int nx = 0, ny = 0;
+		float nx = 0, ny = 0;
 		float rdx = 0;
 		float rdy = 0;
 		float x0, y0;

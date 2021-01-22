@@ -58,7 +58,7 @@ void CMushRoom::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		else
 		{
 			float min_tx, min_ty;
-			int nx = 0, ny = 0;
+			float nx = 0, ny = 0;
 			float rdx = 0;
 			float rdy = 0;
 

@@ -1,5 +1,5 @@
 [SETTINGS]
-start	1
+start	6
 #id		path					type
 [SCENES]
 0	Resources\Scene\worldscene.txt	1
